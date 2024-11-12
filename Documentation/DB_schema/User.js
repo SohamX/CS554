@@ -6,7 +6,7 @@ const user = {
     "role": "cook" | "student",
     "profileImage": String,   // URL to the image stored (Optional?)
     "location": {
-        "address": String,
+        "streetAddress": String,
         "city": String,
         "state": String,
         "zipcode": String,
