@@ -31,6 +31,35 @@ const exportedMethods = {
         date.getDate() === day
     );
   },
+  isValidFutureDate(dateString){
+    var regex = /^(0[1-9]|1[0-2])\/(0[1-9]|[12]\d|3[01])\/\d{4}$/;
+    if (!regex.test(dateString)) {
+        return false;
+    }
+    
+    var dateParts = dateString.split('/');
+    var month = parseInt(dateParts[0], 10);
+    var day = parseInt(dateParts[1], 10);
+    var year = parseInt(dateParts[2], 10);
+    var date = new Date(year, month-1, day);
+    if(day===29 && month===2){
+      return false;
+    }
+    var currentdate  = new Date()
+    currentdate.setHours(0,0,0,0);
+    //const today = new Date();
+    const maxDate = new Date();
+    maxDate.setDate(currentdate.getDate() + 10);
+  
+    if(date.getFullYear() === year &&
+        date.getMonth() === month - 1 &&
+        date.getDate() === day && date > currentdate && date<=maxDate)
+    {
+    
+      return true;
+    }
+    return false;
+  },
 
   checkId(id, varName) {
     if (!id) throw `Error: You must provide a ${varName}`;

@@ -3,7 +3,7 @@ import {users,cooks} from '../config/mongoCollections.js';
 import {ObjectId} from 'mongodb';
 import helpers from '../helpers/pranHelpers.js'
 import bcrypt from 'bcryptjs';
-const userCollection = await users();const sameNumber = await userCollection.findOne({mobileNumber:mobileNumber});
+const userCollection = await users();
 const cookCollection = await cooks();
 export const registerUser = async (
   firstName,
