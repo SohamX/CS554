@@ -13,6 +13,14 @@ export const getDishById = async (id) => {
     return existingDish;
 };
 
+export const getAllDishesByCookId = async (cookId) => {
+    cookId = validateId(cookId, 'userId');
+    const dishCollection = await dishes();
+    const dishesByCookId = await dishCollection.find({ _id: ObjectId.createFromHexString(cookId) }).toArray();
+    if (dishesByCookId === null) throw `No dishes with for cook '${cookId}'.`;
+    return dishesByCookId;
+};
+
 export const addDish = async (
     cookId,
     name,
@@ -22,7 +30,7 @@ export const addDish = async (
     images
 ) => {
     const dishCollection = await dishes();
-    if (!chef || !name || !description || !cuisineType || !cost || !images) {
+    if (!cookId || !name || !description || !cuisineType || !cost || !images) {
         throw "All fields need to be supplied";
     }
     cookId = validateId(cookId, 'cookId');
@@ -34,7 +42,7 @@ export const addDish = async (
     cost = validateCost(cost, 'cost');
     images = checkisValidImageArray(images, 'images');
 
-    //check if dish already present for this chef
+    //check if dish already present for this cook
     validateUniqueDishesPerCook(cookId, name);
 
     let newDish = {
@@ -75,7 +83,7 @@ export const updateDish = async (
     if (name) {
         name = helpers.checkString(name, 'dish name');
         existingDish.name = name;
-        //check if dish already present for this chef
+        //check if dish already present for this cook
         validateUniqueDishesPerCook(cookId, name);
     }
 
@@ -86,7 +94,7 @@ export const updateDish = async (
 
     if (cuisineType) {
         cuisineType = helpers.checkString(cuisineType, 'cuisineType');
-        cuisineType = cuisineType(cuisineType);
+        cuisineType = validateCuisineType(cuisineType);
         existingDish.cuisineType = cuisineType;
     }
     if (cost) {

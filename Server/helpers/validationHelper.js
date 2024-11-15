@@ -1,11 +1,17 @@
 import { ObjectId } from "mongodb";
 import { dishes } from '../config/mongoCollections.js';
-import { cuisineType, S3UrlPattern, imageMagicUrlPattern } from './constants.js';
+import { cuisineType, S3UrlPattern, imageMagicUrlPattern, orderStatus } from './constants.js';
 
 const validateCuisineType = (cuisineName) => {
     if (cuisineType.get(cuisineName) === undefined)
         throw new Error('Invalid cuisine type passed.');
     return cuisineName;
+}
+
+const validateOrderStatus = (status) => {
+    if (orderStatus.get(status) === undefined)
+        throw new Error('Invalid cuisine type passed.');
+    return status;
 }
 
 const validateCost = (cost, variable) => {
@@ -14,9 +20,9 @@ const validateCost = (cost, variable) => {
     if (!(Number.isInteger(cost)) && num.toString().split('.')[1].length > 2) throw `Input '${variable || 'provided'}' of value '${cost || 'provided variable'}' is not a valid input. It allows only 2 decimal points`;
 };
 
-const validateImageUrl = (url, type) => {
+const validateCloudUrl = (url, type) => {
     let regex = type == 'S3' ? S3UrlPattern : imageMagicUrlPattern;
-    if (!(regex.test(url))) throw `'${type || 'provided'}' image url is not valid.`;
+    if (!(regex.test(url))) throw `'${type || 'provided'}' url is not valid.`;
     return url;
 };
 
@@ -29,7 +35,7 @@ const checkisValidArray = (arr, variable) => {
 const checkisValidImageArray = (arr, variable) => {
     arr = checkisValidArray(arr, variable);
     for (let i in arr) {
-        arr[i] = validateImageUrl(arr[i], `${variable || 'provided'} array at index ${i}`);
+        arr[i] = validateCloudUrl(arr[i], `${variable || 'provided'} array at index ${i}`);
     }
     return arr;
 };
@@ -37,7 +43,7 @@ const checkisValidImageArray = (arr, variable) => {
 const checkisValidDishesArray = (arr, variable) => {
     arr = checkisValidArray(arr, variable);
     for (let i in arr) {
-        arr[i] = validateImageUrl(arr[i], `${variable || 'provided'} array at index ${i}`);
+        arr[i] = validateCloudUrl(arr[i], `${variable || 'provided'} array at index ${i}`);
     }
     return arr;
 };
@@ -63,6 +69,7 @@ const validateId = (id, variable) => {
 
 const validateUniqueDishesPerCook = async (cookId, name) => {
     //get all dishes by cookId
+    const dishCollection = await dishes();
     const existingDishesByCookId = await dishCollection.find({ cookId: ObjectId.createFromHexString(cookId) }).toArray();
     if (existingDishesByCookId && existingDishesByCookId.length > 0) {
         for (const i in existingDishesByCookId) {
@@ -74,7 +81,29 @@ const validateUniqueDishesPerCook = async (cookId, name) => {
     }
 }
 
+const checkisInteger = (int, variable) => {
+    int = int.trim();
+    if (!(Number.isInteger(int)) || int <= 0) throw `Input '${variable || 'provided'}' of value ${int || 'provided variable'} is not a positive whole number.`;
+    return int;
+};
+
+const validateDishesList = async (dishes) => {
+
+    if (dishes && dishes.length > 0) {
+        for (const i in dishes) {
+            let currDish = dishes[i];
+            currDish.dishId = validateId(currDish.dishId, 'dishId');
+            currDish.quantity = checkisInteger(currDish.quantity, 'quantity');
+            const dishCollection = await dishes();
+            await getDishById(currDish.dishId);
+        }
+    }
+}
+let checkisValidBoolean = (bool, variable) => {
+    if (typeof bool !== 'boolean') throw `Input '${variable || 'provided'}' of value ${bool || 'provided'} is not a boolean.`;
+};
+
 export {
-    validateCuisineType, validateCost, checkisValidImageArray, validateId,
-    validateUniqueDishesPerCook, checkisValidDishesArray
+    validateCuisineType, validateCost, checkisValidImageArray, validateId, checkisValidBoolean, validateOrderStatus,
+    validateUniqueDishesPerCook, checkisValidDishesArray, validateDishesList, validateCloudUrl
 }

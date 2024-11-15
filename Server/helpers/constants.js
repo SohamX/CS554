@@ -23,6 +23,24 @@ export const cuisineType = (function () {
     };
 })();
 
+export const orderStatus = (function () {
+    const orderStatusEnum = Object.freeze({
+        PLACED: 'placed',
+        PENDING: 'pending',
+        DECLINED: 'declined',
+        CONFIRMED: 'confirmed',
+        INPROGRESS: 'in-progress',
+        READY: 'ready',
+        COMPLETED: 'completed',
+        CANCELLED: 'cancelled'
+    });
+    return {
+        get: function (orderStatus) {
+            return orderStatusEnum[orderStatus.toUpperCase()] || undefined;
+        }
+    };
+})();
+
 export const S3UrlPattern = new RegExp(
     /^https?:\/\/(?:[a-zA-Z0-9-]+\.s3\.[a-zA-Z0-9-]+\.amazonaws\.com\/[a-zA-Z0-9-._~%]*)|(?:https?:\/\/s3\.[a-zA-Z0-9-]+\.amazonaws\.com\/[a-zA-Z0-9-]+\/[a-zA-Z0-9-._~%]*)$/
 );

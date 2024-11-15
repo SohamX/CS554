@@ -11,7 +11,7 @@ const order = {
     //"quantity": Number,                // Number of portions ordered
     "isMealReq": Boolean,
     "totalCost": Number,              // Total price = quantity * dish price
-    "paymentMethod": "PayPal" | "Stripe",  // Payment method
+    "paymentMethod": ObjectId("User.paymentMethod.id"),  // Payment method
     // "delivery": {
     //     "method": "pickup" | "delivery",
     //     "deliveryAddress": String,      // Address in case of delivery
