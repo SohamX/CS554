@@ -1,4 +1,6 @@
-// You can add and export any helper functions you want here. If you aren't using any, then you can just leave this file as is.
+// PLEASE DONT COMMENT OR REMOVE OTHERS HELPERS FILES,YOU CAN USE THIS OR CREATE YOUR OWN HELPERS FILE IN THIS FOLDER
+
+
 import { ObjectId } from "mongodb";
 
 const stringExistandType=(str,param,lenchecker=false,maxlength=0,minlength=0)=>{
@@ -211,3 +213,6 @@ const numberRange=(num,param,low,high)=>{
 }
 
 export{arrayExistandType,booleanExistsandType,dateFormat,onlyletters,isValidDate,isValidWebsite,numberExistandType,numberRange,passwordChecker,stringExistandType,validObject}
+
+
+

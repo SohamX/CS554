@@ -1,14 +1,17 @@
 const order = {
     "_id": new ObjectId(),
-    "dishId": [ObjectId("DishId")],      // References the dish ordered
+    "dishes": [{
+        "dishId": ObjectId("DishId"),
+        "quantity": Number
+    }],      // References the dish ordered
     "studentId": ObjectId("UserId"),   // References the student who ordered
     "cookId": ObjectId("UserId"),      // References the cook who is fulfilling the order
-    "status": "pending" | "declined" | "confirmed" | "in-progress" | "ready" | "completed" | "cancelled",  // Order status
+    "status": "placed" | "pending" | "declined" | "confirmed" | "in-progress" | "ready" | "completed" | "cancelled",  // Order status
     //student can cancel order before it is confirmed by chef
-    "quantity": Number,                // Number of portions ordered
+    //"quantity": Number,                // Number of portions ordered
     "isMealReq": Boolean,
-    "totalPrice": Number,              // Total price = quantity * dish price
-    "paymentMethod": "PayPal" | "Stripe",  // Payment method
+    "totalCost": Number,              // Total price = quantity * dish price
+    "paymentMethod": ObjectId("User.paymentMethod.id"),  // Payment method
     // "delivery": {
     //     "method": "pickup" | "delivery",
     //     "deliveryAddress": String,      // Address in case of delivery
