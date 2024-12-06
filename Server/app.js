@@ -1,22 +1,34 @@
 import express from 'express';
 import cors from 'cors';
+import session from 'express-session';
 const app = express();
 import configRoutes from './routes/index.js';
-//import { checkConnection } from './config/mongoConnection.js';
-
+const rewriteUnsupportedBrowserMethods = (req, res, next) => {
+  if (req.body && req.body._method) {
+    req.method = req.body._method;
+    delete req.body._method;
+  }
+  next();
+};
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({extended: true}));
+app.use(rewriteUnsupportedBrowserMethods);
+app.use(
+  session({
+    name: 'AuthenticationState',
+    secret: 'some secret string!',
+    resave: false,
+    saveUninitialized: false
+  })
+);
+
+
+//MIDDLEWARES
+
+
 
 configRoutes(app);
-
-// const checkDbConnection = async () => {
-//   try {
-//     const status = await checkConnection();
-//     console.log('Connected to MongoDB Atlas:', status);
-//   } catch (error) {
-//     console.error('Connection failed:', error);
-//   }
-// };
 
 app.listen(3000, () => {
   //checkDbConnection();

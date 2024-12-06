@@ -72,13 +72,13 @@ export const registerUser = async (
   }
   
   zipcode = zipcode.trim();
-  if(/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
+  if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
   if(typeof gmail!=="string"){
     throw 'gmail should be of type string'
   }
   
   gmail = gmail.trim();
-  if(/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+  if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
   const sameGamil = await userCollection.findOne({gmail:gmail});
   const sameCookGmail = await cookCollection.findOne({gmail:gmail});
   if(sameGamil||sameCookGmail){
@@ -90,7 +90,7 @@ export const registerUser = async (
   }
   
   mobileNumber = mobileNumber.trim();
-  if(/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber)) throw 'Please enter valid mobileNumber in 000-000-0000 format'
+  if(!/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber)) throw 'Please enter valid mobileNumber in 000-000-0000 format'
   const sameNumber = await userCollection.findOne({mobileNumber:mobileNumber});
   const sameCookNumber = await cookCollection.findOne({mobileNumber:mobileNumber});
   if(sameNumber||sameCookNumber){
@@ -128,8 +128,11 @@ export const registerUser = async (
   if (!insertInfo.acknowledged || !insertInfo.insertedId)
     throw 'Could not add User';
   
-  const succ = {signupCompleted: true}
-  return succ;
+  const createdUser = await userCollection.findOne({ _id: insertInfo.insertedId }, { projection: { password: 0 } });
+
+  if (!createdUser) throw "Failed to retrieve the created user";
+
+  return { signupCompleted: true, user: createdUser };
 
 
 };
@@ -264,13 +267,13 @@ export const registerCook = async (
     }
     
     zipcode = zipcode.trim();
-    if(/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
+    if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
     if(typeof gmail!=="string"){
       throw 'gmail should be of type string'
     }
     
     gmail = gmail.trim();
-    if(/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+    if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
     const sameGamil = await userCollection.findOne({gmail:gmail});
     const sameCookGamil = await cookCollection.findOne({gmail:gmail});
     if(sameGamil||sameCookGamil){
@@ -282,7 +285,7 @@ export const registerCook = async (
     }
     
     mobileNumber = mobileNumber.trim();
-    if(/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber)) throw 'Please enter valid mobileNumber in 000-000-0000 format'
+    if(!/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber)) throw 'Please enter valid mobileNumber in 000-000-0000 format'
     const sameNumber = await userCollection.findOne({mobileNumber:mobileNumber});
     const sameCookNumber = await cookCollection.findOne({mobileNumber:mobileNumber});
     if(sameNumber||sameCookNumber){
@@ -327,7 +330,7 @@ export const registerCook = async (
       
     };
     //const productCollection = await users();
-    const insertInfo = await userCollection.insertOne(newCook);
+    const insertInfo = await cookCollection.insertOne(newCook);
     if (!insertInfo.acknowledged || !insertInfo.insertedId)
       throw 'Could not add User';
     
@@ -399,13 +402,13 @@ export const registerCook = async (
       }
       
       zipcode = zipcode.trim();
-      if(/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
+      if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
       if(typeof gmail!=="string"){
         throw 'gmail should be of type string'
       }
       
       gmail = gmail.trim();
-      if(/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+      if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
       if(currUser.gmail!==gmail){
         const matchedCount = await userCollection.countDocuments({ gmail: gmail });
         const cookMatched =  await cookCollection.countDocuments({ gmail: gmail });
@@ -420,7 +423,7 @@ export const registerCook = async (
       }
       
       mobileNumber = mobileNumber.trim();
-      if(/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber)) throw 'Please enter valid mobileNumber in 000-000-0000 format'
+      if(!/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber)) throw 'Please enter valid mobileNumber in 000-000-0000 format'
       if(currUser.mobileNumber!==mobileNumber){
         const matchedCount = await userCollection.countDocuments({ mobileNumber:mobileNumber });
         const cookMatched =  await cookCollection.countDocuments({ mobileNumber:mobileNumber });
@@ -519,13 +522,13 @@ export const registerCook = async (
       }
       
       zipcode = zipcode.trim();
-      if(/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
+      if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
       if(typeof gmail!=="string"){
         throw 'gmail should be of type string'
       }
       
       gmail = gmail.trim();
-      if(/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+      if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
       if(currUser.gmail!==gmail){
         const matchedCount = await userCollection.countDocuments({ gmail: gmail });
         const cookMatched =  await cookCollection.countDocuments({ gmail: gmail });
@@ -540,7 +543,7 @@ export const registerCook = async (
       }
       
       mobileNumber = mobileNumber.trim();
-      if(/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber)) throw 'Please enter valid mobileNumber in 000-000-0000 format'
+      if(!/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber)) throw 'Please enter valid mobileNumber in 000-000-0000 format'
       if(currUser.mobileNumber!==mobileNumber){
         const matchedCount = await userCollection.countDocuments({ mobileNumber:mobileNumber });
         const cookMatched =  await cookCollection.countDocuments({ mobileNumber:mobileNumber });

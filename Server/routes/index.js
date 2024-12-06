@@ -1,8 +1,10 @@
 //Imports here
-import loginRoutes from './login.js';
+import mealReqRoutes from './mealRequests.js';
+//import commentRoutes from './comments.js';
 
 const constructorMethod = (app) => {
-  app.use('/login', loginRoutes);
+  app.use('/mealReqs', mealReqRoutes);
+  
 
   app.use('*', (req, res) => {
     res.status(404).json({error: 'Route Not found'});
@@ -10,3 +12,4 @@ const constructorMethod = (app) => {
 };
 
 export default constructorMethod;
+
