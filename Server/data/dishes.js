@@ -1,12 +1,7 @@
 import { dishes } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import helpers from '../helpers/pranHelpers.js';
-
-
-
-// import helper from '../helpers/helpers.js';
-
-import { validateCuisineType, validateCost, checkisValidImageArray, validateId, validateUniqueDishesPerCook } from '../helpers/validationHelper.js';
+import { validateCuisineType, validateCost, checkisValidImageArray, validateId, validateUniqueDishesPerCook, checkDishDesc } from '../helpers/validationHelper.js';
 
 
 export const getDishById = async (id) => {
@@ -20,7 +15,7 @@ export const getDishById = async (id) => {
 export const getAllDishesByCookId = async (cookId) => {
     cookId = validateId(cookId, 'userId');
     const dishCollection = await dishes();
-    const dishesByCookId = await dishCollection.find({ _id: ObjectId.createFromHexString(cookId) }).toArray();
+    const dishesByCookId = await dishCollection.find({ cookId: cookId }).toArray();
     if (dishesByCookId === null) throw `No dishes with for cook '${cookId}'.`;
     return dishesByCookId;
 };
@@ -30,21 +25,22 @@ export const addDish = async (
     name,
     description,
     cuisineType,
-    cost,
-    images
+    cost
+    // ,
+    // images
 ) => {
     const dishCollection = await dishes();
-    if (!cookId || !name || !description || !cuisineType || !cost || !images) {
+    if (!cookId || !name || !description || !cuisineType || !cost) {// || !images
         throw "All fields need to be supplied";
     }
     cookId = validateId(cookId, 'cookId');
     name = helpers.checkString(name, 'dish name');
-    description = helpers.checkString(description, 'description');
+    description = checkDishDesc(description, 'description');
     cuisineType = helpers.checkString(cuisineType, 'cuisineType');
     cuisineType = validateCuisineType(cuisineType);
     //validate cost
     cost = validateCost(cost, 'cost');
-    images = checkisValidImageArray(images, 'images');
+    //images = checkisValidImageArray(images, 'images');
 
     //check if dish already present for this cook
     validateUniqueDishesPerCook(cookId, name);
@@ -55,7 +51,7 @@ export const addDish = async (
         description: description,
         cuisineType: cuisineType,
         cost: cost,
-        images: images,
+        //images: images,
         rating: '-',
         createdAt: new Date().toUTCString(),
         isAvailable: true
@@ -79,6 +75,7 @@ export const updateDish = async (
     images,
     isAvailable
 ) => {
+    const dishCollection = await dishes();
     id = validateId(id, 'id');
     cookId = validateId(cookId, 'cookId');
 
@@ -92,7 +89,7 @@ export const updateDish = async (
     }
 
     if (description) {
-        description = helpers.checkString(description, 'description');
+        description = checkDishDesc(description, 'description');
         existingDish.description = description;
     }
 

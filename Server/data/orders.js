@@ -16,22 +16,23 @@ export const addOrder = async (
     cookId,
     studentId,
     dishes,
-    paymentMethod,
+    //paymentMethod,
     totalCost,
-    isMealReq,
-    invoiceLink
+    isMealReq
+    // ,
+    // invoiceLink
 ) => {
     const orderCollection = await orders();
-    if (!cookId || !studentId || !dishes || !paymentMethod || !invoiceLink) {
+    if (!cookId || !studentId || !dishes) { // || !paymentMethod || !invoiceLink
         throw "All fields need to be supplied";
     }
     cookId = validateId(cookId, 'cookId');
     studentId = validateId(studentId, 'studentId');
-    validateDishesList(dishes);
+    await validateDishesList(dishes, false);
     //TO DO validate payment method
     totalCost = validateCost(totalCost, 'totalCost');
     isMealReq = checkisValidBoolean(isMealReq, 'isMealReq');
-    invoiceLink = validateCloudUrl(invoiceLink, 'invoiceLink');
+    //invoiceLink = validateCloudUrl(invoiceLink, 'invoiceLink');
     let newOrder = {
         cookId: cookId,
         studentId: studentId,
@@ -43,8 +44,9 @@ export const addOrder = async (
         createdAt: new Date().toUTCString(),
         updatedAt: new Date().toUTCString(),
         rating: '-',
-        review: '',
-        invoiceLink: invoiceLink
+        review: ''
+        //,
+        //invoiceLink: invoiceLink
     };
 
     const insertInfo = await orderCollection.insertOne(newOrder);
@@ -61,10 +63,10 @@ export const updateOrder = async (
 ) => {
     id = validateId(id, 'id');
     status = validateOrderStatus(status);
-    let existingOrder = await getDishById(id);
+    let existingOrder = await getOrderById(id);
     if (existingOrder.status !== status) {
         const orderCollection = await orders();
-        existingOrder.status == status;
+        existingOrder.status = status;
         let updateOrder = await orderCollection.findOneAndReplace(
             { _id: ObjectId.createFromHexString(id) },
             existingOrder,
