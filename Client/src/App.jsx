@@ -4,6 +4,8 @@ import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 import Login from './components/Login';
+import User from './components/User'
+import PageNotFound from './components/PageNotFound';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -12,6 +14,8 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/user/:id" element={<User />} />
+        <Route path='/*' element={<PageNotFound />} />
         <Route
           path="/home"
           element={
