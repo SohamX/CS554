@@ -9,7 +9,7 @@ export const registerUser = async (
   firstName,
   lastName,
   username,
-  password,
+  
   gmail,
   mobileNumber,
   address, //address mean just street address
@@ -21,7 +21,6 @@ export const registerUser = async (
   if(!firstName ||
     !lastName ||
     !username ||
-    !password ||
     !address ||
   !city ||
   !state ||
@@ -48,17 +47,17 @@ export const registerUser = async (
   if(sameUsername || sameCookname){
     throw `Error : Already username exists with ${username}`
   }
-  if(typeof password!=="string"){
-    throw 'Password should be of type string'
-  }
-  password = password.trim()
+  // if(typeof password!=="string"){
+  //   throw 'Password should be of type string'
+  // }
+  // password = password.trim()
 
-  if(password===""|| /\s/.test(password) || password.length<8){
-    throw 'Password should not contains spaces and must be minimum 8 characters long'
-  }
-  if(!/[A-Z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password) ){
-    throw 'Password should contain at least one uppercase character and at least one number and there has to be at least one special character'
-  }
+  // if(password===""|| /\s/.test(password) || password.length<8){
+  //   throw 'Password should not contains spaces and must be minimum 8 characters long'
+  // }
+  // if(!/[A-Z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password) ){
+  //   throw 'Password should contain at least one uppercase character and at least one number and there has to be at least one special character'
+  // }
   address = helpers.checkString(address,'address');
   if(/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(address)){
     throw `address cannot contains special characters`
@@ -100,15 +99,15 @@ export const registerUser = async (
   country = helpers.checkString(country,'country');
   country = helpers.checkSpecialCharsAndNum(country,'country');
 
-  const saltRounds = 16;
+ // const saltRounds = 16;
 
   //const plainTextPassword = 'mySuperAwesomePassword';
-  const hash = await bcrypt.hash(password, saltRounds);
+  // const hash = await bcrypt.hash(password, saltRounds);
   let newUser = {
     firstName:firstName,
     lastName:lastName,  
     username:username, 
-    password: hash,
+    
     role:"user",
     gmail:gmail,
     mobileNumber:mobileNumber,
@@ -120,8 +119,7 @@ export const registerUser = async (
         country: country,
         coordinates: { longitude: "", latitude: "" } //Calculated and stored?
     },
-    favourites : [],
-    mealRequested : []
+    favourites : []
   };
   //const productCollection = await users();
   const insertInfo = await userCollection.insertOne(newUser);
@@ -619,3 +617,6 @@ export const registerCook = async (
     deletedobj.deleted = new Boolean(true);
     return deletedobj;
   }
+
+
+

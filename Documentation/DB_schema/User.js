@@ -17,8 +17,7 @@ const user = {
     },
     
            
-    "favorites": [ObjectId("DishId")],   
-    "mealRequests": [ObjectId("MealRequestId")]  ,
+    "favorites": [ObjectId("DishId")], 
     "cart": [{
         "_id": new ObjectId(),
         "cookId": ObjectId("UserId"),      // References the cook who is fulfilling the order
