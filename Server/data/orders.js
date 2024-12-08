@@ -12,9 +12,25 @@ export const getOrderById = async (id) => {
     return existingOrder;
 };
 
+export const getAllOrderByCookId = async (cookId) => {
+    cookId = validateId(cookId, 'cookId');
+    const orderCollection = await orders();
+    const allOrderByCookId = await orderCollection.find({ cookId: ObjectId.createFromHexString(cookId) }).toArray();
+    // if (allOrderByCookId === null) throw `No order with cookId '${id}'.`;
+    return allOrderByCookId;
+};
+
+export const getAllOrderByUserId = async (userId) => {
+    userId = validateId(userId, 'userId');
+    const orderCollection = await orders();
+    const allOrderByUserId = await orderCollection.find({ userId: ObjectId.createFromHexString(userId) }).toArray();
+    //if (allOrderByUserId === null) throw `No order with student '${id}'.`;
+    return allOrderByUserId;
+};
+
 export const addOrder = async (
     cookId,
-    studentId,
+    userId,
     dishes,
     //paymentMethod,
     totalCost,
@@ -23,19 +39,19 @@ export const addOrder = async (
     // invoiceLink
 ) => {
     const orderCollection = await orders();
-    if (!cookId || !studentId || !dishes) { // || !paymentMethod || !invoiceLink
+    if (!cookId || !userId || !dishes) { // || !paymentMethod || !invoiceLink
         throw "All fields need to be supplied";
     }
     cookId = validateId(cookId, 'cookId');
-    studentId = validateId(studentId, 'studentId');
+    userId = validateId(userId, 'userId');
     await validateDishesList(dishes, false);
     //TO DO validate payment method
     totalCost = validateCost(totalCost, 'totalCost');
     isMealReq = checkisValidBoolean(isMealReq, 'isMealReq');
     //invoiceLink = validateCloudUrl(invoiceLink, 'invoiceLink');
     let newOrder = {
-        cookId: cookId,
-        studentId: studentId,
+        cookId: ObjectId.createFromHexString(cookId),
+        userId: ObjectId.createFromHexString(userId),
         status: "placed",
         dishes: dishes,
         //paymentMethod: paymentMethod,
@@ -53,7 +69,7 @@ export const addOrder = async (
     if (!insertInfo.acknowledged || !insertInfo.insertedId)
         throw 'Could not add Order';
 
-    return insertInfo.acknowledged;
+    return insertInfo;
 
 };
 

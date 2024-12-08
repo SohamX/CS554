@@ -23,7 +23,7 @@ router
             }
             cookId = validateId(cookId, 'cookId');
             name = helpers.checkString(name, 'dish name');
-            description = checkString(description, 'description');
+            description = checkDishDesc(description, 'description');
             cuisineType = helpers.checkString(cuisineType, 'cuisineType');
             cuisineType = validateCuisineType(cuisineType);
             //validate cost
@@ -31,7 +31,7 @@ router
             //images = checkisValidImageArray(images, 'images');
 
             //check if dish already present for this cook
-            validateUniqueDishesPerCook(cookId, name);
+            await validateUniqueDishesPerCook(cookId, name);
 
         } catch (e) {
             return res.status(400).json(errorMsg(e))

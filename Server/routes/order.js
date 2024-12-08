@@ -10,7 +10,7 @@ router
         const orderFormData = req.body;
         let {
             cookId,
-            studentId,
+            userId,
             dishes,
             paymentMethod,
             totalCost,
@@ -18,11 +18,11 @@ router
             invoiceLink } = orderFormData;
 
         try {
-            if (!cookId || !studentId || !dishes) {//|| !paymentMethod || !invoiceLink
+            if (!cookId || !userId || !dishes) {//|| !paymentMethod || !invoiceLink
                 throw "All fields need to be supplied";
             }
             cookId = validateId(cookId, 'cookId');
-            studentId = validateId(studentId, 'studentId');
+            userId = validateId(userId, 'userId');
             await validateDishesList(dishes, true);
             //TO DO validate payment method
             totalCost = validateCost(parseFloat(totalCost), 'totalCost');
@@ -36,7 +36,7 @@ router
 
         try {
             const orderAdded = await orderData.addOrder(cookId,
-                studentId,
+                userId,
                 dishes,
                 //paymentMethod,
                 totalCost,
@@ -105,6 +105,42 @@ router
 
         } catch (e) {
             res.status(400).json(errorMsg(e));
+            return;
+        }
+    })
+
+router
+    .route('/cook/:cookId')
+    .get(async (req, res) => {
+        try {
+            req.params.cookId = validateId(req.params.cookId, 'cookId URL Param');
+        } catch (e) {
+            res.status(400).json(errorMsg(e));
+            return;
+        }
+        try {
+            const orders = await orderData.getAllOrderByCookId(req.params.cookId);
+            res.status(200).json({ status: "success", orders: orders });
+        } catch (e) {
+            res.status(404).json(errorMsg(e));
+            return;
+        }
+    })
+
+router
+    .route('/user/:userId')
+    .get(async (req, res) => {
+        try {
+            req.params.cookId = validateId(req.params.userId, 'userId URL Param');
+        } catch (e) {
+            res.status(400).json(errorMsg(e));
+            return;
+        }
+        try {
+            const orders = await orderData.getAllOrderByUserId(req.params.userId);
+            res.status(200).json({ status: "success", orders: orders });
+        } catch (e) {
+            res.status(404).json(errorMsg(e));
             return;
         }
     })
