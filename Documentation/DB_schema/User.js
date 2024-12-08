@@ -20,13 +20,13 @@ const user = {
     "favorites": [ObjectId("DishId")], 
     "cart": [{
         "_id": new ObjectId(),
-        "cookId": ObjectId("UserId"),      // References the cook who is fulfilling the order
-        "dishes": [{
-            "dishId": ObjectId("DishId"),
-            "quantity": Number
-        }],      // References the dish added to cart along with tgheir quantities       
-        "totalCost": Number,              // Total price = quantity * dish price        
+        "dishName": String,
+        "cookName": String,
+        "eachCost": Number,
+        "quantity": Number,
+        "subtotal": Number                   // subtotal = quantity * eachCost      
     }],
+    "cartTotal": Number,
     "paymentMethod": [{
         "_id": new ObjectId(),
         "type": "creditCard" | "debitCard" | "PayPal" | "Stripe",
