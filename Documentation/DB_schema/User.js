@@ -26,21 +26,22 @@ const user = {
         "quantity": Number,
         "subtotal": Number                   // subtotal = quantity * eachCost      
     }],
-    "cartTotal": Number,
-    "paymentMethod": [{
+    "cartTotal": Number,                      //CartTotal = sum of all subtotals
+    "paymentCards": [{
         "_id": new ObjectId(),
         "type": "creditCard" | "debitCard" | "PayPal" | "Stripe",
         "provider": "visa" | "masterCard" | "americanExpress" | "discover" | "PayPal" | "Stripe",
         "cardNumber": String,   // hashed cardNumber
         "last4Digits": String, //last four digits on the card
         "expirationDate": "MM/YY",
-        "createdAt": Date,
+        "cvv": String,   // hashed cv
+        
         "isDefault": Boolean,
-        "billingAddress": {
-            "zipCode": String,
-            "country": String
-        },
-        "nickName": String
+        
+        "zipCode": String,
+        "country": String
+       
+        
     }]
 }
 

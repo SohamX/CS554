@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 const dishCollection = await dishes();
 const userCollection = await users();
 const cookCollection = await cooks();
+const saltRounds = 16;
 export const registerUser = async (
   firstName,
   lastName,
@@ -123,6 +124,7 @@ export const registerUser = async (
     favourites : [],
     cart : [],
     cartTotal : 0,
+    paymentCards : []
   };
   //const productCollection = await users();
   const insertInfo = await userCollection.insertOne(newUser);
@@ -776,6 +778,59 @@ export const removeItemFromCart = async (itemId) => {
   }
   return {deleted:true};
 };
+
+
+export const addCardDetails = async (userId, type, provider, cardNumber, cardHolderName,expirationDate,cvv,zipcode,country,isDefault) => {
+  if(!userId||!type||!provider||!cardNumber||!cardHolderName||!expirationDate||!cvv||!zipcode||!country||!isDefault){
+    throw("All fields need to be supplied")
+  }
+  userId = helpers.checkId(userId, 'userId');
+  if (typeof cardNumber !== 'string') throw `Error: ${cardNumber} must be a string!`;
+  cardNumber = cardNumber.trim();
+  
+  if(!/^\d{16}$/.test(cardNumber)) throw 'Please enter valid card number';
+  cardHolderName = helpers.checkString(cardHolderName, 'cardHolderName');
+  cardHolderName = helpers.checkSpecialCharsAndNum(cardHolderName, 'cardHolderName');
+  if(!helpers.isValidExpirationDate(expirationDate)) throw 'Your Card is Expired';
+  if(typeof cvv !== 'string') throw `Error: ${cvv} must be a string!`;
+  cvv = cvv.trim();
+  if(!/^\d{3}$/.test(cvv)) throw 'Please enter valid cvv';
+  if(typeof zipcode!=="string"){
+    throw 'zipcode should be of type string'
+  }
+  
+  zipcode = zipcode.trim();
+  if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
+  country = helpers.checkString(country,'country');
+  country = helpers.checkSpecialCharsAndNum(country,'country');
+  
+  const hashcardNumber = await bcrypt.hash(cardNumber, saltRounds);
+  const hashcvv = await bcrypt.hash(cvv, saltRounds);
+  if(isDefault ==="true"){
+    isDefault = true;}else{
+      isDefault = false;
+    }
+
+  const carddetails = {
+    _id: new ObjectId(),
+    type: type,
+    provider: provider,
+    cardNumber: hashcardNumber,
+    cardHolderName: cardHolderName,
+    expirationDate: expirationDate,
+    cvv: hashcvv,
+    zipcode: zipcode,
+    country: country,
+    isDefault: isDefault
+  };
+  
+  
+  const updateInfo = await userCollection.findOneAndUpdate({_id: new ObjectId(userId)}, {$push: {paymentCards: carddetails}}, {returnDocument: 'after'});
+  if(!updateInfo){
+    throw("Card details not added")
+  }
+  return {added:true};
+}
 
 
 

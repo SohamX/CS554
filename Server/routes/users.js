@@ -342,6 +342,52 @@ router
     }
   })
 
+//ALL PAYMENT CARD ROUTES
+
+router
+  .route('/paymentCard/:userId')
+  .post(async (req, res) => {
+    let { type, provider, cardNumber, cardHolderName,expirationDate,cvv,zipcode,country,isDefault } = req.body;
+    try {
+      if(!type||!provider||!cardNumber||!cardHolderName||!expirationDate||!cvv||!zipcode||!country){
+        throw("All fields need to be supplied")
+      }
+      
+      if (typeof cardNumber !== 'string') throw `Error: ${cardNumber} must be a string!`;
+      cardNumber = cardNumber.trim();
+      
+      if(!/^\d{16}$/.test(cardNumber)) throw 'Please enter valid card number';
+      cardHolderName = helpers.checkString(cardHolderName, 'cardHolderName');
+      cardHolderName = helpers.checkSpecialCharsAndNum(cardHolderName, 'cardHolderName');
+      if(!helpers.isValidExpirationDate(expirationDate)) throw 'Your Card is Expired';
+      if(typeof cvv !== 'string') throw `Error: ${cvv} must be a string!`;
+      cvv = cvv.trim();
+      if(!/^\d{3}$/.test(cvv)) throw 'Please enter valid cvv';
+      if(typeof zipcode!=="string"){
+        throw 'zipcode should be of type string'
+      }
+      
+      zipcode = zipcode.trim();
+      if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
+      country = helpers.checkString(country,'country');
+      country = helpers.checkSpecialCharsAndNum(country,'country');
+      req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
+
+    } catch (e) {
+      res.status(400).json({error:e});
+      return;
+    }
+    try {
+      const statObj = await userData.addCardDetails(req.params.userId, type, provider, cardNumber, cardHolderName,expirationDate,cvv,zipcode,country,isDefault);
+      res.status(200).json({ status: "success"});
+    } catch (e) {
+      res.status(400).json({error:e});
+      return;
+    }
+  })
+
+  
+
 
 
 export default router;
