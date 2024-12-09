@@ -29,7 +29,7 @@ export const orderStatus = (function () {
         PENDING: 'pending',
         DECLINED: 'declined',
         CONFIRMED: 'confirmed',
-        INPROGRESS: 'in-progress',
+        IN_PROGRESS: 'in_progress',
         READY: 'ready',
         COMPLETED: 'completed',
         CANCELLED: 'cancelled'

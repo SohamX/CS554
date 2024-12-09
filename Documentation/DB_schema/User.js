@@ -17,31 +17,31 @@ const user = {
     },
     
            
-    "favorites": [ObjectId("DishId")],   
-    "mealRequests": [ObjectId("MealRequestId")]  ,
+    "favorites": [ObjectId("DishId")], 
     "cart": [{
         "_id": new ObjectId(),
-        "cookId": ObjectId("UserId"),      // References the cook who is fulfilling the order
-        "dishes": [{
-            "dishId": ObjectId("DishId"),
-            "quantity": Number
-        }],      // References the dish added to cart along with tgheir quantities       
-        "totalCost": Number,              // Total price = quantity * dish price        
+        "dishName": String,
+        "cookName": String,
+        "eachCost": Number,
+        "quantity": Number,
+        "subtotal": Number                   // subtotal = quantity * eachCost      
     }],
-    "paymentMethod": [{
+    "cartTotal": Number,                      //CartTotal = sum of all subtotals
+    "paymentCards": [{
         "_id": new ObjectId(),
         "type": "creditCard" | "debitCard" | "PayPal" | "Stripe",
         "provider": "visa" | "masterCard" | "americanExpress" | "discover" | "PayPal" | "Stripe",
         "cardNumber": String,   // hashed cardNumber
         "last4Digits": String, //last four digits on the card
         "expirationDate": "MM/YY",
-        "createdAt": Date,
+        "cvv": String,   // hashed cv
+        
         "isDefault": Boolean,
-        "billingAddress": {
-            "zipCode": String,
-            "country": String
-        },
-        "nickName": String
+        
+        "zipCode": String,
+        "country": String
+       
+        
     }]
 }
 

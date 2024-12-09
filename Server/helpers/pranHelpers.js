@@ -89,6 +89,30 @@ const exportedMethods = {
     }
     return strVal;
   },
+  isValidExpirationDate(expirationDate) {           //CARD expiration date Checker
+    // Regular expression for MM/YY format
+    const regex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+
+    if (!regex.test(expirationDate)) {
+        return false; // Invalid format
+    }
+
+    // Extract month and year
+    const [month, year] = expirationDate.split("/").map(Number);
+
+    // Get the current month and year
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth() + 1; // Months are zero-based
+    const currentYear = currentDate.getFullYear() % 100; // Get last two digits of the year
+
+    // Check if the date is in the future
+    if (year > currentYear || (year === currentYear && month >= currentMonth)) {
+        return true;
+    }
+
+    return false; // Date is in the past
+},
+
   checkStringArray(arr, varName) {
     if (!arr || !Array.isArray(arr))
       throw `You must provide an a//We will allow an empty array for this,
