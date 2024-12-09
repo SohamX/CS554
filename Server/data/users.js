@@ -140,62 +140,35 @@ export const registerUser = async (
 
 };
 
-export const loginUser = async (username, password) => {
-  if(!username || !password){
-    throw 'Both Username and Password must be supplied'
+export const loginUser = async (gmail) => {
+  if(!gmail){
+    throw 'gmail must be supplied'
   }
-  username = helpers.checkString(username,'username');
-  username = helpers.checkSpecialCharsAndNum(username,'username');
-  if(username.length<5||username.length>10){
-    throw 'username should be at least 5 characters long with a max of 10 characters '
-  }
-  username=username.toLowerCase();
-  if(typeof password!=="string"){
-    throw 'Password should be of type string'
-  }
-  password = password.trim()
 
-  if(password===""|| /\s/.test(password) || password.length<8){
-    throw 'Password should not contains spaces and must be minimum 8 characters long'
-  }
-  if(!/[A-Z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password) ){
-    throw 'Password should contain at least one uppercase character and at least one number and there has to be at least one special character'
-  }
+  gmail = gmail.trim();
+  if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
   
-  const usernameFound = await userCollection.findOne({username:username});
-  const cooknameFound = await cookCollection.findOne({username:username});
-  if(!usernameFound){
-    if(cooknameFound){
-        let check = false;
-        try {
-            check = await bcrypt.compare(password, cooknameFound.password);
-        } catch (error) {
-            //no op
-        }
-        if (check) {
-          const { password,...dataforsessions } = cooknameFound
-          return dataforsessions
-        } else {
-            throw "Either the username or password is invalid"
-        }
-    }else{
-        throw "Either the username or password is invalid"
+  const userFound = await userCollection.findOne({gmail:gmail});
+  const cookFound = await cookCollection.findOne({gmail:gmail});
+  if(!userFound){
+    if(cookFound){
+        
+        
+          
+          return cookFound;
+        } 
+    else{
+        throw "No user or cook found with that gmail"
     }
   }else{
-    let compareToMatch = false;
+    
 
-    try {
-        compareToMatch = await bcrypt.compare(password, usernameFound.password);
-    } catch (e) {
-        //no op
-    }
+    
 
-    if (compareToMatch) {
-        const { password,...dataforsessions } = usernameFound
+    
+        const { paymentCards,...dataforsessions } = userFound
         return dataforsessions
-    } else {
-        throw "Either the username or password is invalid"
-    }
+    
 
   }
   
