@@ -1,6 +1,7 @@
 import { ObjectId } from "mongodb";
 import { dishes } from '../config/mongoCollections.js';
 import { cuisineType, S3UrlPattern, imageMagicUrlPattern, orderStatus } from './constants.js';
+import { dishData } from '../data/index.js';
 
 const validateCuisineType = (cuisineName) => {
     if (cuisineType.get(cuisineName) === undefined)
@@ -17,7 +18,8 @@ const validateOrderStatus = (status) => {
 const validateCost = (cost, variable) => {
     if (typeof cost !== 'number' || isNaN(cost)) throw `${cost || 'provided variable'} for cost is not a number.`;
     if (cost <= 0) throw `Input '${variable || 'provided'}' of value ${cost || 'provided variable'} is not greater than zero.`;
-    if (!(Number.isInteger(cost)) && num.toString().split('.')[1].length > 2) throw `Input '${variable || 'provided'}' of value '${cost || 'provided variable'}' is not a valid input. It allows only 2 decimal points`;
+    if (!(Number.isInteger(cost)) && cost.toString().split('.')[1].length > 2) throw `Input '${variable || 'provided'}' of value '${cost || 'provided variable'}' is not a valid input. It allows only 2 decimal points`;
+    return cost;
 };
 
 const validateCloudUrl = (url, type) => {
@@ -60,6 +62,16 @@ const checkisValidString = (str, variable) => {
     return str.trim();
 };
 
+const checkDishDesc = (str, variable) => {
+    checkUndefinedOrNull(str, variable);
+    str = checkisValidString(str, variable);
+    str = str.trim();
+    if (str.length < 2 || str.length > 150) throw `${variable} must be a non-empty string and length should be min 2 and max 150`;
+    if (!isNaN(str))
+        throw `Error: ${str} is not a valid value for ${variable} as it only contains digits`;
+    return str;
+};
+
 const validateId = (id, variable) => {
     checkUndefinedOrNull(id, variable);
     id = checkisValidString(id, variable);
@@ -82,28 +94,34 @@ const validateUniqueDishesPerCook = async (cookId, name) => {
 }
 
 const checkisInteger = (int, variable) => {
-    int = int.trim();
+    //int = int.trim();
     if (!(Number.isInteger(int)) || int <= 0) throw `Input '${variable || 'provided'}' of value ${int || 'provided variable'} is not a positive whole number.`;
     return int;
 };
 
-const validateDishesList = async (dishes) => {
+const validateDishesList = async (dishes, fromRoute) => {
 
     if (dishes && dishes.length > 0) {
         for (const i in dishes) {
             let currDish = dishes[i];
             currDish.dishId = validateId(currDish.dishId, 'dishId');
+            if (fromRoute)
+                currDish.quantity = parseInt(currDish.quantity);
             currDish.quantity = checkisInteger(currDish.quantity, 'quantity');
-            const dishCollection = await dishes();
-            await getDishById(currDish.dishId);
+            await dishData.getDishById(currDish.dishId);
         }
     }
 }
 let checkisValidBoolean = (bool, variable) => {
     if (typeof bool !== 'boolean') throw `Input '${variable || 'provided'}' of value ${bool || 'provided'} is not a boolean.`;
+    return bool;
 };
+
+const errorMsg = (e) => {
+    return { error: e.message ? e.message : e }
+}
 
 export {
     validateCuisineType, validateCost, checkisValidImageArray, validateId, checkisValidBoolean, validateOrderStatus,
-    validateUniqueDishesPerCook, checkisValidDishesArray, validateDishesList, validateCloudUrl
+    validateUniqueDishesPerCook, checkisValidDishesArray, validateDishesList, validateCloudUrl, checkDishDesc, errorMsg
 }

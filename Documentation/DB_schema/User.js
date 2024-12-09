@@ -1,10 +1,12 @@
 const user = {
     "_id": new ObjectId(),
-    "name": String,
-    "email": String,
+    "firstName": String,
+    "lastName": String,
+    "username": String,
     "password": String,   // hashed password
-    "role": "cook" | "student",
-    "profileImage": String,   // URL to the image stored (Optional?)
+    "role": "user",
+    "gmail": String,
+    "mobileNumber": String,
     "location": {
         "streetAddress": String,
         "city": String,
@@ -13,44 +15,68 @@ const user = {
         "country": String,
         "coordinates": { "longitude": longitude, "latitude": latitude } //Calculated and stored?
     },
-    // Registration timestamp
-    "cookDetails": {          // If user is a cook
-        "bio": String,
-        "rating": Number,         // Average rating?
-        "reviews": [reviewers],
-        "dishes": [ObjectId("DishId")],  // Array of dish IDs posted by the cook
-        // "availability": {
-        //     "days": [String],  // E.g., ['Monday', 'Wednesday', 'Friday']
-        //     "hours": { "start": String, "end": String }  // E.g., {"start": "10:00", "end": "20:00"}
-        // },
-        // "earnings": Number,  // Total earnings from selling meals
-    },
-    "studentDetails": {       // If user is a student
-        "favorites": [ObjectId("DishId")],   // Array of favorite dish IDs
-        "mealRequests": [ObjectId("MealRequestId")]  // Array of posted meal requests
-    },
+    
+           
+    "favorites": [ObjectId("DishId")], 
     "cart": [{
         "_id": new ObjectId(),
-        "cookId": ObjectId("UserId"),      // References the cook who is fulfilling the order
-        "dishes": [{
-            "dishId": ObjectId("DishId"),
-            "quantity": Number
-        }],      // References the dish added to cart along with tgheir quantities       
-        "totalCost": Number,              // Total price = quantity * dish price        
+        "dishName": String,
+        "cookName": String,
+        "eachCost": Number,
+        "quantity": Number,
+        "subtotal": Number                   // subtotal = quantity * eachCost      
     }],
-    "paymentMethod": [{
+    "cartTotal": Number,                      //CartTotal = sum of all subtotals
+    "paymentCards": [{
         "_id": new ObjectId(),
         "type": "creditCard" | "debitCard" | "PayPal" | "Stripe",
         "provider": "visa" | "masterCard" | "americanExpress" | "discover" | "PayPal" | "Stripe",
         "cardNumber": String,   // hashed cardNumber
         "last4Digits": String, //last four digits on the card
         "expirationDate": "MM/YY",
-        "createdAt": Date,
+        "cvv": String,   // hashed cv
+        
         "isDefault": Boolean,
-        "billingAddress": {
-            "zipCode": String,
-            "country": String
-        },
-        "nickName": String
+        
+        "zipCode": String,
+        "country": String
+       
+        
     }]
+}
+
+
+const cook = {
+    "_id": new ObjectId(),
+    "firstName": String,
+    "lastName": String,
+    "username": String,
+    "password": String,
+    "role": "cook",
+    "gmail": String,
+    "mobileNumber": String,
+    "bio": String,
+    "location": {
+        "address": String,
+        "city": String,
+        "state": String,
+        "zipcode": String,
+        "country": String,
+        "coordinates": { "longitude": "", "latitude": "" } //Calculated and stored?
+    },
+    "availability": {
+        "days": [],  // E.g., ['Monday', 'Wednesday', 'Friday']
+        "hours": { "start": "", "end": "" }  // E.g., {"start": "10:00", "end": "20:00"}
+    },
+    "earnings": Number,
+    "dishes": [ObjectId("DishId")],
+    "avgRating": Number,
+    "reviews" : [{
+        "userId": ObjectId("userId"), // Array of reviewers
+        
+        "review": String,
+         "rating": Number      // Rating for 5
+    }]
+    
+
 }

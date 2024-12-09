@@ -5,6 +5,8 @@ import viteLogo from '/vite.svg';
 import './App.css';
 import { ApiProvider } from './contexts/ApiContext';
 import Login from './components/Login';
+import User from './components/User'
+import PageNotFound from './components/PageNotFound';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -18,6 +20,8 @@ function App() {
           <div className='App-body'>
             <Routes>
               <Route path="/" element={<Login />} />
+              <Route path="/user/:id" element={<User />} />
+              <Route path='/*' element={<PageNotFound />} />
             </Routes>
           </div>
         </div>

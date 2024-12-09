@@ -62,14 +62,7 @@ export const createMealreq = async (
       if (!insertInfo.acknowledged || !insertInfo.insertedId) {
         throw 'Could not add meal request';
       }
-      await userCollection.updateOne(
-        { _id: new ObjectId(userId) },
-        {
-          $push: {
-            mealRequested: new ObjectId(insertInfo.insertedId)
-          }
-        }
-      );
+      
       return { mealRequestCreated: true, requestId: insertInfo.insertedId };
 
     

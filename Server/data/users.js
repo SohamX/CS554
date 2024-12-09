@@ -1,15 +1,17 @@
 //import mongo collections, bcrypt and implement the following data functions
-import {users,cooks} from '../config/mongoCollections.js';
+import {users,cooks,dishes} from '../config/mongoCollections.js';
 import {ObjectId} from 'mongodb';
 import helpers from '../helpers/pranHelpers.js'
 import bcrypt from 'bcryptjs';
+const dishCollection = await dishes();
 const userCollection = await users();
 const cookCollection = await cooks();
+const saltRounds = 16;
 export const registerUser = async (
   firstName,
   lastName,
   username,
-  password,
+  
   gmail,
   mobileNumber,
   address, //address mean just street address
@@ -21,7 +23,6 @@ export const registerUser = async (
   if(!firstName ||
     !lastName ||
     !username ||
-    !password ||
     !address ||
   !city ||
   !state ||
@@ -48,17 +49,17 @@ export const registerUser = async (
   if(sameUsername || sameCookname){
     throw `Error : Already username exists with ${username}`
   }
-  if(typeof password!=="string"){
-    throw 'Password should be of type string'
-  }
-  password = password.trim()
+  // if(typeof password!=="string"){
+  //   throw 'Password should be of type string'
+  // }
+  // password = password.trim()
 
-  if(password===""|| /\s/.test(password) || password.length<8){
-    throw 'Password should not contains spaces and must be minimum 8 characters long'
-  }
-  if(!/[A-Z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password) ){
-    throw 'Password should contain at least one uppercase character and at least one number and there has to be at least one special character'
-  }
+  // if(password===""|| /\s/.test(password) || password.length<8){
+  //   throw 'Password should not contains spaces and must be minimum 8 characters long'
+  // }
+  // if(!/[A-Z]/.test(password) || !/\d/.test(password) || !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password) ){
+  //   throw 'Password should contain at least one uppercase character and at least one number and there has to be at least one special character'
+  // }
   address = helpers.checkString(address,'address');
   if(/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(address)){
     throw `address cannot contains special characters`
@@ -100,15 +101,15 @@ export const registerUser = async (
   country = helpers.checkString(country,'country');
   country = helpers.checkSpecialCharsAndNum(country,'country');
 
-  const saltRounds = 16;
+ // const saltRounds = 16;
 
   //const plainTextPassword = 'mySuperAwesomePassword';
-  const hash = await bcrypt.hash(password, saltRounds);
+  // const hash = await bcrypt.hash(password, saltRounds);
   let newUser = {
     firstName:firstName,
     lastName:lastName,  
     username:username, 
-    password: hash,
+    
     role:"user",
     gmail:gmail,
     mobileNumber:mobileNumber,
@@ -121,7 +122,9 @@ export const registerUser = async (
         coordinates: { longitude: "", latitude: "" } //Calculated and stored?
     },
     favourites : [],
-    mealRequested : []
+    cart : [],
+    cartTotal : 0,
+    paymentCards : []
   };
   //const productCollection = await users();
   const insertInfo = await userCollection.insertOne(newUser);
@@ -333,8 +336,10 @@ export const registerCook = async (
     const insertInfo = await cookCollection.insertOne(newCook);
     if (!insertInfo.acknowledged || !insertInfo.insertedId)
       throw 'Could not add User';
+    const createdCook = await cookCollection.findOne({ _id: insertInfo.insertedId }, { projection: { password: 0 } });
     
-    const succ = {signupCompleted: true}
+    if (!createdCook) throw "Failed to retrieve the created cook";
+    const succ = {signupCompleted: true,cook: createdCook}
     return succ;
   
   
@@ -366,7 +371,7 @@ export const registerCook = async (
           throw "Some fields cannot be empty"
         }
       userId = helpers.checkId(userId,'userId');
-      const currUser = await userCollection.findOne({_id:ObjectId(userId)});
+      const currUser = await userCollection.findOne({_id: new ObjectId(userId)});
       if(!currUser){
         throw 'No user with that ID';
       }
@@ -487,7 +492,7 @@ export const registerCook = async (
           throw "Some fields cannot be empty"
         }
       userId = helpers.checkId(userId,'userId');
-      const currUser = await cookCollection.findOne({_id:ObjectId(userId)});
+      const currUser = await cookCollection.findOne({_id: new ObjectId(userId)});
       if(!currUser){
         throw 'No cook with that ID';
       }
@@ -619,3 +624,214 @@ export const registerCook = async (
     deletedobj.deleted = new Boolean(true);
     return deletedobj;
   }
+
+  
+  export const getUserById = async(userId) =>{
+    userId = helpers.checkId(userId,'userId');
+    const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+    if (!user) {
+      throw `Error: User does not exist`;
+    }
+    return user;
+  }
+
+
+
+//CART RELATED FUNCTIONS ADDING,DELETING,GET,UPDATE FOR USER
+
+
+
+
+
+export const addItemtoCart = async (
+  userId,
+  dishId,
+  
+) => {
+  if(!userId||!dishId){
+    throw("All fields need to be supplied")
+  }
+  userId = helpers.checkId(userId, 'userId');
+  dishId = helpers.checkId(dishId, 'dishId');
+  //cookId = helpers.checkId(cookId, 'cookId');
+
+  
+  const user = await userCollection.findOne({_id: new ObjectId(userId)});
+  if (!user) throw 'No user with that userId';
+  const dish = await dishCollection.findOne({_id: new ObjectId(dishId)});
+  if (!dish) throw 'No dish with that dishId';
+  // const cook = await cookCollection.findOne({_id: new ObjectId(cookId)});
+  // if (!cook) throw 'No cook with that cookId';
+  const cook = await cookCollection.findOne({_id:new ObjectId(dish.cookId)});
+
+  const newItem = {
+    _id: new ObjectId(),
+    dishName : dish.name,
+    cookName : cook.username,
+    eachCost: dish.cost,
+    quantity: 1,
+    subtotal: dish.cost
+  };
+  
+  const updateInfo = await userCollection.updateOne({_id: new ObjectId(userId)}, {$push: {cart: newItem}});
+  
+  if (!updateInfo)
+    throw `Error: Update failed! Could not add the item for the user Id with userId ${userId}`;
+  const userData = await userCollection.findOne({_id: new ObjectId(userId)});
+  let sum = 0;
+  userData.cart.forEach((element)=>{
+    sum+=element.subtotal;
+  })
+  const addedItem = await userCollection.findOneAndUpdate({_id:new ObjectId(userId)},{$set:{cartTotal:sum}},{returnDocument:'after'});
+  if(!addedItem){
+    throw("Item is not added")
+  }
+  return addedItem;
+};
+
+export const getCartItems = async (userId) => {
+  if(!userId){
+    throw("userID need to be supplied")
+  }
+  userId = helpers.checkId(userId,'userId');
+  const user = await userCollection.findOne({_id: new ObjectId(userId)});
+  if (!user) throw 'No user with that userId';
+  
+  return user.cart;
+};
+
+export const getItem = async(itemId)=>{
+  if(!itemId){
+    throw("itemId need to be supplied")
+  }
+  itemId = helpers.checkId(itemId,'itemId');
+  
+  
+  const foundItem = await userCollection.findOne(
+    {'cart._id': new ObjectId(itemId)},
+    {projection: {'cart.$': 1}}
+  );
+  if (!foundItem) throw 'Item Not found';
+  //console.log(foundReview.reviews);
+  return foundItem.cart[0];
+}
+
+export const updateItembyQuant = async (itemId) => {
+  if(!itemId){
+    throw("itemId need to be supplied")
+  }
+  itemId = helpers.checkId(itemId,'itemId');
+
+  const item = await getItem(itemId);
+  let newQuant = item.quantity+1;
+  let newSubtotal = item.eachCost*newQuant;
+  
+  var newObject = {
+    'cart.$.quantity': newQuant,
+    'cart.$.subtotal': newSubtotal
+  }
+  const updatedItem = await userCollection.findOneAndUpdate({'cart._id': new ObjectId(itemId)}, {$set:newObject},{returnDocument:'after'});
+  
+  let sum = 0
+  updatedItem.cart.forEach((element) => {
+    sum += element.subtotal;    
+  });
+
+  const updatedCartTotal = await userCollection.findOneAndUpdate({_id: new ObjectId(updatedItem._id)}, {$set:{cartTotal:sum}},{returnDocument:'after'});
+  
+  
+  return updatedCartTotal;
+};
+
+export const removeItemFromCart = async (itemId) => {
+  if(!itemId){
+    throw("itemId need to be supplied")
+  }
+  itemId = helpers.checkId(itemId,'itemId');
+  
+  const user = await userCollection.findOne({'cart._id': new ObjectId(itemId)});
+  if(!user){
+    throw("No item with that ID")
+  }
+  if(user.cart.length===1){
+    await userCollection.findOneAndUpdate({'cart._id': new ObjectId(itemId)}, {$set:{cartTotal:0}});
+  }
+  else{
+    let deleteSubTotal = 0;
+    let sum = 0;
+    user.cart.forEach((element) => {
+      if(element._id.toString() === itemId){
+        deleteSubTotal = element.subtotal;
+        
+      }
+      sum+=element.subtotal; 
+    });
+    await userCollection.findOneAndUpdate({'cart._id': new ObjectId(itemId)}, {$set:{cartTotal:(sum-deleteSubTotal)}});
+  }
+  const removedreview=await userCollection.findOneAndUpdate(
+    {'cart._id': new ObjectId(itemId)},
+    {$pull: {cart: {_id: new ObjectId(itemId)}}},
+    { returnDocument: "after" }
+  );
+  if(!removedreview){
+    throw("Review is not deleted")
+  }
+  return {deleted:true};
+};
+
+
+export const addCardDetails = async (userId, type, provider, cardNumber, cardHolderName,expirationDate,cvv,zipcode,country,isDefault) => {
+  if(!userId||!type||!provider||!cardNumber||!cardHolderName||!expirationDate||!cvv||!zipcode||!country||!isDefault){
+    throw("All fields need to be supplied")
+  }
+  userId = helpers.checkId(userId, 'userId');
+  if (typeof cardNumber !== 'string') throw `Error: ${cardNumber} must be a string!`;
+  cardNumber = cardNumber.trim();
+  
+  if(!/^\d{16}$/.test(cardNumber)) throw 'Please enter valid card number';
+  cardHolderName = helpers.checkString(cardHolderName, 'cardHolderName');
+  cardHolderName = helpers.checkSpecialCharsAndNum(cardHolderName, 'cardHolderName');
+  if(!helpers.isValidExpirationDate(expirationDate)) throw 'Your Card is Expired';
+  if(typeof cvv !== 'string') throw `Error: ${cvv} must be a string!`;
+  cvv = cvv.trim();
+  if(!/^\d{3}$/.test(cvv)) throw 'Please enter valid cvv';
+  if(typeof zipcode!=="string"){
+    throw 'zipcode should be of type string'
+  }
+  
+  zipcode = zipcode.trim();
+  if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
+  country = helpers.checkString(country,'country');
+  country = helpers.checkSpecialCharsAndNum(country,'country');
+  
+  const hashcardNumber = await bcrypt.hash(cardNumber, saltRounds);
+  const hashcvv = await bcrypt.hash(cvv, saltRounds);
+  if(isDefault ==="true"){
+    isDefault = true;}else{
+      isDefault = false;
+    }
+
+  const carddetails = {
+    _id: new ObjectId(),
+    type: type,
+    provider: provider,
+    cardNumber: hashcardNumber,
+    cardHolderName: cardHolderName,
+    expirationDate: expirationDate,
+    cvv: hashcvv,
+    zipcode: zipcode,
+    country: country,
+    isDefault: isDefault
+  };
+  
+  
+  const updateInfo = await userCollection.findOneAndUpdate({_id: new ObjectId(userId)}, {$push: {paymentCards: carddetails}}, {returnDocument: 'after'});
+  if(!updateInfo){
+    throw("Card details not added")
+  }
+  return {added:true};
+}
+
+
+
+

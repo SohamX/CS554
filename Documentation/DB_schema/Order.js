@@ -4,8 +4,8 @@ const order = {
         "dishId": ObjectId("DishId"),
         "quantity": Number
     }],      // References the dish ordered
-    "studentId": ObjectId("UserId"),   // References the student who ordered
-    "cookId": ObjectId("UserId"),      // References the cook who is fulfilling the order
+    "userId": ObjectId("UserId"),   // References the student/user who ordered
+    "cookId": ObjectId("CookId"),      // References the cook who is fulfilling the order
     "status": "placed" | "pending" | "declined" | "confirmed" | "in-progress" | "ready" | "completed" | "cancelled",  // Order status
     //student can cancel order before it is confirmed by chef
     //"quantity": Number,                // Number of portions ordered

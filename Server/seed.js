@@ -1,10 +1,12 @@
 import {dbConnection, closeConnection} from './config/mongoConnection.js';
 import {userData} from './data/index.js';
 import { mealReqData } from './data/index.js';
+import { dishData } from './data/index.js';
 const db = await dbConnection();
 await db.dropDatabase();
 
 let userIds = [];
+let cookIds = [];
 const usersData = [
     {
       firstName: "John",
@@ -123,7 +125,7 @@ const usersData = [
   
   for (const cook of cooksData) {
     try {
-      await userData.registerCook(
+      const { signupCompleted, cook: registeredUser } =   await userData.registerCook(
         cook.firstName,
         cook.lastName,
         cook.username,
@@ -138,8 +140,10 @@ const usersData = [
         cook.bio
       );
       console.log(`Cook ${cook.username} registered successfully`);
+      cookIds.push(registeredUser._id.toString()); // Store the cook ID
     } catch (error) {
       console.error(`Failed to register ${cook.username}: ${error}`);
+      
     }
   }
 
@@ -149,7 +153,7 @@ const usersData = [
         user.firstName,
         user.lastName,
         user.username,
-        user.password,
+        
         user.gmail,
         user.mobileNumber,
         user.address,
@@ -217,6 +221,87 @@ const usersData = [
       );
     } catch (error) {
       console.error(`Failed to create meal request for user ${meal.userId}: ${error}`);
+    }
+  }
+
+  const seedDishes = [
+    {
+      cookId: cookIds[0], // Example cook ID
+      name: "Classic Cheeseburger",
+      description: "A juicy grilled beef patty topped with melted cheddar cheese, lettuce, tomato, and pickles.",
+      cuisineType: "American",
+      cost: 8,
+    },
+    {
+      cookId: cookIds[0],
+      name: "Chicken Tacos",
+      description: "Soft corn tortillas filled with seasoned grilled chicken, fresh salsa, and a drizzle of lime crema.",
+      cuisineType: "Mexican",
+      cost: 6,
+     
+    },
+    {
+      cookId: cookIds[1],
+      name: "Margherita Pizza",
+      description: "A traditional Italian pizza with a thin crust, fresh mozzarella, tomatoes, and basil.",
+      cuisineType: "Italian",
+      cost: 1,
+      
+    },
+    {
+      cookId: cookIds[2],
+      name: "French Onion Soup",
+      description: "Rich, caramelized onions in a savory beef broth topped with a layer of melted Gruyère cheese.",
+      cuisineType: "French",
+      cost: 7,
+      
+    },
+    {
+      cookId: cookIds[2],
+      name: "Greek Salad",
+      description: "A refreshing salad with crisp cucumbers, juicy tomatoes, red onions, Kalamata olives, and feta cheese.",
+      cuisineType: "Greek",
+      cost: 5,
+      
+    },
+    {
+      cookId: cookIds[3],
+      name: "Kung Pao Chicken",
+      description: "A spicy stir-fry dish with diced chicken, peanuts, and vegetables in a flavorful Sichuan sauce.",
+      cuisineType: "Chinese",
+      cost: 9,
+      
+    },
+    {
+      cookId:cookIds[0],
+      name: "Sushi Platter",
+      description: "An assortment of fresh sushi rolls including California rolls, tuna sashimi, and salmon nigiri.",
+      cuisineType: "Japanese",
+      cost: 14,
+      
+    },
+    {
+      cookId: cookIds[1],
+      name: "Pad Thai",
+      description: "A classic Thai dish with stir-fried rice noodles, shrimp, eggs, and tamarind sauce.",
+      cuisineType: "Thai",
+      cost: 10,
+      
+    }
+  ];
+
+  for (const dish of seedDishes) {
+    try {
+      await dishData.addDish(
+        dish.cookId,
+        dish.name,
+        dish.description,
+        dish.cuisineType,
+        dish.cost
+      );
+      console.log(`Dish ${dish.name} added successfully`);
+    } catch (error) {
+      console.error(`Failed to add dish ${dish.name}: ${error}`);
     }
   }
 
