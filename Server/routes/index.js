@@ -1,9 +1,11 @@
 //Imports here
 import mealReqRoutes from './mealRequests.js';
 //import commentRoutes from './comments.js';
+import cookRoutes from './cooks.js'
 
 const constructorMethod = (app) => {
   app.use('/mealReqs', mealReqRoutes);
+  app.use('/cook', cookRoutes);
   
 
   app.use('*', (req, res) => {
