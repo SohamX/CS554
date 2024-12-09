@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
+import { ApiProvider } from './contexts/ApiContext';
 import Login from './components/Login';
 
 function App() {
@@ -10,36 +11,17 @@ function App() {
 
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route
-          path="/home"
-          element={
-            <>
-              <div>
-                <a href="https://vitejs.dev" target="_blank">
-                  <img src={viteLogo} className="logo" alt="Vite logo" />
-                </a>
-                <a href="https://react.dev" target="_blank">
-                  <img src={reactLogo} className="logo react" alt="React logo" />
-                </a>
-              </div>
-              <h1>Vite + React</h1>
-              <div className="card">
-                <button onClick={() => setCount((count) => count + 1)}>
-                  count is {count}
-                </button>
-                <p>
-                  Edit <code>src/App.jsx</code> and save to test HMR
-                </p>
-              </div>
-              <p className="read-the-docs">
-                Click on the Vite and React logos to learn more
-              </p>
-            </>
-          }
-        />
-      </Routes>
+      <ApiProvider>
+        <div className='App'>
+          <header className='App-header'>
+          </header>
+          <div className='App-body'>
+            <Routes>
+              <Route path="/" element={<Login />} />
+            </Routes>
+          </div>
+        </div>
+      </ApiProvider>
     </Router>
   );
 }
