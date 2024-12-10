@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApi } from '../contexts/ApiContext';
 import { Container, TextField, Button, Typography, Box, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from '@mui/material';
@@ -6,7 +6,7 @@ import { AuthContext } from '../contexts/AccountContext';
 
 const AdditionalInfo = () => {
     const [role, setRole] = useState('student');
-    const { message, firstName, lastName, gmail } = useLocation().state;
+    const { message = "", firstName = "", lastName = "", gmail = ""} = useLocation().state || {};
     const [formData, setFormData] = useState({
         firstName: firstName,
         lastName: lastName,
@@ -23,6 +23,12 @@ const AdditionalInfo = () => {
     const navigate = useNavigate();
     const { apiCall, loading, error } = useApi();
     const { setCurrentUser } = useContext(AuthContext);
+
+    useEffect(() => {
+        if (!message) {
+            navigate('/');
+        }
+    }, [message]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -53,16 +59,14 @@ const AdditionalInfo = () => {
             const data = await response.user;
             console.log('Success:', data);
             setCurrentUser(data);
-            navigate(role === 'student' ? '/students' : '/cooks');
+            navigate(role === 'student' ? '/student' : '/cook');
         } catch (error) {
             console.error('Error:', error);
             alert(error.error);
         }
     };
 
-    if (message!=="Hello from MyComponent!"){
-        navigate('/');
-    }
+    
 
     return (
         <Container maxWidth="sm" style={{marginTop: "3%", marginBottom: "4%"}}>

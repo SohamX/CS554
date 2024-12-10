@@ -12,6 +12,7 @@ import Student from './components/Student/Student.jsx';
 import PageNotFound from './components/PageNotFound';
 import PrivateRoute from './components/PrivateRoute';
 import AdditionalInfo from './components/AdditionalInfo.jsx';
+import Navigation from './components/Navigation.jsx';
 
 const AuthProviderWithRouter = withRouter(AuthProvider);
 
@@ -23,6 +24,7 @@ function App() {
         <AuthProviderWithRouter>
           <div className='App'>
             <header className='App-header'>
+              <Navigation />
             </header>
             <div className='App-body'>
               <Routes>

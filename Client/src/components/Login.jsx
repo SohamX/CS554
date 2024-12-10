@@ -48,7 +48,7 @@ const Login = () => {
     }
   };
   if (currentUser) {
-    if (currentUser.role === 'student') {
+    if (currentUser.role === 'user') {
       return <Navigate to='/student' />;
     } else if (currentUser.role === 'cook') {
       return <Navigate to='/cook' />;
