@@ -92,7 +92,7 @@ router
         zipcode,
         country);
     if (succ.signupCompleted) {
-      res.status(200).json({ status: "success" });
+      res.status(200).json({ status: "success",user:succ.user });
     }
     else {
       res.status(500).json({ error: "Internal Server Error" });
@@ -103,6 +103,29 @@ router
       return;
     }
   });
+
+router.route('/login').post(async (req, res) => {     // AFTER LOGIN 
+    let { gmail } = req.body;
+    try {
+      if(!gmail){
+        throw 'gmail must be supplied'
+      }
+    
+      gmail = gmail.trim();
+      if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+    } catch (e) {
+      res.status(400).json({error:e});
+      return;
+    }
+    try {
+      const data = await userData.loginUser(gmail);
+      res.status(200).json({ status: "success", data:data});
+    } catch (e) {
+      res.status(404).json({error:e});
+      return;
+    }
+  });
+  
 
 //GET USER BY ID ROUTE   
 
@@ -387,7 +410,6 @@ router
   })
 
   
-
 
 
 export default router;
