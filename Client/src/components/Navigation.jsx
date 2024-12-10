@@ -64,8 +64,40 @@ const Navigation = () => {
                             </section>
                         </div>
                     ) : (
-                    // Cook Navigation
-                    <></>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                            <section style={{ display: "flex", alignItems: "center" }}>
+                                <Button color="inherit">
+                                    <Link to="/cook" style={{ color: "white", textDecoration: "none" }}>
+                                        Home
+                                    </Link>
+                                </Button>
+                            </section>
+                            <section style={{ display: "flex", alignItems: "center" }}>
+                                <Button color="inherit" style={{width: "auto"}}>
+                                    <Link to="/cooks/menu" style={{ color: "white", textDecoration: "none" }}>
+                                        My Dishes
+                                    </Link>
+                                </Button>
+                                <Button color="inherit" style={{width: "auto"}}>
+                                    <Link to="/cooks/orders" style={{ color: "white", textDecoration: "none" }}>
+                                        Orders
+                                    </Link>
+                                </Button>
+                                <Button color="inherit" style={{width: "auto"}}>
+                                    <Link to="/cooks/requests" style={{ color: "white", textDecoration: "none" }}>
+                                        Meal Requests
+                                    </Link>
+                                </Button>
+                                <Button color="inherit" style={{width: "auto"}}>
+                                    <Link to="/cooks/account" style={{ color: "white", textDecoration: "none" }}>
+                                        My Account
+                                    </Link>
+                                </Button>
+                                <Button color="inherit" style={{width: "auto"}} onClick={doSignOut}>
+                                    Sign Out
+                                </Button>
+                            </section>
+                        </div>
                     )
                 ) : (
                     <div style={{ display: "flex", justifyContent: "flex-end" }}>

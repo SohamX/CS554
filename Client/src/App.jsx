@@ -13,6 +13,7 @@ import PageNotFound from './components/PageNotFound';
 import PrivateRoute from './components/PrivateRoute';
 import AdditionalInfo from './components/AdditionalInfo.jsx';
 import Navigation from './components/Navigation.jsx';
+import Cook from './components/Cooks/Cooks.jsx';
 
 const AuthProviderWithRouter = withRouter(AuthProvider);
 
@@ -31,8 +32,11 @@ function App() {
                 <Route path="/" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/additional/info" element={<AdditionalInfo />} />
-                <Route path="/student" element={<PrivateRoute />} >
+                <Route path="/student" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/student" element={<Student />} />
+                </Route>
+                <Route path="/cook" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/cook" element={<Cook />} />
                 </Route>
                 <Route path='/*' element={<PageNotFound />} />
               </Routes>

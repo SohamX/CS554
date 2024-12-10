@@ -56,9 +56,15 @@ const AdditionalInfo = () => {
             if(response.error){
                 throw response;
             }
-            const data = await response.user;
-            console.log('Success:', data);
-            setCurrentUser(data);
+            if(role === 'student'){
+                const data = await response.user;
+                console.log('Success:', data);
+                setCurrentUser(data);
+            } else {
+                const data = await response.cook;
+                console.log('Success:', data);
+                setCurrentUser(data);
+            }
             navigate(role === 'student' ? '/student' : '/cook');
         } catch (error) {
             console.error('Error:', error);
