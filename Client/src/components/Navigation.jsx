@@ -69,12 +69,16 @@ const Navigation = () => {
                     )
                 ) : (
                     <div style={{ display: "flex", justifyContent: "flex-end" }}>
-                        <Button color="inherit" component={Link} to="/">
-                            Sign In
-                        </Button>
-                        <Button color="inherit" component={Link} to="/signup">
-                            Sign Up
-                        </Button>
+                        {location.pathname!=='/additional/info' && (
+                            <>
+                                <Button color="inherit" component={Link} to="/">
+                                    Sign In
+                                </Button>
+                                <Button color="inherit" component={Link} to="/signup">
+                                    Sign Up
+                                </Button>
+                            </>
+                        )}
                     </div>
                 )}
                 </Box>
