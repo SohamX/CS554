@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { doCreateUserWithEmailAndPassword } from '../firebase/FirebaseFunctions';
 import { AuthContext } from '../contexts/AccountContext';
 import SocialSignIn from './SocialSignIn';
@@ -8,6 +8,7 @@ import { Container, TextField, Button, Typography, Box, Alert } from '@mui/mater
 function SignUp() {
     const { currentUser } = useContext(AuthContext);
     const [pwMatch, setPwMatch] = useState('');
+    const navigate = useNavigate();
     const handleSignUp = async (e) => {
         e.preventDefault();
         const { firstName, lastName, email, passwordOne, passwordTwo } = e.target.elements;
@@ -22,6 +23,9 @@ function SignUp() {
                 passwordOne.value,
                 firstName.value + ' ' + lastName.value
             );
+            navigate('/additional/info', {
+                state: { message: 'Hello from MyComponent!', firstName: firstName.value, lastName: lastName.value, gmail: email.value},
+            });
         } catch (error) {
             alert(error);
         }

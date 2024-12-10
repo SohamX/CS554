@@ -14,7 +14,7 @@ export const AuthProvider = ({children, navigate}) => {
     const auth = getAuth();
     useEffect(() => {
         let myListener = onAuthStateChanged(auth, async (user) => {
-          if(user){
+          if(user && user.displayName){
             try {
               const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/login`, {
                   method: 'POST',
@@ -29,9 +29,10 @@ export const AuthProvider = ({children, navigate}) => {
               setCurrentUser(response.data);
               console.log('onAuthStateChanged', response);
             } catch (error) {
+                console.log('user', user);
                 console.error('Error getting user data:', error.error);
                 if (error.error==='No user or cook found with that gmail'){
-                  alert('User not found, please sign up first');
+                  alert('We need some more information to create your account. Please fill out the form on the next page.');
                   navigate('/additional/info', {
                     state: { message: 'Hello from MyComponent!', firstName: user.displayName.split(' ')[0], lastName: user.displayName.split(' ')[1], gmail: user.email},
                   });
