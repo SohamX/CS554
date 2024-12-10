@@ -1,32 +1,41 @@
-import { useState } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 import { ApiProvider } from './contexts/ApiContext';
+import { AuthProvider } from './contexts/AccountContext';
 import Login from './components/Login';
-import User from './components/User'
+import Signup from './components/Signup';
+// import Student from './components/Student/Student.jsx';
 import PageNotFound from './components/PageNotFound';
+import PrivateRoute from './components/PrivateRoute';
+import AdditionalInfo from './components/AdditionalInfo.jsx';
 
 function App() {
-  const [count, setCount] = useState(0);
 
   return (
-    <Router>
-      <ApiProvider>
-        <div className='App'>
-          <header className='App-header'>
-          </header>
-          <div className='App-body'>
-            <Routes>
-              <Route path="/" element={<Login />} />
-              <Route path="/user/:id" element={<User />} />
-              <Route path='/*' element={<PageNotFound />} />
-            </Routes>
+    <ApiProvider>
+      <AuthProvider>
+        <Router>
+          <div className='App'>
+            <header className='App-header'>
+            </header>
+            <div className='App-body'>
+              <Routes>
+                <Route path="/" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/additional/info" element={<AdditionalInfo />} />
+                <Route path="/student" element={<PrivateRoute />} >
+                  {/* <Route path="/student" element={<Student />} /> */}
+                </Route>
+                <Route path='/*' element={<PageNotFound />} />
+              </Routes>
+            </div>
           </div>
-        </div>
-      </ApiProvider>
-    </Router>
+        </Router>
+      </AuthProvider>
+    </ApiProvider>
   );
 }
 
