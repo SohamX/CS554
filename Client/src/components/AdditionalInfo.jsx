@@ -8,10 +8,10 @@ const AdditionalInfo = () => {
     const [role, setRole] = useState('student');
     const { message, firstName, lastName, gmail } = useLocation().state;
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
+        firstName: firstName,
+        lastName: lastName,
         username: '',
-        gmail: '',
+        gmail: gmail,
         mobileNumber: '',
         address: '',
         city: '',
@@ -38,25 +38,25 @@ const AdditionalInfo = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const url = role === 'student' ? '/users/register' : '/cooks/register';
+        const url = role === 'student' ? `${import.meta.env.VITE_SERVER_URL}/users/register` : `${import.meta.env.VITE_SERVER_URL}/cooks/register`;
         try {
-        const response = await apiCall(url, {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData),
-        });
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.data.json();
-        console.log('Success:', data);
-        setCurrentUser(data);
-        navigate(role === 'student' ? '/students' : '/cooks');
+            const response = await apiCall(url, {
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+            if(response.error){
+                throw response;
+            }
+            const data = await response.user;
+            console.log('Success:', data);
+            setCurrentUser(data);
+            navigate(role === 'student' ? '/students' : '/cooks');
         } catch (error) {
-        console.error('Error:', error);
-        alert(error);
+            console.error('Error:', error);
+            alert(error.error);
         }
     };
 
@@ -65,7 +65,7 @@ const AdditionalInfo = () => {
     }
 
     return (
-        <Container maxWidth="sm">
+        <Container maxWidth="sm" style={{marginTop: "3%", marginBottom: "4%"}}>
             <Box sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
                 <Typography variant="h4" component="h1" gutterBottom>
                     Additional Information
@@ -81,39 +81,9 @@ const AdditionalInfo = () => {
                     <TextField
                         fullWidth
                         margin="normal"
-                        label="First Name"
-                        name="firstName"
-                        value={formData.firstName}
-                        defaultValue={firstName}
-                        onChange={handleChange}
-                        required
-                    />
-                    <TextField
-                        fullWidth
-                        margin="normal"
-                        label="Last Name"
-                        name="lastName"
-                        value={formData.lastName}
-                        defaultValue={lastName}
-                        onChange={handleChange}
-                        required
-                    />
-                    <TextField
-                        fullWidth
-                        margin="normal"
                         label="Username"
                         name="username"
                         value={formData.username}
-                        onChange={handleChange}
-                        required
-                    />
-                    <TextField
-                        fullWidth
-                        margin="normal"
-                        label="Gmail"
-                        name="gmail"
-                        value={formData.gmail}
-                        defaultValue={gmail}
                         onChange={handleChange}
                         required
                     />

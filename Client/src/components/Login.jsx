@@ -25,7 +25,12 @@ const Login = () => {
     try {
       await doSignInWithEmailAndPassword(email.value, password.value);
     } catch (error) {
-      setError(error.message);
+      if(error.message.trim() === "Firebase: Error (auth/invalid-credential)."){
+        setError('No user found with that email');
+      }
+      else{
+        setError(error.message);
+      }
     }
   };
 

@@ -2,15 +2,14 @@ import React, {useState, useEffect} from 'react';
 import {getAuth, onAuthStateChanged} from 'firebase/auth';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-export const AuthContext = React.createContext();
 import { useApi } from './ApiContext';
-import { useNavigate } from 'react-router-dom';
 
-export const AuthProvider = ({children}) => {
+export const AuthContext = React.createContext();
+
+export const AuthProvider = ({children, navigate}) => {
     const [currentUser, setCurrentUser] = useState(null);
     const [loadingUser, setLoadingUser] = useState(true);
-    const navigate = useNavigate();
-    const { apiCall, loading, error } = useApi();
+    const { apiCall } = useApi();
 
     const auth = getAuth();
     useEffect(() => {
@@ -24,14 +23,15 @@ export const AuthProvider = ({children}) => {
                   },
                   body: JSON.stringify({ gmail: user.email }),
               });
+              if(response.error){
+                throw response;
+              }
               setCurrentUser(response.data);
-              console.log('onAuthStateChanged', response.data);
-              setLoadingUser(false);
+              console.log('onAuthStateChanged', response);
             } catch (error) {
-                console.error('Error getting user data:', error);
+                console.error('Error getting user data:', error.error);
                 if (error.error==='No user or cook found with that gmail'){
                   alert('User not found, please sign up first');
-                  setLoadingUser(false); 
                   navigate('/additional/info', {
                     state: { message: 'Hello from MyComponent!', firstName: user.displayName.split(' ')[0], lastName: user.displayName.split(' ')[1], gmail: user.email},
                   });
@@ -39,6 +39,8 @@ export const AuthProvider = ({children}) => {
                 else{
                   alert(error);
                 }
+            } finally{
+              setLoadingUser(false); 
             }
           }
           else{
@@ -63,7 +65,7 @@ export const AuthProvider = ({children}) => {
   }
 
   return (
-    <AuthContext.Provider value={{currentUser}}>
+    <AuthContext.Provider value={{currentUser, setCurrentUser}}>
       {children}
     </AuthContext.Provider>
   );

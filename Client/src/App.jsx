@@ -5,19 +5,22 @@ import viteLogo from '/vite.svg';
 import './App.css';
 import { ApiProvider } from './contexts/ApiContext';
 import { AuthProvider } from './contexts/AccountContext';
+import withRouter from './contexts/withRouter.jsx';
 import Login from './components/Login';
 import Signup from './components/Signup';
-// import Student from './components/Student/Student.jsx';
+import Student from './components/Student/Student.jsx';
 import PageNotFound from './components/PageNotFound';
 import PrivateRoute from './components/PrivateRoute';
 import AdditionalInfo from './components/AdditionalInfo.jsx';
+
+const AuthProviderWithRouter = withRouter(AuthProvider);
 
 function App() {
 
   return (
     <ApiProvider>
-      <AuthProvider>
-        <Router>
+      <Router>
+        <AuthProviderWithRouter>
           <div className='App'>
             <header className='App-header'>
             </header>
@@ -27,14 +30,14 @@ function App() {
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/additional/info" element={<AdditionalInfo />} />
                 <Route path="/student" element={<PrivateRoute />} >
-                  {/* <Route path="/student" element={<Student />} /> */}
+                  <Route path="/student" element={<Student />} />
                 </Route>
                 <Route path='/*' element={<PageNotFound />} />
               </Routes>
             </div>
           </div>
-        </Router>
-      </AuthProvider>
+        </AuthProviderWithRouter>
+      </Router>
     </ApiProvider>
   );
 }

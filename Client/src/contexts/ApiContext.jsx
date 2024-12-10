@@ -12,9 +12,6 @@ export const ApiProvider = ({ children }) => {
     setError(null);
     try {
       const response = await fetch(url, options);
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
       const data = await response.json();
       setLoading(false);
       return data;
