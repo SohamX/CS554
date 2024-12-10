@@ -68,7 +68,7 @@ const usersData = [
       firstName: "Charlie",
       lastName: "Cook",
       username: "charli",
-      password: "CharlieCook1@",
+     
       gmail: "charlie.cook@gmail.com",
       mobileNumber: "111-222-3333",
       address: "789 Pine St",
@@ -82,7 +82,7 @@ const usersData = [
       firstName: "Diana",
       lastName: "Baker",
       username: "dianabake",
-      password: "DianaBake2@",
+     
       gmail: "diana.bake@gmail.com",
       mobileNumber: "222-333-4444",
       address: "321 Birch St",
@@ -96,7 +96,7 @@ const usersData = [
       firstName: "Evan",
       lastName: "Grillmaster",
       username: "evangrill",
-      password: "EvanGrill3@",
+      
       gmail: "evan.grill@gmail.com",
       mobileNumber: "333-444-5555",
       address: "456 Cedar St",
@@ -110,7 +110,7 @@ const usersData = [
       firstName: "Fiona",
       lastName: "Soup",
       username: "fionasoup",
-      password: "FionaSoup4@",
+     
       gmail: "fiona.soup@gmail.com",
       mobileNumber: "444-555-6666",
       address: "123 Spruce St",

@@ -131,7 +131,7 @@ export const registerUser = async (
   if (!insertInfo.acknowledged || !insertInfo.insertedId)
     throw 'Could not add User';
   
-  const createdUser = await userCollection.findOne({ _id: insertInfo.insertedId }, { projection: { password: 0 } });
+  const createdUser = await userCollection.findOne({ _id: insertInfo.insertedId }, { projection: { paymentCards: 0 } });
 
   if (!createdUser) throw "Failed to retrieve the created user";
 

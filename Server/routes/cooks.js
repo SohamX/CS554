@@ -7,12 +7,12 @@ import helpers from "../helpers/pranHelpers.js";
 const userCollection = await users();
 const cookCollection = await cooks();
 
-router.route("/").post(async (req, res) => {
+router.route("/register").post(async (req, res) => {
   let {
     firstName,
     lastName,
     username,
-    password,
+    
     gmail,
     mobileNumber,
     address,
@@ -27,7 +27,7 @@ router.route("/").post(async (req, res) => {
       !firstName ||
       !lastName ||
       !username ||
-      !password ||
+      
       !address ||
       !city ||
       !state ||
@@ -49,25 +49,25 @@ router.route("/").post(async (req, res) => {
       throw "username should be at least 5 characters long with a max of 10 characters ";
     }
     username = username.toLowerCase();
-    const sameUsername = await userCollection.findOne({ username: username });
-    const sameCookname = await cookCollection.findOne({ username: username });
-    if (sameUsername || sameCookname) {
-      throw `Error: User/Cook with ${username} already exists`;
-    }
-    if (typeof password !== "string") {
-      throw "Password should be of type string";
-    }
-    password = password.trim();
-    if (password === "" || /\s/.test(password) || password.length < 8) {
-      throw "Password should not contains spaces and must be minimum 8 characters long";
-    }
-    if (
-      !/[A-Z]/.test(password) ||
-      !/\d/.test(password) ||
-      !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password)
-    ) {
-      throw "Password should contain at least one uppercase character and at least one number and there has to be at least one special character";
-    }
+    // const sameUsername = await userCollection.findOne({ username: username });
+    // const sameCookname = await cookCollection.findOne({ username: username });
+    // if (sameUsername || sameCookname) {
+    //   throw `Error: User/Cook with ${username} already exists`;
+    // }
+    // if (typeof password !== "string") {
+    //   throw "Password should be of type string";
+    // }
+    // password = password.trim();
+    // if (password === "" || /\s/.test(password) || password.length < 8) {
+    //   throw "Password should not contains spaces and must be minimum 8 characters long";
+    // }
+    // if (
+    //   !/[A-Z]/.test(password) ||
+    //   !/\d/.test(password) ||
+    //   !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password)
+    // ) {
+    //   throw "Password should contain at least one uppercase character and at least one number and there has to be at least one special character";
+    // }
     address = helpers.checkString(address, "address");
     if (/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(address)) {
       throw `address cannot contains special characters`;
@@ -89,11 +89,11 @@ router.route("/").post(async (req, res) => {
     gmail = gmail.trim();
     if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail))
       throw "Please enter valid gmail";
-    const sameGamil = await userCollection.findOne({ gmail: gmail });
-    const sameCookGamil = await cookCollection.findOne({ gmail: gmail });
-    if (sameGamil || sameCookGamil) {
-      throw `Error: Account with email id: ${gmail} already exists`;
-    }
+    // const sameGamil = await userCollection.findOne({ gmail: gmail });
+    // const sameCookGamil = await cookCollection.findOne({ gmail: gmail });
+    // if (sameGamil || sameCookGamil) {
+    //   throw `Error: Account with email id: ${gmail} already exists`;
+    // }
 
     if (typeof mobileNumber !== "string") {
       throw "mobileNumber should be of type string";
@@ -102,18 +102,18 @@ router.route("/").post(async (req, res) => {
     mobileNumber = mobileNumber.trim();
     if (!/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber))
       throw "Please enter valid mobileNumber in 000-000-0000 format";
-    const sameNumber = await userCollection.findOne({
-      mobileNumber: mobileNumber,
-    });
-    const sameCookNumber = await cookCollection.findOne({
-      mobileNumber: mobileNumber,
-    });
-    console.log("same:", sameCookNumber);
-    if (sameNumber) {
-      throw `Error: A user already exists with number: ${sameNumber.mobileNumber}`;
-    } else if (sameCookNumber) {
-      throw `Error: A cook already exists with number: ${sameCookNumber.mobileNumber}`;
-    }
+    // const sameNumber = await userCollection.findOne({
+    //   mobileNumber: mobileNumber,
+    // });
+    // const sameCookNumber = await cookCollection.findOne({
+    //   mobileNumber: mobileNumber,
+    // });
+    // console.log("same:", sameCookNumber);
+    // if (sameNumber) {
+    //   throw `Error: A user already exists with number: ${sameNumber.mobileNumber}`;
+    // } else if (sameCookNumber) {
+    //   throw `Error: A cook already exists with number: ${sameCookNumber.mobileNumber}`;
+    // }
 
     country = helpers.checkString(country, "country");
     country = helpers.checkSpecialCharsAndNum(country, "country");
@@ -130,7 +130,7 @@ router.route("/").post(async (req, res) => {
       firstName,
       lastName,
       username,
-      password,
+      
       gmail,
       mobileNumber,
       address,
@@ -141,7 +141,7 @@ router.route("/").post(async (req, res) => {
       bio
     );
     if (success.signupCompleted) {
-      res.status(200).json({ status: "Cook Registered Successfully" });
+      res.status(200).json({ status: "Cook Registered Successfully",cook:success.cook });
     } else {
       res.status(500).json({ error: "Internal Server Error" });
     }

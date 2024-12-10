@@ -92,7 +92,7 @@ router
         zipcode,
         country);
     if (succ.signupCompleted) {
-      res.status(200).json({ status: "success" });
+      res.status(200).json({ status: "success",user:succ.user });
     }
     else {
       res.status(500).json({ error: "Internal Server Error" });

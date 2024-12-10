@@ -9,7 +9,7 @@ export const registerCook = async (
   firstName,
   lastName,
   username,
-  password,
+  
   gmail,
   mobileNumber,
   address,
@@ -23,7 +23,7 @@ export const registerCook = async (
     !firstName ||
     !lastName ||
     !username ||
-    !password ||
+    
     !address ||
     !city ||
     !state ||
@@ -51,21 +51,21 @@ export const registerCook = async (
   if (sameUsername || sameCookname) {
       throw `Error: User/Cook with ${username} already exists`;
   }
-  if (typeof password !== "string") {
-    throw "Password should be of type string";
-  }
-  password = password.trim();
+  // if (typeof password !== "string") {
+  //   throw "Password should be of type string";
+  // }
+  // password = password.trim();
 
-  if (password === "" || /\s/.test(password) || password.length < 8) {
-    throw "Password should not contains spaces and must be minimum 8 characters long";
-  }
-  if (
-    !/[A-Z]/.test(password) ||
-    !/\d/.test(password) ||
-    !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password)
-  ) {
-    throw "Password should contain at least one uppercase character and at least one number and there has to be at least one special character";
-  }
+  // if (password === "" || /\s/.test(password) || password.length < 8) {
+  //   throw "Password should not contains spaces and must be minimum 8 characters long";
+  // }
+  // if (
+  //   !/[A-Z]/.test(password) ||
+  //   !/\d/.test(password) ||
+  //   !/[!@#$%^&*()\-+={}[\]:;"'<>,.?\/|\\]/.test(password)
+  // ) {
+  //   throw "Password should contain at least one uppercase character and at least one number and there has to be at least one special character";
+  // }
   address = helpers.checkString(address, "address");
   if (/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(address)) {
     throw `address cannot contains special characters`;
@@ -118,15 +118,14 @@ export const registerCook = async (
   if (/^[^a-zA-Z]+$/.test(bio)) {
     throw "Bio contains only numeric and special characters";
   }
-  const saltRounds = 16;
+  // const saltRounds = 16;
 
-  //const plainTextPassword = 'mySuperAwesomePassword';
-  const hash = await bcrypt.hash(password, saltRounds);
+  // //const plainTextPassword = 'mySuperAwesomePassword';
+  // const hash = await bcrypt.hash(password, saltRounds);
   let newCook = {
     firstName: firstName,
     lastName: lastName,
     username: username,
-    password: hash,
     role: "cook",
     gmail: gmail,
     mobileNumber: mobileNumber,
@@ -153,8 +152,12 @@ export const registerCook = async (
   if (!insertInfo.acknowledged || !insertInfo.insertedId)
     throw "Could not add User";
 
-  const succ = { signupCompleted: true };
-  return succ;
+  const createdCook = await cookCollection.findOne({ _id: insertInfo.insertedId });
+
+  if (!createdCook) throw "Failed to retrieve the created cook";
+
+  return { signupCompleted: true, cook: createdCook };
+
 };
 
 export const updateCook = async (
@@ -286,6 +289,8 @@ export const updateCook = async (
     throw `Error: Update failed! Could not update cook's data with id ${userId}`;
   return { cookDataUpdated: true };
 };
+
+
 
 export const deleteCook = async (userId) => {
   userId = helpers.checkId(userId, "userId");

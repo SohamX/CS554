@@ -9,7 +9,7 @@ const constructorMethod = (app) => {
   app.use('/users', userRoutes);
   app.use('/orders', orderRoutes);
   app.use('/dishes', dishRoutes);
-  app.use('/cook', cookRoutes);
+  app.use('/cooks', cookRoutes);
 
   app.use('*', (req, res) => {
     res.status(404).json({ error: 'Route Not found' });
