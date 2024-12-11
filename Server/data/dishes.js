@@ -81,7 +81,7 @@ export const updateDish = async (
 
     //get existing dish   
     let existingDish = await getDishById(id);
-    if (name) {
+    if (name && existingDish.name != name.trim()) {
         name = helpers.checkString(name, 'dish name');
         existingDish.name = name;
         //check if dish already present for this cook
@@ -108,7 +108,7 @@ export const updateDish = async (
         images = checkisValidImageArray(images, 'images');
         existingDish.images = images;
     }
-    if (isAvailable) {
+    if (isAvailable != null) {
         existingDish.isAvailable = isAvailable;
     }
 

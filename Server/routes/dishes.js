@@ -97,8 +97,10 @@ router
 
         try {
             cookId = validateId(cookId, 'cookId');
+            let existingDish = await dishData.getDishById(req.params.id);
 
-            if (name) {
+
+            if (name && existingDish.name != name.trim()) {
                 name = helpers.checkString(name, 'dish name');
                 //check if dish already present for this cook
                 validateUniqueDishesPerCook(cookId, name);
@@ -120,8 +122,8 @@ router
             if (images) {
                 images = checkisValidImageArray(images, 'images');
             }
-            if (isAvailable) {
-                isAvailable = checkisValidBoolean(Boolean(isAvailable));
+            if (dishFormData.isAvailable != null) {
+                isAvailable = checkisValidBoolean(Boolean(dishFormData.isAvailable));
             }
 
         } catch (e) {

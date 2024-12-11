@@ -43,3 +43,9 @@ body{
   font-size: calc(10px + 2vmin);
   color: #333;
 }
+
+.errorMessage {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
