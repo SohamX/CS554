@@ -12,14 +12,18 @@ router
     let { firstName,
       lastName,
       username,
-      
       gmail,
       mobileNumber,
       address, //address mean just street address
       city,
       state,
       zipcode,
-      country } = req.body;
+      country,
+      latitude,
+      longitude } = req.body;
+
+      let latitude_float
+      let longitude_float
     try {
       
         if(!firstName ||
@@ -31,7 +35,9 @@ router
         !zipcode ||
         !country ||
         !gmail||
-        !mobileNumber
+        !mobileNumber ||
+        !latitude ||
+        !longitude
         ){
             throw "All fields need to be supplied"
           }
@@ -64,6 +70,12 @@ router
           throw 'gmail should be of type string'
         }
 
+        latitude_float = parseFloat(latitude.trim());
+        latitude_float = helpers.latitudeAndLongitude(latitude_float, 'Latitude')
+        
+        longitude_float = parseFloat(longitude.trim());
+        longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
+
         gmail = gmail.trim();
         if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
 
@@ -83,14 +95,15 @@ router
       const succ = await userData.registerUser(firstName,
         lastName,
         username,
-        
         gmail,
         mobileNumber,
         address, //address mean just street address
         city,
         state,
         zipcode,
-        country);
+        country,
+        latitude_float,
+        longitude_float);
     if (succ.signupCompleted) {
       res.status(200).json({ status: "success",user:succ.user });
     }
@@ -168,8 +181,12 @@ router.route('/login').post(async (req, res) => {     // AFTER LOGIN
         city,
         state,
         zipcode,
-        country } = req.body
+        country,
+        latitude,
+        longitude } = req.body
 
+        let latitude_float
+        let longitude_float
       try {
         if(!firstName ||
           !lastName ||
@@ -181,7 +198,9 @@ router.route('/login').post(async (req, res) => {     // AFTER LOGIN
         !zipcode ||
         !country ||
         !gmail||
-        !mobileNumber
+        !mobileNumber||
+        !latitude ||
+        !longitude
         ){
             throw "Some fields cannot be empty"
           }
@@ -218,6 +237,12 @@ router.route('/login').post(async (req, res) => {     // AFTER LOGIN
           throw 'gmail should be of type string'
         }
         
+        latitude_float = parseFloat(latitude.trim());
+        latitude_float = helpers.latitudeAndLongitude(latitude_float, 'Latitude')
+        
+        longitude_float = parseFloat(longitude.trim());
+        longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
+
         gmail = gmail.trim();
         if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
         
@@ -253,7 +278,9 @@ router.route('/login').post(async (req, res) => {     // AFTER LOGIN
               city,
               state,
               zipcode,
-              country);
+              country,
+              latitude_float,
+              longitude_float);
           if (updateInfo) {
               res.status(200).json({ status: "success", user: updateInfo });
           }

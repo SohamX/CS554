@@ -11,14 +11,15 @@ export const registerUser = async (
   firstName,
   lastName,
   username,
-  
   gmail,
   mobileNumber,
   address, //address mean just street address
   city,
   state,
   zipcode,
-  country
+  country,
+  latitude,
+  longitude
 ) => {
   if(!firstName ||
     !lastName ||
@@ -29,7 +30,9 @@ export const registerUser = async (
   !zipcode ||
   !country ||
   !gmail||
-  !mobileNumber
+  !mobileNumber ||
+  !latitude ||
+  !longitude
   ){
       throw "All fields need to be supplied"
     }
@@ -77,6 +80,13 @@ export const registerUser = async (
   if(typeof gmail!=="string"){
     throw 'gmail should be of type string'
   }
+
+    // latitude_float = parseFloat(latitude.trim());
+    let latitude_float = helpers.latitudeAndLongitude(latitude, 'Latitude')
+
+    // longitude_float = parseFloat(longitude.trim());
+    let longitude_float = helpers.latitudeAndLongitude(longitude, 'Longitude')
+  
   
   gmail = gmail.trim();
   if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
@@ -119,7 +129,7 @@ export const registerUser = async (
         state: state,
         zipcode: zipcode,
         country: country,
-        coordinates: { longitude: "", latitude: "" } //Calculated and stored?
+        coordinates: { longitude: longitude_float, latitude: latitude_float} //Calculated and stored?
     },
     favourites : [],
     cart : [],
@@ -180,25 +190,27 @@ export const loginUser = async (gmail) => {
   export const updateUser = async (userId, firstName,
     lastName,
     username,
-    
     gmail,
     mobileNumber,
     address,
     city,
     state,
     zipcode,
-    country) => {
+    country,
+    latitude,
+    longitude) => {
       if(!userId||!firstName ||
         !lastName ||
         !username ||
-        
         !address ||
       !city ||
       !state ||
       !zipcode ||
       !country ||
       !gmail||
-      !mobileNumber
+      !mobileNumber ||
+      !latitude || 
+      !longitude
       ){
           throw "Some fields cannot be empty"
         }
@@ -244,6 +256,12 @@ export const loginUser = async (gmail) => {
         throw 'gmail should be of type string'
       }
       
+      // latitude_float = parseFloat(latitude.trim());
+      let latitude_float = helpers.latitudeAndLongitude(latitude, 'Latitude')
+  
+      // longitude_float = parseFloat(longitude.trim());
+      let longitude_float = helpers.latitudeAndLongitude(longitude, 'Longitude')
+  
       gmail = gmail.trim();
       if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
       if(currUser.gmail!==gmail){
@@ -283,7 +301,11 @@ export const loginUser = async (gmail) => {
             city: city,
             state: state,
             zipcode: zipcode,
-            country: country
+            country: country,
+            coordinates : {
+              longitude: longitude_float,
+              latitude: latitude_float
+            }
         }
         
         
