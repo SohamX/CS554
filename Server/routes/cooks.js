@@ -7,12 +7,12 @@ import helpers from "../helpers/pranHelpers.js";
 const userCollection = await users();
 const cookCollection = await cooks();
 
+// ADD COOK ROUTE
 router.route("/register").post(async (req, res) => {
   let {
     firstName,
     lastName,
     username,
-    
     gmail,
     mobileNumber,
     address,
@@ -21,13 +21,16 @@ router.route("/register").post(async (req, res) => {
     zipcode,
     country,
     bio,
+    latitude,
+    longitude
   } = req.body;
+  let latitude_float
+  let longitude_float
   try {
     if (
       !firstName ||
       !lastName ||
       !username ||
-      
       !address ||
       !city ||
       !state ||
@@ -35,7 +38,9 @@ router.route("/register").post(async (req, res) => {
       !country ||
       !gmail ||
       !mobileNumber ||
-      !bio
+      !bio ||
+      !latitude ||
+      !longitude
     ) {
       throw "All mandatory fields are not supplied";
     }
@@ -86,6 +91,14 @@ router.route("/register").post(async (req, res) => {
       throw "gmail should be of type string";
     }
 
+    let str1 = latitude.trim()
+    latitude_float = parseFloat(str1);
+    latitude_float = helpers.latitudeAndLongitude(latitude_float, 'Latitude')
+  
+    let str2 = longitude.trim()
+    longitude_float = parseFloat(str2);
+    longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
+
     gmail = gmail.trim();
     if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail))
       throw "Please enter valid gmail";
@@ -130,7 +143,6 @@ router.route("/register").post(async (req, res) => {
       firstName,
       lastName,
       username,
-      
       gmail,
       mobileNumber,
       address,
@@ -138,7 +150,9 @@ router.route("/register").post(async (req, res) => {
       state,
       zipcode,
       country,
-      bio
+      bio,
+      latitude_float,
+      longitude_float
     );
     if (success.signupCompleted) {
       res.status(200).json({ status: "Cook Registered Successfully",cook:success.cook });
@@ -151,9 +165,29 @@ router.route("/register").post(async (req, res) => {
   }
 });
 
-router.route("/").put(async (req, res) => {
+// GET COOK BY ID
+router.route("/:id")
+.get(async (req, res) => {
+  let userId  = req.params.id;
+  try {
+    if (!userId) throw `Cook ID not Provided`;
+    userId = helpers.checkId(userId, "userId");
+    const data = await cookData.getCookByID(userId);
+    if (data) {
+      res.status(200).json({ status: "success", cook: data });
+    } else {
+      res.status(404).json({ error: "Cook Not Found" });
+    }
+  } catch (e) {
+    res.status(400).json({ error: e });
+    return;
+  }
+})
+
+// UPDATE USER BY ID
+.put(async (req, res) => {
   let {
-    userId,
+    // userId,
     firstName,
     lastName,
     username,
@@ -164,11 +198,16 @@ router.route("/").put(async (req, res) => {
     state,
     zipcode,
     country,
+    bio,
+    latitude,
+    longitude
   } = req.body;
+  let userId = req.params.id
+  let latitude_float, longitude_float;
 
   try {
     if (
-      !userId ||
+      // !userId ||
       !firstName ||
       !lastName ||
       !username ||
@@ -178,7 +217,10 @@ router.route("/").put(async (req, res) => {
       !zipcode ||
       !country ||
       !gmail ||
-      !mobileNumber
+      !mobileNumber ||
+      !bio ||
+      !latitude ||
+      !longitude
     ) {
       throw "All mandatory fields are not provided";
     }
@@ -189,6 +231,7 @@ router.route("/").put(async (req, res) => {
     if (!currUser) {
       throw "No cook with that ID";
     }
+    
     firstName = helpers.checkString(firstName, "firstName");
     firstName = helpers.checkSpecialCharsAndNum(firstName, "firstName");
     lastName = helpers.checkString(lastName, "lastName");
@@ -228,6 +271,14 @@ router.route("/").put(async (req, res) => {
       throw "gmail should be of type string";
     }
 
+    let str1 = latitude.trim()
+    latitude_float = parseFloat(str1);
+    latitude_float = helpers.latitudeAndLongitude(latitude_float, 'Latitude')
+  
+    let str2 = longitude.trim()
+    longitude_float = parseFloat(str2);
+    longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
+
     gmail = gmail.trim();
     if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail))
       throw "Please enter valid gmail";
@@ -259,6 +310,12 @@ router.route("/").put(async (req, res) => {
         throw "Already mobileNumber exists";
       }
     }
+    country = helpers.checkString(country, "country");
+    country = helpers.checkSpecialCharsAndNum(country, "country");
+    bio = helpers.checkString(bio, "bio");
+    if (/^[^a-zA-Z]+$/.test(bio)) {
+      throw "Bio contains only numeric and special characters";
+    }
   } catch (e) {
     return res.status(400).json({ error: e });
   }
@@ -275,7 +332,10 @@ router.route("/").put(async (req, res) => {
       city,
       state,
       zipcode,
-      country
+      country,
+      bio,
+      latitude_float,
+      longitude_float
     );
     if (success.cookDataUpdated) {
       res.status(200).json({ status: "Cook Updated Successfully" });
@@ -286,9 +346,10 @@ router.route("/").put(async (req, res) => {
     res.status(400).json({ error: e });
     return;
   }
-});
+})
 
-router.route("/").delete(async (req, res) => {
+// DELETE USER BY ID
+.delete(async (req, res) => {
   let { userId } = req.body;
   try {
     if (!userId) throw `Cook ID not Provided`;
@@ -305,4 +366,47 @@ router.route("/").delete(async (req, res) => {
   }
 });
 
+// UPDATE COOK'S AVAILABILTY
+router.route("/availability/:id").put(async(req, res) => {
+  // let userId = req.params.id
+  // let {
+  //   days,
+  //   hours
+  // } = req.body
+  // try {
+  //   if (!userId) throw `Cook ID not Provided`;
+  //   userId = helpers.checkId(userId, "userId");
+  //   const data = await cookData.getCookByID(userId);
+  //   if (data) {
+  //     res.status(200).json({ status: "success", cook: data });
+  //   } else {
+  //     res.status(404).json({ error: "Cook Not Found" });
+  //   }
+  // } catch (e) {
+    res.status(400).json({ error: "Logic not implemented yet" });
+    return;
+  // }
+})
+
+// GET COOK'S AVAILABILITY BY ID
+.get(async(req, res) => {
+  let userId = req.params.id
+  try {
+    if (!userId) throw `Cook ID not Provided`;
+    userId = helpers.checkId(userId, "userId");
+    const data = await cookData.getCookByID(userId);
+    if (!data) {
+      res.status(404).json({ error: "Cook Not Found" });
+    }
+    const availability = await cookData.getCookAvailability(userId);
+    if (availability) {
+      res.status(200).json({ status: "success", availability: availability });
+    } else {
+      res.status(500).json({ error: "INTERNAL SERVER ERROR" });
+    }
+  } catch (e) {
+    res.status(400).json({ error: e });
+    return;
+  }
+})
 export default router;

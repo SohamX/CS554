@@ -9,7 +9,6 @@ export const registerCook = async (
   firstName,
   lastName,
   username,
-  
   gmail,
   mobileNumber,
   address,
@@ -17,13 +16,14 @@ export const registerCook = async (
   state,
   zipcode,
   country,
-  bio
+  bio,
+  latitude,
+  longitude
 ) => {
   if (
     !firstName ||
     !lastName ||
     !username ||
-    
     !address ||
     !city ||
     !state ||
@@ -31,7 +31,9 @@ export const registerCook = async (
     !country ||
     !gmail ||
     !mobileNumber ||
-    !bio
+    !bio || 
+    !latitude ||
+    !longitude
   ) {
     throw "All fields need to be supplied";
   }
@@ -83,6 +85,11 @@ export const registerCook = async (
   if (typeof gmail !== "string") {
     throw "gmail should be of type string";
   }
+
+  // latitude_float = parseFloat(latitude.trim());
+  let latitude_float = helpers.latitudeAndLongitude(latitude, 'Latitude')
+  // longitude_float = parseFloat(longitude.trim());
+  let longitude_float = helpers.latitudeAndLongitude(longitude, 'Longitude')
 
   gmail = gmail.trim();
   if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail))
@@ -136,7 +143,7 @@ export const registerCook = async (
       state: state,
       zipcode: zipcode,
       country: country,
-      coordinates: { longitude: "", latitude: "" }, //Calculated and stored?
+      coordinates: { longitude: longitude_float, latitude: latitude_float }, //Calculated and stored?
     },
     availability: {
       days: [], // E.g., ['Monday', 'Wednesday', 'Friday']
@@ -171,7 +178,10 @@ export const updateCook = async (
   city,
   state,
   zipcode,
-  country
+  country,
+  bio,
+  latitude,
+  longitude
 ) => {
   if (
     !userId ||
@@ -184,16 +194,17 @@ export const updateCook = async (
     !zipcode ||
     !country ||
     !gmail ||
-    !mobileNumber
+    !mobileNumber ||
+    !latitude ||
+    !longitude
   ) {
-    throw "Some fields cannot be empty";
+    throw "All mandatory field are not provided";
   }
   userId = helpers.checkId(userId, "userId");
   const currUser = await cookCollection.findOne({ _id: new ObjectId(userId) });
   if (!currUser) {
     throw "No cook with that ID";
   }
-
   firstName = helpers.checkString(firstName, "firstName");
   firstName = helpers.checkSpecialCharsAndNum(firstName, "firstName");
   lastName = helpers.checkString(lastName, "lastName");
@@ -233,6 +244,12 @@ export const updateCook = async (
     throw "gmail should be of type string";
   }
 
+  // latitude_float = parseFloat(latitude.trim());
+  let latitude_float = helpers.latitudeAndLongitude(latitude, 'Latitude')
+
+  // longitude_float = parseFloat(longitude.trim());
+  let longitude_float = helpers.latitudeAndLongitude(longitude, 'Longitude')
+
   gmail = gmail.trim();
   if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail))
     throw "Please enter valid gmail";
@@ -262,9 +279,12 @@ export const updateCook = async (
       throw "Already mobileNumber exists";
     }
   }
-
   country = helpers.checkString(country, "country");
   country = helpers.checkSpecialCharsAndNum(country, "country");
+  bio = helpers.checkString(bio, "bio");
+  if (/^[^a-zA-Z]+$/.test(bio)) {
+    throw "Bio contains only numeric and special characters";
+  }
 
   let updateduserData = {
     firstName: firstName,
@@ -272,12 +292,14 @@ export const updateCook = async (
     username: username,
     gmail: gmail,
     mobileNumber: mobileNumber,
+    bio: bio,
     location: {
       address: address,
       city: city,
       state: state,
       zipcode: zipcode,
       country: country,
+      coordinates: { longitude: longitude_float, latitude: latitude_float }, //Calculated and stored?
     },
   };
   const updateInfo = await cookCollection.findOneAndUpdate(
@@ -289,8 +311,6 @@ export const updateCook = async (
     throw `Error: Update failed! Could not update cook's data with id ${userId}`;
   return { cookDataUpdated: true };
 };
-
-
 
 export const deleteCook = async (userId) => {
   userId = helpers.checkId(userId, "userId");
@@ -309,3 +329,20 @@ export const deleteCook = async (userId) => {
   return deletedobj;
 };
 
+export const getCookByID = async (userId) => {
+  userId = helpers.checkId(userId, "userId");
+  const currUser = await cookCollection.findOne({ _id: new ObjectId(userId) });
+  if (!currUser) {
+    throw `No cook found with ID: ${userId}`;
+  }
+  return currUser;
+}
+
+export const getCookAvailability = async (userId) => {
+  userId = helpers.checkId(userId, "userId");
+  const currUser = await cookCollection.findOne({ _id: new ObjectId(userId) });
+  if (!currUser) {
+    throw `No cook found with ID: ${userId}`;
+  }
+  return currUser.availability;
+}

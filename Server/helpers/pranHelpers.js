@@ -75,7 +75,8 @@ const exportedMethods = {
     if (!strVal) throw `Error: You must supply a ${varName}!`;
     if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
     strVal = strVal.trim();
-    if (strVal.length < 2 || strVal.length > 25) throw `${varName} must be a non-empty string and length should be min 2 and max 25`;
+    if (varName !== 'bio' && (strVal.length < 2 || strVal.length > 25)) throw `${varName} must be a non-empty string and length should be min 2 and max 25`;
+    if (varName === 'bio' && (strVal.length < 2 || strVal.length > 200)) throw `${varName} must be a non-empty string and length should be min 2 and max 200`;
     if (!isNaN(strVal))
       throw `Error: ${strVal} is not a valid value for ${varName} as it only contains digits`;
     return strVal;
@@ -126,7 +127,25 @@ const exportedMethods = {
 
     return arr;
   },
-  
+
+  latitudeAndLongitude(num, varName) {
+    if (num === undefined || num === null)
+        throw `Error: ${varName || 'Provided parameter'} is null or undefined`;
+    if (typeof num != 'number')
+        throw `Error: ${varName || 'Provided parameter'} is not a number`;
+    if (Number.isNaN(num))
+        throw `Error: ${varName || 'Provided parameter'} is NaN`;
+    let test = num.toString();
+    let testArr = test.split('.');
+    if (testArr.length = 2 && testArr[1].length > 6)
+        throw `Error: ${varName || 'Provided parameter'} must be upto 6 decimal places`;
+    if (varName === 'Latitude') {
+      if (num > 90 || num < -90) throw `Error: ${varName || 'Provided parameter'} is out of range, the valid range is -90.000000 to 90.000000`
+    } else if (varName === 'Longitude') {
+      if (num > 180 || num < -180) throw `Error: ${varName || 'Provided parameter'} is out of range, the valid range is -180.000000 to 180.000000`
+    }
+    return num;
+  }
 };
 
 export default exportedMethods;
