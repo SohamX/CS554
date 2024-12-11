@@ -12,6 +12,13 @@ export const getDishById = async (id) => {
     return existingDish;
 };
 
+export const getAvailableDishes = async (id) => {
+    const dishCollection = await dishes();
+    const existingDishes = await dishCollection.find({ isAvailable: true }).toArray();
+    if (existingDishes.length === 0) throw `No dish available.`;
+    return existingDishes;
+};
+
 export const getAllDishesByCookId = async (cookId) => {
     cookId = validateId(cookId, 'userId');
     const dishCollection = await dishes();

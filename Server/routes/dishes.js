@@ -6,6 +6,15 @@ import { dishData } from '../data/index.js';
 
 router
     .route('/')
+    .get(async (req, res) => {
+        try {
+            const dishes = await dishData.getAvailableDishes();
+            res.status(200).json({ status: "success", dishes: dishes });
+        } catch (e) {
+            res.status(404).json(errorMsg(e));
+            return;
+        }
+    })
     .post(async (req, res) => {
         const dishFormData = req.body;
         let {
