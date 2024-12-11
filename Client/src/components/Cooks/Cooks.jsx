@@ -13,6 +13,8 @@ const student = () => {
         navigate("/");
         }
     }, [currentUser]);
+
+    console.log(currentUser);
     
     return (
         <div>

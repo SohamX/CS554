@@ -6,7 +6,7 @@ const order = {
     }],      // References the dish ordered
     "userId": ObjectId("UserId"),   // References the student/user who ordered
     "cookId": ObjectId("CookId"),      // References the cook who is fulfilling the order
-    "status": "placed" | "pending" | "declined" | "confirmed" | "in-progress" | "ready" | "completed" | "cancelled",  // Order status
+    "status": "placed" | "in-progress" | "ready" | "completed" | "cancelled",  // Order status
     //student can cancel order before it is confirmed by chef
     //"quantity": Number,                // Number of portions ordered
     "isMealReq": Boolean,
@@ -19,8 +19,8 @@ const order = {
     // },
     "createdAt": Date,                // Timestamp when the order was placed
     "updatedAt": Date,                 // Timestamp for last update on order status
-    "rating": Number, //0-5 (Optional) Student can rate the order only if it is completed?
-    "review": String,    //(Optional) Student can leave a review after the order is completed?
+    // "rating": Number, //0-5 (Optional) Student can rate the order only if it is completed?
+    // "review": String,    //(Optional) Student can leave a review after the order is completed?
     "invoiceLink": "S3 url"
 }
 

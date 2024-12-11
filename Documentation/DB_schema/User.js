@@ -73,10 +73,7 @@ const cook = {
     "avgRating": Number,
     "reviews" : [{
         "userId": ObjectId("userId"), // Array of reviewers
-        
         "review": String,
-         "rating": Number      // Rating for 5
+        "rating": Number      // Rating for 5
     }]
-    
-
 }

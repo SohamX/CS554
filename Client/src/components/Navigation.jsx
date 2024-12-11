@@ -23,7 +23,7 @@ const Navigation = () => {
                                     </Link>
                                 </Button>
                             </section>
-                            <section style={{ display: "flex", alignItems: "center" }}>
+                            {/* <section style={{ display: "flex", alignItems: "center" }}>
                                 {location.pathname === '/student' && (
                                     <Box sx={{ display: 'flex', alignItems: 'center', mx: 'auto' }}>
                                         <InputBase
@@ -36,8 +36,13 @@ const Navigation = () => {
                                         </IconButton>
                                     </Box>
                                 )}
-                            </section>
+                            </section> */}
                             <section style={{ display: "flex", alignItems: "center", width: "fit-content" }}>
+                                <Button color="inherit" style={{width: "auto"}}>
+                                    <Link to="/student/cooksaroundyou" style={{ color: "white", textDecoration: "none" }}>
+                                        Cooks Around You
+                                    </Link>
+                                </Button>
                                 <Button color="inherit" style={{width: "auto"}}>
                                     <Link to="/student/cart" style={{ color: "white", textDecoration: "none" }}>
                                         Cart

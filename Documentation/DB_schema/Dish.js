@@ -11,6 +11,11 @@ const dish = {
     // },
     "images": [String],               // URL to the dish image stored
     "rating": Number,              // Average rating of the dish
+    "reviews": [{
+        "userId": ObjectId,         // References to users who reviewed the dish
+        "rating": Number,           // Rating given by the user
+        "review": String            // Review text
+    }], // References to reviews of the dish
     "createdAt": Date,             // Timestamp when dish was created in the DB
     "isAvailable": Boolean//,         // Whether the dish is currently available
     //"isDeleted": Boolean    //true, if dish is deleted by the cook
