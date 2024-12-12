@@ -382,6 +382,7 @@ export const addItemtoCart = async (
 
   const newItem = {
     _id: new ObjectId(),
+    dishId : dishId,
     dishName : dish.name,
     cookName : cook.username,
     eachCost: dish.cost,
