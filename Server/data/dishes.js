@@ -149,3 +149,47 @@ export const deleteDish = async (
     }
     return resObj;
 }
+
+export const searchQuery = async (
+  dish,
+  cuisine,
+  location,
+  minPrice,
+  maxPrice
+) => {
+  const dishCollection = await dishes();
+  if (cuisine.trim() !== "") {
+    cuisine = helpers.checkString(cuisine, "cuisine");
+    cuisine = validateCuisineType(cuisine);
+  }
+
+  if (minPrice) {
+    if (typeof minPrice != "number") throw `Error: min price is not a number`;
+    if (Number.isNaN(minPrice)) throw `Error: min price is not a number`;
+  }
+
+  if (maxPrice) {
+    if (typeof maxPrice != "number") throw `Error: max price is not a number`;
+    if (Number.isNaN(maxPrice)) throw `Error: max price is not a number`;
+  }
+
+  if (minPrice && maxPrice && minPrice > maxPrice) throw `Error: Min price cannot be greater than Max price`
+
+  //location validation to be implemented
+
+  let query = {};
+  if (cuisine.trim() !== "")
+    query["cuisineType"] = { $regex: cuisine, $options: "i" };
+  if (dish.trim() !== "") query["name"] = { $regex: dish, $options: "i" };
+  if (minPrice) {
+    query["cost"] = {};
+    query["cost"].$gte = minPrice;
+  }
+  if (maxPrice) {
+    query["cost"] = query["cost"] || {}; 
+    query["cost"].$lte = maxPrice;
+  }
+  let results;
+  results = await dishCollection.find(query).toArray();
+  return results;
+};

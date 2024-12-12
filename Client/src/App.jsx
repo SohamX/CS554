@@ -36,6 +36,7 @@ function App() {
                 <Route path="/additional/info" element={<AdditionalInfo />} />
                 <Route path="/student" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/student" element={<Student />} />
+                  <Route path="/student/dishes/:id" element={<DishDetail />} />
                 </Route>
                 <Route path="/cook/dishes" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook/dishes" element={<DishesList />} />

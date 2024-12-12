@@ -145,7 +145,21 @@ const exportedMethods = {
       if (num > 180 || num < -180) throw `Error: ${varName || 'Provided parameter'} is out of range, the valid range is -180.000000 to 180.000000`
     }
     return num;
+  },
+
+  validateFloats(num, varName) {
+    num = num.trim()
+    let str = num.split('.');
+    if (str.length > 2) throw `Error: Invalid ${varName}`
+    if (str.length == 2 && (str[1].length > 2)) throw `Error: ${varName} should be upto 2 decimals` 
+
+    const validNumberRegex = /^\d+(\.\d{1,2})?$/;
+    if (!validNumberRegex.test(num)) throw `Error: Invalid ${varName}`
+      
+    let floatNum = parseFloat(num);
+    return floatNum
   }
+
 };
 
 export default exportedMethods;
