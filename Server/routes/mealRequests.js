@@ -8,8 +8,8 @@ import helpers from '../helpers/pranHelpers.js'
 // });
 router.route('/').post(async (req, res) => {
   const mealReqFormData = req.body;
-  const userId = req.session.user.userId;
   let {
+  userId,
   noOfPeople ,
   description ,
   cuisineType,

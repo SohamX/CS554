@@ -16,7 +16,10 @@ import Navigation from './components/Navigation.jsx';
 import Cook from './components/Cooks/Cooks.jsx';
 import DishesList from './components/Dishes/DishesList.jsx';
 import DishDetail from './components/Dishes/DishDetail.jsx';
-
+import PendingMR from './components/Student/MealReqs/PendingMR.jsx';
+import AddMealReq from './components/Student/MealReqs/AddMealReq.jsx';
+import MealReq from './components/Student/MealReqs/MealReq.jsx';
+import AcceptedMR from './components/Student/MealReqs/AcceptedMR.jsx';
 const AuthProviderWithRouter = withRouter(AuthProvider);
 
 function App() {
@@ -42,6 +45,18 @@ function App() {
                 </Route>
                 <Route path="/cook/dishes/:id" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook/dishes/:id" element={<DishDetail />} />
+                </Route>
+                <Route path="/mealReqs/users/pending" element={<PrivateRoute requiredRole="user" />} >
+                  <Route path="/mealReqs/users/pending" element={<PendingMR />} />
+                </Route>
+                <Route path="/mealReqs/add" element={<PrivateRoute requiredRole="user" />} >
+                  <Route path="/mealReqs/add" element={<AddMealReq/>} />
+                </Route>
+                <Route path="/mealReqs/pending/:mealReqId/responses" element={<PrivateRoute requiredRole="user" />} >
+                  <Route path="/mealReqs/pending/:mealReqId/responses" element={<MealReq />} />
+                </Route>
+                <Route path="/mealReqs/users/accepted" element={<PrivateRoute requiredRole="user" />} >
+                  <Route path="/mealReqs/users/accepted" element={<AcceptedMR />} />
                 </Route>
                 <Route path="/cook" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook" element={<Cook />} />
