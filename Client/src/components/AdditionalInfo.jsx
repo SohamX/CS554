@@ -7,6 +7,7 @@ import { AuthContext } from '../contexts/AccountContext';
 const AdditionalInfo = () => {
     const [role, setRole] = useState('student');
     const { message = "", firstName = "", lastName = "", gmail = ""} = useLocation().state || {};
+    const [location, setLocation] = useState({ latitude: null, longitude: null });
     const [formData, setFormData] = useState({
         firstName: firstName,
         lastName: lastName,
@@ -30,6 +31,24 @@ const AdditionalInfo = () => {
         }
     }, [message]);
 
+    useEffect(() => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                setLocation({
+                  latitude: position.coords.latitude,
+                  longitude: position.coords.longitude,
+                });
+              },
+              (error) => {
+                console.error("Error getting location:", error);
+              }
+            );
+        } else {
+            console.error("Geolocation is not supported by this browser.");
+        }
+    }, []);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prevData) => ({
@@ -46,12 +65,16 @@ const AdditionalInfo = () => {
         e.preventDefault();
         const url = role === 'student' ? `${import.meta.env.VITE_SERVER_URL}/users/register` : `${import.meta.env.VITE_SERVER_URL}/cooks/register`;
         try {
+            if(!location.latitude || !location.longitude){
+                throw {error: 'Please enable location services to continue'};
+            }
+            let body = {...formData, ...location};
             const response = await apiCall(url, {
                 method: 'POST',
                 headers: {
                 'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(formData),
+                body: JSON.stringify(body),
             });
             if(response.error){
                 throw response;

@@ -11,7 +11,7 @@ const Navigation = () => {
 
     return (
         <AppBar position="static">
-            <Toolbar>
+            <Toolbar sx={{width: '-webkit-fill-available'}}>
                 <Box sx={{ flexGrow: 1 }}>
                 {currentUser ? (
                     currentUser.role === 'user' ? (
@@ -49,7 +49,7 @@ const Navigation = () => {
                                     </Link>
                                 </Button>
                                 <Button color="inherit" style={{width: "auto"}}>
-                                    <Link to="/student/requests" style={{ color: "white", textDecoration: "none" }}>
+                                    <Link to="/mealReqs/users/pending" style={{ color: "white", textDecoration: "none" }}>
                                         Meal Requests
                                     </Link>
                                 </Button>

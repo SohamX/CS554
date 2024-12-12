@@ -1,8 +1,10 @@
 import {mealReqs,users,cooks} from '../config/mongoCollections.js';
 import {ObjectId} from 'mongodb';
 import helpers from '../helpers/pranHelpers.js';
+import { cookData } from './index.js';
 const mealReqsCollection = await mealReqs();
 const userCollection = await users();
+const cookCollection = await cooks();
 export const createMealreq = async (
     userId,
     noOfPeople,
@@ -108,7 +110,7 @@ export const getPendingMealReqsByUser = async (userId) => {
   }).toArray();
 
   
-  if (!pendingMealReqs || pendingMealReqs.length === 0) {
+  if (!pendingMealReqs) {
       throw `No pending meal requests found for user with ID '${userId}'`;
   }
 
@@ -129,7 +131,7 @@ export const getAcceptedMealReqsByUser = async (userId) => {
     })
     .toArray();
 
-  if (!acceptedMealReqs || acceptedMealReqs.length === 0) {
+  if (!acceptedMealReqs) {
     throw `No accepted meal requests found for user with ID '${userId}'`;
   }
 
@@ -140,7 +142,7 @@ export const getAcceptedMealReqsByUser = async (userId) => {
     );
     return {
       ...mealReq,
-      acceptedCookId: acceptedResponse.cookId
+      acceptedCookusername: cookData.getCookByID(acceptedResponse.cookId).username
     };
   });
 
@@ -158,9 +160,14 @@ export const getResponsesForMealReq = async (mealReqId) => {
   if (!mealRequest) {
       throw `No meal request found with ID '${mealReqId}'`;
   }
-
+  
+  for (const response of mealRequest.responses) {
+    const cook = await cookCollection.findOne({ _id: new ObjectId(response.cookId) });
+    response.cookName = cook.username;}
   
   return mealRequest.responses;
+
+
 };
 
 export const acceptMealRequest = async (mealReqId, cookId) => {
