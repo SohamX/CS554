@@ -58,6 +58,20 @@ function EditDish(props) {
             setCuisineType(event.target.value);
         };
 
+        const handleNameChange = (event) => {
+            if (dish.name != event.target.value) {
+                setDataMofidied(true);
+            }
+            setName(event.target.value);
+        };
+
+        const handleDescChange = (event) => {
+            if (dish.description != event.target.value) {
+                setDataMofidied(true);
+            }
+            setDescription(event.target.value);
+        };
+
         const handleCostChange = (e) => {
             let value = e.target.value;
             console.log('value: ' + value);
@@ -133,7 +147,7 @@ function EditDish(props) {
                                 if (nameF) {
                                     try {
                                         if (name != nameF.value.trim()) {
-                                            setDataMofidied(true);
+                                           setDataMofidied(true);
                                         }
                                         nameVal = helpers.checkString(nameF.value, 'Dish Name');
                                     } catch (err) {
@@ -216,6 +230,7 @@ function EditDish(props) {
                                 variant="outlined"
                                 fullWidth
                                 required
+                                onChange={handleNameChange}
                             />
                             <TextField
                                 id="description"
@@ -226,6 +241,7 @@ function EditDish(props) {
                                 fullWidth
                                 required
                                 multiline
+                                onChange={handleDescChange}
                             />
                             <FormControl fullWidth>
                                 <InputLabel id="cuisineType-label">Cuisine Type *</InputLabel>
