@@ -137,8 +137,8 @@ const exportedMethods = {
         throw `Error: ${varName || 'Provided parameter'} is NaN`;
     let test = num.toString();
     let testArr = test.split('.');
-    if (testArr.length = 2 && testArr[1].length > 6)
-        throw `Error: ${varName || 'Provided parameter'} must be upto 6 decimal places`;
+    if (!testArr.length === 2 || testArr[1].length < 6)
+        throw `Error: ${testArr.length} ${varName || 'Provided parameter'} must be upto 6 decimal places`;
     if (varName === 'Latitude') {
       if (num > 90 || num < -90) throw `Error: ${varName || 'Provided parameter'} is out of range, the valid range is -90.000000 to 90.000000`
     } else if (varName === 'Longitude') {

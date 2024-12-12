@@ -11,7 +11,7 @@ const Navigation = () => {
 
     return (
         <AppBar position="static">
-            <Toolbar>
+            <Toolbar sx={{width: '-webkit-fill-available'}}>
                 <Box sx={{ flexGrow: 1 }}>
                 {currentUser ? (
                     currentUser.role === 'user' ? (

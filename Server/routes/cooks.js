@@ -91,12 +91,10 @@ router.route("/register").post(async (req, res) => {
       throw "gmail should be of type string";
     }
 
-    let str1 = latitude.trim()
-    latitude_float = parseFloat(str1);
+    latitude_float = latitude;
     latitude_float = helpers.latitudeAndLongitude(latitude_float, 'Latitude')
   
-    let str2 = longitude.trim()
-    longitude_float = parseFloat(str2);
+    longitude_float = longitude;
     longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
 
     gmail = gmail.trim();
@@ -271,12 +269,10 @@ router.route("/:id")
       throw "gmail should be of type string";
     }
 
-    let str1 = latitude.trim()
-    latitude_float = parseFloat(str1);
+    latitude_float = latitude;
     latitude_float = helpers.latitudeAndLongitude(latitude_float, 'Latitude')
   
-    let str2 = longitude.trim()
-    longitude_float = parseFloat(str2);
+    longitude_float = longitude;
     longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
 
     gmail = gmail.trim();
