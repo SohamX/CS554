@@ -22,6 +22,7 @@ import MealReq from './components/Student/MealReqs/MealReq.jsx';
 import AcceptedMR from './components/Student/MealReqs/AcceptedMR.jsx';
 import CartDetails from './components/Cart/CartDetails.jsx';
 import StudentProfile from './components/Student/StudentProfile.jsx';
+import CookProfile from './components/Cooks/CookProfile.jsx';
 
 
 const AuthProviderWithRouter = withRouter(AuthProvider);
@@ -74,6 +75,9 @@ function App() {
                 </Route>
                 <Route path="/student/account" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/student/account" element={<StudentProfile />} />
+                </Route>
+                <Route path="/cook/account" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/cook/account" element={<CookProfile />} />
                 </Route>
                 <Route path='/*' element={<PageNotFound />} />
               </Routes>

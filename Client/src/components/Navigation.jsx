@@ -94,7 +94,7 @@ const Navigation = () => {
                                     </Link>
                                 </Button>
                                 <Button color="inherit" style={{width: "auto"}}>
-                                    <Link to="/cooks/account" style={{ color: "white", textDecoration: "none" }}>
+                                    <Link to="/cook/account" style={{ color: "white", textDecoration: "none" }}>
                                         My Account
                                     </Link>
                                 </Button>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useApi } from "../../contexts/ApiContext";
 import { AuthContext } from "../../contexts/AccountContext";
 
-const student = () => {
+const Cook = () => {
     const { apiCall, loading, error } = useApi();
     const { currentUser } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -23,4 +23,4 @@ const student = () => {
     );
 }
 
-export default student;
+export default Cook;

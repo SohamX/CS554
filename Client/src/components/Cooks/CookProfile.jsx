@@ -1,30 +1,32 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useApi } from '../../contexts/ApiContext';
+import { useApi } from "../../contexts/ApiContext";
 import { AuthContext } from "../../contexts/AccountContext";
 import { Container, Typography, TextField, Button, Box } from "@mui/material";
 
-const StudentProfile = () => {
+const CookProfile = () => {
     const { apiCall, loading, error } = useApi();
     const { currentUser } = useContext(AuthContext);
     const [editPersonalInfo, setEditPersonalInfo] = useState(false);
     const [editAddress, setEditAddress] = useState(false);
-
+    
     //Mohini add states and variables below here
     const [personalInfo, setPersonalInfo] = useState({
-        firstName: currentUser.firstName,
-        lastName: currentUser.lastName,
-        username: currentUser.username,
-        gmail: currentUser.gmail,
-        mobileNumber: currentUser.mobileNumber,
-    });
-    const [address, setAddress] = useState({
-        address: currentUser.location.address,
-        city: currentUser.location.city,
-        state: currentUser.location.state,
-        zipcode: currentUser.location.zipcode,
-        country: currentUser.location.country,
-    });
+        firstName: currentUser?.firstName || '',
+        lastName: currentUser?.lastName || '',
+        username: currentUser?.username || '',
+        gmail: currentUser?.gmail || '',
+        mobileNumber: currentUser?.mobileNumber || '',
+        bio: currentUser?.bio || '',
+      });
+    
+      const [address, setAddress] = useState({
+        address: currentUser?.location?.address || '',
+        city: currentUser?.location?.city || '',
+        state: currentUser?.location?.state || '',
+        zipcode: currentUser?.location?.zipcode || '',
+        country: currentUser?.location?.country || '',
+      });
 
     const handlePersonalInfoChange = (e) => {
         const { name, value } = e.target;
@@ -47,7 +49,7 @@ const StudentProfile = () => {
     return (
         <Container maxWidth="sm" style={{ marginTop: "3%", marginBottom: "4%" }}>
             <Typography variant="h4" component="h1" gutterBottom>
-                Student Profile
+                Cook Profile
             </Typography>
             <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
                 <Typography variant="h5">Personal Information</Typography>
@@ -91,6 +93,15 @@ const StudentProfile = () => {
                         label="Username"
                         name="username"
                         value={personalInfo.username}
+                        onChange={handlePersonalInfoChange}
+                        disabled={!editPersonalInfo}
+                    />
+                    <TextField
+                        fullWidth
+                        margin="normal"
+                        label="Bio"
+                        name="bio"
+                        value={personalInfo.bio}
                         onChange={handlePersonalInfoChange}
                         disabled={!editPersonalInfo}
                     />
@@ -189,4 +200,4 @@ const StudentProfile = () => {
     );
 };
 
-export default StudentProfile;
+export default CookProfile;
