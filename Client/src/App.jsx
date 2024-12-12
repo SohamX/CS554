@@ -20,6 +20,10 @@ import PendingMR from './components/Student/MealReqs/PendingMR.jsx';
 import AddMealReq from './components/Student/MealReqs/AddMealReq.jsx';
 import MealReq from './components/Student/MealReqs/MealReq.jsx';
 import AcceptedMR from './components/Student/MealReqs/AcceptedMR.jsx';
+import CartDetails from './components/Cart/CartDetails.jsx';
+
+
+
 const AuthProviderWithRouter = withRouter(AuthProvider);
 
 function App() {
@@ -40,6 +44,9 @@ function App() {
                 <Route path="/student" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/student" element={<Student />} />
                 </Route>
+                <Route path="/student/cart" element={<PrivateRoute requiredRole="user" />} >
+                  <Route path="/student/cart" element={<CartDetails />} />
+                </Route>
                 <Route path="/cook/dishes" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook/dishes" element={<DishesList />} />
                 </Route>
@@ -50,7 +57,7 @@ function App() {
                   <Route path="/mealReqs/users/pending" element={<PendingMR />} />
                 </Route>
                 <Route path="/mealReqs/add" element={<PrivateRoute requiredRole="user" />} >
-                  <Route path="/mealReqs/add" element={<AddMealReq/>} />
+                  <Route path="/mealReqs/add" element={<AddMealReq />} />
                 </Route>
                 <Route path="/mealReqs/pending/:mealReqId/responses" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/mealReqs/pending/:mealReqId/responses" element={<MealReq />} />
@@ -60,6 +67,9 @@ function App() {
                 </Route>
                 <Route path="/cook" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook" element={<Cook />} />
+                </Route>
+                <Route path="/cook/orders" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/cook/orders" element={<DishDetail />} />
                 </Route>
 
                 <Route path='/*' element={<PageNotFound />} />
