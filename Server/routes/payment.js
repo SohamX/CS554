@@ -25,7 +25,8 @@ router
                     return res.status(400).json({ error: 'Payment failed.' });
                 }
                 console.log('totalCost ' + totalCost);
-
+                //remove from cart
+                //TO DO
                 const orderAdded = await orderData.addOrder(
                     cookId,
                     userId,

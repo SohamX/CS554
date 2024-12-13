@@ -94,6 +94,10 @@ function CheckoutDetails() {
     const closeAddFormState = () => {
         setShowAddForm(false);
     };
+    const handleOnClickAddPayment = () => {
+        setShowAddForm(!showAddForm);
+        setSelectedPaymentMethod('');
+    };
 
     return (
         <Box sx={{ mx: 'auto', width: '70%', mt: 5 }}>
@@ -149,12 +153,12 @@ function CheckoutDetails() {
                 variant="contained"
                 color="primary"
                 sx={{ mt: 1, mr: 1 }}
-                onClick={() => setShowAddForm(!showAddForm)}
+                onClick={handleOnClickAddPayment}
             >
                 Add Payment Method
             </Button>
             {showAddForm && (
-                <AddCard userId={userId} paymentMethods={paymentMethods} closeAddFormState={closeAddFormState} />
+                <AddCard userId={userId} paymentMethods={paymentMethods} refreshPaymentMethods={getPaymentMethodsList} closeAddFormState={closeAddFormState} />
             )}
             {/* <Button
                 variant="contained"

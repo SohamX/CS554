@@ -124,7 +124,7 @@ export const createCustomer = async (
     try {
         const customer = await stripe.customers.create({
             name: email,
-            email: email, // Optional, you can store their email
+            email: email,
         });
 
         console.log("Created customer:", customer.id);
@@ -141,7 +141,7 @@ export const retrieveCustomer = async (
 ) => {
     try {
         const customer = await stripe.customers.retrieve({
-            email: email, // Optional, you can store their email
+            email: email,
         });
 
         console.log("Created customer:", customer.id);

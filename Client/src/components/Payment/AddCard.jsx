@@ -18,7 +18,7 @@ function AddCard(props) {
     const [country, setCountry] = useState('United States');
     const [isDefault, setIsDefault] = useState(false);
     const [nickName, setNickName] = useState('');
-
+    const userId = props.userId;
     // Handlers
     const handleCardNumberChange = (e) => setCardNumber(e.target.value);
     const handleCardHolderNameChange = (e) => setCardHolderName(e.target.value);
@@ -28,19 +28,56 @@ function AddCard(props) {
     const handleCountryChange = (e) => setCountry(e.target.value);
     const handleIsDefaultChange = (e) => setIsDefault(e.target.checked);
 
-    const handleSubmitPayment = async (e) => {
+    const handleSubmitCard = async (e) => {
         e.preventDefault();
-
-        // Basic validation
-        if (!amount || !cardNumber || !expiryMonth || !expiryYear || !cvc) {
-            setError(true);
-            setErrorMsg('All fields are required');
-            return;
-        }
+        let errors = [];
 
         setLoading(true);
         setError(false);
         setErrorMsg('');
+
+        if (!cardType || !provider || !cardNumber || !cardHolderName || !expirationDate || !cvv || !zipcode || !country) {
+            errors.push('All required fields must be filled.');
+        }
+
+        if (!/^\d{16}$/.test(cardNumber.trim())) {
+            errors.push('Card number must be a 16-digit number.');
+        }
+
+        if (!/^[a-zA-Z\s]+$/.test(cardHolderName.trim())) {
+            errors.push('Cardholder name must only contain letters and spaces.');
+        }
+
+        if (!/^\d{2}\/\d{2}$/.test(expirationDate.trim())) {
+            errors.push('Expiration date must be in MM/YY format.');
+        }
+
+        const [month, year] = expirationDate.split('/').map((val) => parseInt(val, 10));
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentYear = parseInt(currentDate.getFullYear().toString().slice(-2));
+
+        if (month < 1 || month > 12 || year < currentYear || (year === currentYear && month < currentMonth)) {
+            errors.push('Card expiration date is invalid or expired.');
+        }
+
+        if (!/^\d{3}$/.test(cvv.trim())) {
+            errors.push('CVV must be a 3-digit number.');
+        }
+
+        if (!/^\d{5}(-\d{4})?$/.test(zipcode.trim())) {
+            errors.push('Please enter a valid ZIP code.');
+        }
+
+        if (!/^[a-zA-Z\s]+$/.test(country.trim())) {
+            errors.push('Country name must only contain letters and spaces.');
+        }
+        if (errors.length > 0) {
+            setError(true);
+            setErrorMsg(errors.join('\n'));
+            return;
+        }
+
 
         try {
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/paymentCard/${userId}`, {
@@ -68,11 +105,16 @@ function AddCard(props) {
                 console.error('Failed to store payment method');
                 throw response.error;
             }
+            props.refreshPaymentMethods();
+            document.getElementById('add-card').reset();
+            setLoading(false);
+            alert('Card Added successfully!');
+            props.closeAddFormState();
         } catch (error) {
             console.error('Error sending payment method to backend:', error);
-            alert(error);
+            //alert(error);
             setError(true);
-            setErrorMsg(`Could not add card: ${err.message}`);
+            setErrorMsg(`Could not add card: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -91,7 +133,7 @@ function AddCard(props) {
                     </Typography>
                 )}
 
-                <form id="add-card" onSubmit={handleSubmitPayment}>
+                <form id="add-card" onSubmit={handleSubmitCard}>
                     <Box display="flex" flexDirection="column" gap={3}>
                         <FormControl fullWidth>
                             <InputLabel id="cardType-label">Card Type</InputLabel>
@@ -211,6 +253,7 @@ function AddCard(props) {
                             color="secondary"
                             fullWidth
                             sx={{ ml: 1 }}
+                            disabled={loading}
                             onClick={() => {
                                 document.getElementById('add-card').reset();
                                 props.closeAddFormState();
