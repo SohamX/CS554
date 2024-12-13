@@ -72,10 +72,10 @@ router
           throw 'gmail should be of type string'
         }
 
-        latitude_float = parseFloat(latitude.trim());
+        latitude_float = latitude
         latitude_float = helpers.latitudeAndLongitude(latitude_float, 'Latitude')
         
-        longitude_float = parseFloat(longitude.trim());
+        longitude_float = longitude
         longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
 
         gmail = gmail.trim();
@@ -91,6 +91,7 @@ router
         country = helpers.checkString(country,'country');
         country = helpers.checkSpecialCharsAndNum(country,'country');
       }catch (e) {
+          console.log(e);
           return res.status(400).json({error:e})
         }
     try {

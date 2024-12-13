@@ -133,8 +133,11 @@ export const registerUser = async (
         coordinates: { longitude: longitude_float, latitude: latitude_float} //Calculated and stored?
     },
     favourites : [],
-    cart : [],
-    cartTotal : 0,
+    cart : {
+      cookId : "",
+      dishes : []
+    },
+    
     paymentCards : []
   };
   //const productCollection = await users();
@@ -379,33 +382,85 @@ export const addItemtoCart = async (
   if (!dish) throw 'No dish with that dishId';
   // const cook = await cookCollection.findOne({_id: new ObjectId(cookId)});
   // if (!cook) throw 'No cook with that cookId';
+  dish.cookId = dish.cookId.toString();
   const cook = await cookCollection.findOne({_id:new ObjectId(dish.cookId)});
-
-  const newItem = {
-    _id: new ObjectId(),
-    dishId : dishId,
-    dishName : dish.name,
-    cookName : cook.username,
-    eachCost: dish.cost,
-    quantity: 1,
-    subtotal: dish.cost
-  };
   
-  const updateInfo = await userCollection.updateOne({_id: new ObjectId(userId)}, {$push: {cart: newItem}});
-  
-  if (!updateInfo)
-    throw `Error: Update failed! Could not add the item for the user Id with userId ${userId}`;
-  const userData = await userCollection.findOne({_id: new ObjectId(userId)});
-  let sum = 0;
-  userData.cart.forEach((element)=>{
-    sum+=element.subtotal;
-  })
-  const addedItem = await userCollection.findOneAndUpdate({_id:new ObjectId(userId)},{$set:{cartTotal:sum}},{returnDocument:'after'});
-  if(!addedItem){
-    throw("Item is not added")
+  if(user.cart.cookId!=="" && user.cart.cookId!==dish.cookId){
+    throw("You can't add items from different cooks")
   }
-  return addedItem;
-};
+
+  if(user.cart.cookId===""){
+    const updatedCart = {
+      cookId : dish.cookId,
+      dishes : [{
+        dishId : dishId,
+        quantity : 1
+      }]
+    }
+    const updatedUser = await userCollection.findOneAndUpdate({_id:new ObjectId(userId)},{$set:{cart:updatedCart}},{returnDocument:'after'});
+    if(!updatedUser){
+      throw("Item is not added")
+    }
+    
+    updatedUser.cart.cookName = cook.username;
+    updatedUser.cart.dishes[0].dishName = dish.name;
+    updatedUser.cart.dishes[0].subTotat = dish.cost;
+    updatedUser.cart.totalCost = dish.cost;
+
+    return updatedUser;
+
+  }
+
+  else{
+    let found = false;
+
+    
+    user.cart.dishes.forEach((item) => {
+        if (item.dishId === dishId) {
+            found = true;
+            item.quantity += 1; 
+        }
+    });
+    
+    if (!found) {
+        
+        user.cart.dishes.push({
+            dishId: dishId,
+            quantity: 1
+        });
+   }
+
+   const updatedUserData = await userCollection.findOneAndUpdate({_id:new ObjectId(userId)},{$set:{cart:user.cart}},{returnDocument:'after'});
+
+    if(!updatedUserData){
+      throw("Item is not added")
+    }
+    
+    updatedUserData.cart.cookName = cook.username;
+
+    for (const element of updatedUserData.cart.dishes) {
+      let dish = await dishCollection.findOne({ _id: new ObjectId(element.dishId) });
+      element.dishName = dish.name;
+      element.subTotal = dish.cost * element.quantity;
+    }
+
+    // updatedUserData.cart.dishes.forEach(async(element)=>{
+    //   let dish = await dishCollection.findOne({_id:new ObjectId(element.dishId)});
+    //   console.log(dish);
+    //   element.dishName = dish.name;
+    //   element.subTotal = dish.cost*element.quantity;
+      
+    // })
+
+    const totalCost = updatedUserData.cart.dishes.reduce((sum, element) => {
+      return sum + element.subTotal;
+    }, 0);
+  
+  
+    updatedUserData.cart.totalCost = totalCost;  
+
+    return updatedUserData.cart;
+}};
 
 export const getCartItems = async (userId) => {
   if(!userId){
@@ -415,8 +470,29 @@ export const getCartItems = async (userId) => {
   const user = await userCollection.findOne({_id: new ObjectId(userId)});
   if (!user) throw 'No user with that userId';
   
+  if(user.cart.cookId===""){
+    return user.cart;
+  }
+  let cook = await cookCollection.findOne({_id:new ObjectId(user.cart.cookId)});
+  user.cart.cookName = cook.username;
+  for (const element of user.cart.dishes) {
+    let dish = await dishCollection.findOne({ _id: new ObjectId(element.dishId) });
+    element.dishName = dish.name;
+    element.subTotal = dish.cost * element.quantity;
+  }
+  const totalCost = user.cart.dishes.reduce((sum, element) => {
+    return sum + element.subTotal;
+  }, 0);
+
+
+  user.cart.totalCost = totalCost;  
+  
   return user.cart;
 };
+
+
+
+
 
 export const getItem = async(itemId)=>{
   if(!itemId){
@@ -433,6 +509,7 @@ export const getItem = async(itemId)=>{
   //console.log(foundReview.reviews);
   return foundItem.cart[0];
 }
+
 
 export const updateItembyQuant = async (itemId) => {
   if(!itemId){
