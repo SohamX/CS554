@@ -122,6 +122,6 @@ const errorMsg = (e) => {
 }
 
 export {
-    validateCuisineType, validateCost, checkisValidImageArray, validateId, checkisValidBoolean, validateOrderStatus,
+    validateCuisineType, validateCost, checkisValidImageArray, validateId, checkisValidBoolean, validateOrderStatus, checkisValidString,
     validateUniqueDishesPerCook, checkisValidDishesArray, validateDishesList, validateCloudUrl, checkDishDesc, errorMsg
 }

@@ -497,13 +497,14 @@ export const removeItemFromCart = async (itemId) => {
 };
 
 
-export const addCardDetails = async (userId, type, provider, cardNumber, cardHolderName,expirationDate,cvv,zipcode,country,isDefault) => {
-  if(!userId||!type||!provider||!cardNumber||!cardHolderName||!expirationDate||!cvv||!zipcode||!country||!isDefault){
-    throw("All fields need to be supplied")
+export const addCardDetails = async (userId, type, provider, cardNumber, cardHolderName, expirationDate, cvv, zipcode, country, isDefault, nickName) => {
+  if (!userId || !type || !provider || !cardNumber || !cardHolderName || !expirationDate || !cvv || !zipcode || !country || !isDefault) {
+    throw ("All fields need to be supplied")
   }
   userId = helpers.checkId(userId, 'userId');
   if (typeof cardNumber !== 'string') throw `Error: ${cardNumber} must be a string!`;
   cardNumber = cardNumber.trim();
+  let lastFourDigits = cardNumber.slice(-4);
   
   if(!/^\d{16}$/.test(cardNumber)) throw 'Please enter valid card number';
   cardHolderName = helpers.checkString(cardHolderName, 'cardHolderName');
@@ -527,18 +528,23 @@ export const addCardDetails = async (userId, type, provider, cardNumber, cardHol
     isDefault = true;}else{
       isDefault = false;
     }
+  if (nickName) {
+    nickName = checkisValidString(nickName, 'nickName');
+  }
 
   const carddetails = {
     _id: new ObjectId(),
     type: type,
     provider: provider,
     cardNumber: hashcardNumber,
+    last4Digits: lastFourDigits,
     cardHolderName: cardHolderName,
     expirationDate: expirationDate,
     cvv: hashcvv,
     zipcode: zipcode,
     country: country,
-    isDefault: isDefault
+    isDefault: isDefault,
+    nickName: nickName ? nickName : ''
   };
   
   
@@ -549,6 +555,14 @@ export const addCardDetails = async (userId, type, provider, cardNumber, cardHol
   return {added:true};
 }
 
-
-
-
+export const getAllPayementMethodByUserId = async (
+  userId
+) => {
+  if (!userId) {
+    throw ("User Id need to be supplied")
+  }
+  userId = helpers.checkId(userId, 'userId');
+  const paymentMethods = await userCollection.find({ _id: ObjectId.createFromHexString(userId) }).project({ _id: 0, paymentCards: 1 }).toArray();
+  if (paymentMethods === null || paymentMethods.length === 0 || paymentMethods[0].paymentCards === null || paymentMethods[0].paymentCards.length === 0) throw `No payment method added for User.`;
+  return paymentMethods[0].paymentCards;
+}

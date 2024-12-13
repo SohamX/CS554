@@ -396,8 +396,24 @@ router
 
 router
   .route('/paymentCard/:userId')
+  .get(async (req, res) => {
+    try {
+      req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
+    } catch (e) {
+      res.status(400).json(errorMsg(e));
+      return;
+    }
+    try {
+      const paymentMethodList = await userData.getAllPayementMethodByUserId(req.params.userId);
+      res.status(200).json({ status: "success", paymentMethodList: paymentMethodList });
+    } catch (e) {
+      res.status(400).json(errorMsg(e));
+      return;
+    }
+
+  })
   .post(async (req, res) => {
-    let { type, provider, cardNumber, cardHolderName,expirationDate,cvv,zipcode,country,isDefault } = req.body;
+    let { type, provider, cardNumber, cardHolderName, expirationDate, cvv, zipcode, country, isDefault, nickName } = req.body;
     try {
       if(!type||!provider||!cardNumber||!cardHolderName||!expirationDate||!cvv||!zipcode||!country){
         throw("All fields need to be supplied")
@@ -423,13 +439,16 @@ router
       country = helpers.checkSpecialCharsAndNum(country,'country');
       req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
 
+      if (nickName) {
+        nickName = checkisValidString(nickName, 'nickName');
+      }
     } catch (e) {
       res.status(400).json({error:e});
       return;
     }
     try {
-      const statObj = await userData.addCardDetails(req.params.userId, type, provider, cardNumber, cardHolderName,expirationDate,cvv,zipcode,country,isDefault);
-      res.status(200).json({ status: "success"});
+      const statObj = await userData.addCardDetails(req.params.userId, type, provider, cardNumber, cardHolderName, expirationDate, cvv, zipcode, country, isDefault, nickName);
+      res.status(200).json({ status: "success" });
     } catch (e) {
       res.status(400).json({error:e});
       return;

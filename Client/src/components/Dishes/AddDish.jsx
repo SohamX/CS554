@@ -1,13 +1,13 @@
 import React, { useContext, useState } from 'react';
 import { Button, Typography, Box, TextField, Card, Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useApi } from '../../contexts/ApiContext';
-import { AuthContext } from '../../contexts/AccountContext';
+import { useApi } from '../../contexts/ApiContext.jsx';
+import { AuthContext } from '../../contexts/AccountContext.jsx';
 import helpers from '../../helpers/pranHelpers.js';
 import { cuisineTypeEnum } from '../../helpers/constants.js';
 import { validateCost, checkDishDesc } from '../../helpers/validationHelper.js';
 
-function Add(props) {
+function AddDish(props) {
     const navigate = useNavigate();
     const { apiCall } = useApi();
     const { currentUser } = useContext(AuthContext);
@@ -234,4 +234,4 @@ function Add(props) {
     return <div>{body}</div>;
 }
 
-export default Add;
+export default AddDish;
