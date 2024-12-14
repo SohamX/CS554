@@ -150,6 +150,18 @@ function DishesList() {
                                 {dishes.map((dish) => (
                                     <TableRow key={dish._id}>
                                         <TableCell>
+                                        <Box display="flex" alignItems="center" gap={2}>
+                                            <img
+                                                src={dish.imageUrl}
+                                                alt={dish.name}
+                                                style={{
+                                                    width: 80,
+                                                    height: 80,
+                                                    objectFit: 'cover',
+                                                    borderRadius: 8,
+                                                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                                                }}
+                                            />
                                             <Link to={{
                                                 pathname: `/cook/dishes/${dish._id}`,
                                                 state: { refreshDishes: getDishesList }
@@ -167,6 +179,7 @@ function DishesList() {
                                                     {dish.name}
                                                 </Typography>
                                             </Link>
+                                        </Box>
                                         </TableCell>
                                         <TableCell>
                                             <FormControlLabel

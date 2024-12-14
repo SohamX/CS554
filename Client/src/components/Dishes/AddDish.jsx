@@ -16,6 +16,7 @@ function AddDish(props) {
     const [errorMsg, setErrorMsg] = useState('');
     const [cuisineType, setCuisineType] = useState('');
     const [cost, setCost] = useState('');
+    const [file, setFile] = useState()
     const cookId = props.cookId;
 
     const handleCuisineTypeChange = (event) => {
@@ -36,6 +37,10 @@ function AddDish(props) {
             setCost(formattedValue);
         }
     };
+    const fileSelected = event => {
+        const file = event.target.files[0]
+            setFile(file);
+        }
 
     const onSubmitDish = async (e) => {
         try {
@@ -75,20 +80,21 @@ function AddDish(props) {
                 setErrorMsg(errors.join('\n'));
                 return;
             }
+
+            const formData = new FormData();
+            formData.append('cookId', cookId);
+            formData.append('name', nameVal);
+            formData.append('description', descriptionVal);
+            formData.append('cuisineType', cuisineType);
+            formData.append('cost', costVal);
+            formData.append('image', file);
+
             const addDish = async () => {
                 try {
                     const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/dishes/`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            cookId: cookId,
-                            name: nameVal,
-                            description: descriptionVal,
-                            cuisineType: cuisineType,
-                            cost: costVal
-                        }),
+                        // headers: {'Content-Type': 'multipart/form-data'},
+                        body: formData,
                     });
                     if (response.error) {
                         throw response;
@@ -196,6 +202,17 @@ function AddDish(props) {
                                         inputMode: 'decimal'
                                     }}
                                 />
+                                <FormControl fullWidth>
+                                    <InputLabel shrink>Dish Image</InputLabel>
+                                    <input
+                                        id="image"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={fileSelected}
+                                        style={{ marginTop: '20px' }} // Adds spacing below the label
+                                    />
+                                </FormControl>
+                               
                             </Box>
                             <Box
                                 display="flex"

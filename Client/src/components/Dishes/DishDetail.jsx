@@ -177,6 +177,18 @@ function DishDetail(props) {
                 <h2>Dish</h2>
                 <Box display="flex" flexDirection="column" alignItems="center" mt={5}>
                     <Card sx={{ width: '100%', maxWidth: 600, mb: 3 }}>
+                    <img
+                        src={dish.imageUrl}
+                        alt={dish.name}
+                        style={{
+                            width: '100%',
+                            height: 'auto',
+                            maxHeight: '400px',
+                            objectFit: 'cover',
+                            borderTopLeftRadius: '4px',
+                            borderTopRightRadius: '4px'
+                        }}
+                    />
                         <CardHeader title={dish.name} />
                         <CardContent>
                             <Typography variant="body1" >
