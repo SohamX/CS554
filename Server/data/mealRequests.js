@@ -162,7 +162,9 @@ export const getResponsesForMealReq = async (mealReqId) => {
   }
   
   for (const response of mealRequest.responses) {
-    const cook = await cookCollection.findOne({ _id: new ObjectId(response.cookId) });
+    let cookId = response.cookId.toString();
+    const cook = await cookCollection.findOne({ _id: new ObjectId(cookId) });
+    console.log(cook);
     response.cookName = cook.username;}
   
   return mealRequest.responses;
@@ -238,8 +240,12 @@ export const getAcceptedMealReqsByCook = async (cookId) => {
     })
     .toArray();
 
-  if (acceptedMealReqs.length === 0) {
-    throw `No accepted meal requests found for cook with ID ${cookId}`;
+  // if (acceptedMealReqs.length === 0) {
+  //   throw `No accepted meal requests found for cook with ID ${cookId}`;
+  // }
+  for (const mealReq of acceptedMealReqs) {
+    const user = await userCollection.findOne({ _id: new ObjectId(mealReq.userId) });
+    mealReq.username = user.username;
   }
 
   return acceptedMealReqs;
@@ -257,8 +263,12 @@ export const getPendingMealReqsByCook = async (cookId) => {
     })
     .toArray();
 
-  if (pendingMealReqs.length === 0) {
-    throw `No pending meal requests found with cookId ${cookId}`;
+  // if (pendingMealReqs.length === 0) {
+  //   throw `No pending meal requests found with cookId ${cookId}`;
+  // }
+  for (const mealReq of pendingMealReqs) {
+    const user = await userCollection.findOne({ _id: new ObjectId(mealReq.userId) });
+    mealReq.username = user.username;
   }
 
   return pendingMealReqs;
@@ -274,12 +284,16 @@ export const getPendingMealReqsWithoutCook = async (cookId) => {
   const pendingMealReqs = await mealReqsCollection
     .find({
       status: "pending",
-      "responses.cookId": { $ne: cookId } 
+      "responses.cookId": { $ne: new ObjectId(cookId) } 
     })
     .toArray();
 
-  if (pendingMealReqs.length === 0) {
-    throw `No pending meal requests found where cookId ${cookId} is not present.`;
+  // if (pendingMealReqs.length === 0) {
+  //   throw `No pending meal requests found where cookId ${cookId} is not present.`;
+  // }
+  for (const mealReq of pendingMealReqs) {
+    const user = await userCollection.findOne({ _id: new ObjectId(mealReq.userId) });
+    mealReq.username = user.username;
   }
 
   return pendingMealReqs;

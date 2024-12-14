@@ -15,9 +15,9 @@ const user = {
         "country": String,
         "coordinates": { "longitude": longitude, "latitude": latitude } //Calculated and stored?
     },
-    
-           
-    "favorites": [ObjectId("DishId")], 
+
+
+    "favorites": [ObjectId("DishId")],
     "cart": [{
         "_id": new ObjectId(),
         "dishName": String,
@@ -35,13 +35,14 @@ const user = {
         "last4Digits": String, //last four digits on the card
         "expirationDate": "MM/YY",
         "cvv": String,   // hashed cv
-        
+
         "isDefault": Boolean,
-        
+
         "zipCode": String,
-        "country": String
-       
-        
+        "country": String,
+        "nickName": String //Optional
+
+
     }]
 }
 
@@ -71,7 +72,7 @@ const cook = {
     "earnings": Number,
     "dishes": [ObjectId("DishId")],
     "avgRating": Number,
-    "reviews" : [{
+    "reviews": [{
         "userId": ObjectId("userId"), // Array of reviewers
         "review": String,
         "rating": Number      // Rating for 5

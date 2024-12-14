@@ -23,6 +23,12 @@ import AcceptedMR from './components/Student/MealReqs/AcceptedMR.jsx';
 import CartDetails from './components/Cart/CartDetails.jsx';
 import StudentProfile from './components/Student/StudentProfile.jsx';
 import CookProfile from './components/Cooks/CookProfile.jsx';
+import CheckoutDetails from './components/Payment/CheckoutDetails.jsx';
+import AddCard from './components/Payment/AddCard.jsx';
+import PendingMRCook from './components/Cooks/MealReqs/PendingMRCook.jsx';
+import AwaitingMRCook from './components/Cooks/MealReqs/AwaitingMRCook.jsx';
+import AcceptedMRCook from './components/Cooks/MealReqs/AcceptedMRCook.jsx';
+import CardsList from './components/Payment/CardsList.jsx';
 
 
 const AuthProviderWithRouter = withRouter(AuthProvider);
@@ -49,6 +55,15 @@ function App() {
                 <Route path="/student/cart" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/student/cart" element={<CartDetails />} />
                 </Route>
+                <Route path="/student/checkout" element={<PrivateRoute requiredRole="user" />} >
+                  <Route path="/student/checkout" element={<CheckoutDetails />} />
+                </Route>
+                <Route path="/student/addCard" element={<PrivateRoute requiredRole="user" />} >
+                  <Route path="/student/addCard" element={<AddCard />} />
+                </Route>
+                <Route path="/student/cardDetails" element={<PrivateRoute requiredRole="user" />} >
+                  <Route path="/student/cardDetails" element={<CardsList />} />
+                </Route>
                 <Route path="/cook/dishes" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook/dishes" element={<DishesList />} />
                 </Route>
@@ -58,6 +73,9 @@ function App() {
                 <Route path="/mealReqs/users/pending" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/mealReqs/users/pending" element={<PendingMR />} />
                 </Route>
+                <Route path="/mealReqs/cooks/pending" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/mealReqs/cooks/pending" element={<PendingMRCook />} />
+                </Route>
                 <Route path="/mealReqs/add" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/mealReqs/add" element={<AddMealReq />} />
                 </Route>
@@ -66,6 +84,12 @@ function App() {
                 </Route>
                 <Route path="/mealReqs/users/accepted" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/mealReqs/users/accepted" element={<AcceptedMR />} />
+                </Route>
+                <Route path="/mealReqs/cooks/awaiting" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/mealReqs/cooks/awaiting" element={<AwaitingMRCook />} />
+                </Route>
+                <Route path="/mealReqs/cooks/accepted" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/mealReqs/cooks/accepted" element={<AcceptedMRCook />} />
                 </Route>
                 <Route path="/cook" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook" element={<Cook />} />

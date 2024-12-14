@@ -94,7 +94,7 @@ function AddMealReq(props) {
         // Reset form and notify user
         document.getElementById('add-author').reset();
         alert('Meal Request Added Successfully!');
-        navigate(`/mealReq/users/pending`);
+        navigate(`/mealReqs/users/pending`);
       } catch (error) {
         console.error('Error while sending meal request:', error);
         setErrors([...newErrors, 'Failed to add meal request. Please try again later.']);

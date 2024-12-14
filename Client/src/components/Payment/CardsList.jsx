@@ -1,58 +1,61 @@
 import React, { useContext, useEffect, useState } from 'react';
-import AddDish from './AddDish.jsx';
-import EditDish from './EditDish.jsx';
-import DeleteDish from './DeleteDish.jsx';
+import AddCard from './AddCard.jsx';
+import EditCard from './EditCard.jsx';
+import DeleteCard from './DeleteCard.jsx';
 import { Link } from 'react-router-dom';
 import { Button, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, FormControlLabel, Switch } from '@mui/material';
-import { useApi } from '../../contexts/ApiContext';
-import { AuthContext } from '../../contexts/AccountContext';
+import { useApi } from '../../contexts/ApiContext.jsx';
+import { AuthContext } from '../../contexts/AccountContext.jsx';
 
 
-function DishesList() {
+function CardsList() {
     const { apiCall } = useApi();
     const { currentUser } = useContext(AuthContext);
     let str = JSON.stringify(currentUser, null, 2);
-    let cookId;
+    let userId;
     try {
         const currentUserObj = JSON.parse(str);
         console.log('currentUserObj: ' + currentUserObj);
-        const userId = currentUserObj._id;
-        cookId = userId;
+        const studentId = currentUserObj._id;
+        userId = studentId;
 
         console.log("User ID:", userId);
     } catch (error) {
         console.error("Failed to parse JSON:", error.message);
-        console.error("Cook Id not found!");
+        console.error("User Id not found!");
     }
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [editDish, setEditDish] = useState(null);
-    const [deleteDish, setDeleteDish] = useState(null);
-    const [dishes, setDishes] = useState(null);
+    const [editCard, setEditCard] = useState(null);
+    const [deleteCard, setDeleteCard] = useState(null);
+    const [Cards, setCards] = useState([]);
     const isById = false;
-    const attr = 'dish';
-    const getDishesList = async () => {
+    const attr = 'card';
+    const getPaymentMethodsList = async () => {
         try {
-            const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/dishes/cook/${cookId}`, {
+            const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/paymentCard/${userId}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
                 }
             });
             if (response.error) {
-                throw response;
+                if (response.error === 'No payment method added for User.') {
+                    throw `No payment method found for your account. Please add a payment method.`;
+                } else {
+                    throw response;
+                }
             }
-
-            console.log("Dishes successfully fetched:", response.dishes);
-            setDishes(response.dishes);
+            console.log("Payment methods successfully fetched:", response.paymentMethodList);
+            setCards(response.paymentMethodList);
         } catch (error) {
             alert(error);
         }
     };
 
     useEffect(() => {
-        getDishesList();
+        getPaymentMethodsList();
     }, [])
 
     const handleToggleChange = async (event, id) => {
@@ -86,12 +89,12 @@ function DishesList() {
     };
     const handleOpenEditModal = (dish) => {
         setShowEditModal(true);
-        setEditDish(dish);
+        setEditCard(dish);
     };
 
     const handleOpenDeleteModal = (dish) => {
         setShowDeleteModal(true);
-        setDeleteDish(dish);
+        setDeleteCard(dish);
     };
     const closeAddFormState = () => {
         setShowAddForm(false);
@@ -102,28 +105,28 @@ function DishesList() {
         setShowDeleteModal(false);
     };
 
-    if (dishes) {
+    if (Cards) {
 
         return (
             <div>
-                <h2>Dishes</h2>
+                <h2>Cards</h2>
                 <Button
                     variant="contained"
                     color="primary"
-                    sx={{ mt: 1, mr: 1 }}
+                    sx={{ mt: 1, mr: 1, width: '150px' }}
                     onClick={() => setShowAddForm(!showAddForm)}
                 >
-                    Add Dish
+                    Add Card
                 </Button>
                 {showAddForm && (
-                    <AddDish type='dish' cookId={cookId} refreshDishes={getDishesList} closeAddFormState={closeAddFormState} />
+                    <AddCard userId={userId} paymentMethods={Cards} refreshPaymentMethods={getPaymentMethodsList} closeAddFormState={closeAddFormState} />
                 )}
                 <br />
                 <br />
                 <Box
                     sx={{
                         mx: 'auto',
-                        width: '100%',
+                        width: '80%',
                         mt: 3,
                         p: 3,
                         display: 'flex',
@@ -142,69 +145,41 @@ function DishesList() {
                         <Table sx={{ minWidth: 650 }} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Card Details</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {dishes.map((dish) => (
-                                    <TableRow key={dish._id}>
+                                {Cards.map((card) => (
+                                    <TableRow key={card._id}>
                                         <TableCell>
-                                        <Box display="flex" alignItems="center" gap={2}>
-                                            <img
-                                                src={dish.imageUrl}
-                                                alt={dish.name}
-                                                style={{
-                                                    width: 80,
-                                                    height: 80,
-                                                    objectFit: 'cover',
-                                                    borderRadius: 8,
-                                                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
+                                            <Typography
+                                                sx={{
+                                                    fontWeight: 'bold',
                                                 }}
-                                            />
-                                            <Link to={{
-                                                pathname: `/cook/dishes/${dish._id}`,
-                                                state: { refreshDishes: getDishesList }
-                                            }}>
-                                                <Typography
-                                                    sx={{
-                                                        fontWeight: 'bold',
-                                                        '&:hover': {
-                                                            textDecoration: 'underline'
-                                                        }
-                                                    }}
-                                                    variant='h6'
-                                                    component='h3'
-                                                >
-                                                    {dish.name}
-                                                </Typography>
-                                            </Link>
-                                        </Box>
+                                                variant='h6'
+                                                component='h3'
+                                            >
+                                                (**** **** **** {card.last4Digits})
+                                            </Typography>
+                                            <Typography>{card.type.toUpperCase()}</Typography>
+                                            <Typography>{card.provider}</Typography>
+
                                         </TableCell>
                                         <TableCell>
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        checked={dish.isAvailable}
-                                                        onChange={(event) => handleToggleChange(event, dish._id)}
-                                                        color="primary"
-                                                    />
-                                                }
-                                                label={dish.isAvailable ? "Available" : "Unavailable"}
-                                            />
                                             <Button
                                                 variant="contained"
                                                 color="secondary"
-                                                sx={{ mt: 1 }}
-                                                onClick={() => handleOpenEditModal(dish)}
+                                                sx={{ mt: 1, width: '100px', mr: 2 }}
+                                                onClick={() => handleOpenEditModal(card)}
                                             >
                                                 Edit
                                             </Button>
                                             <Button
                                                 variant="contained"
                                                 color="error"
-                                                sx={{ mt: 1 }}
-                                                onClick={() => handleOpenDeleteModal(dish)}
+                                                sx={{ mt: 1, width: '100px' }}
+                                                onClick={() => handleOpenDeleteModal(card)}
                                             >
                                                 Delete
                                             </Button>
@@ -216,21 +191,23 @@ function DishesList() {
                     </TableContainer>
                 </Box>
                 {showEditModal && (
-                    <EditDish
+                    <EditCard
                         isOpen={showEditModal}
-                        dish={editDish}
+                        userId={userId}
+                        card={editCard}
                         handleClose={handleCloseModals}
-                        refreshDishes={getDishesList}
+                        refreshCards={getPaymentMethodsList}
                         attr={attr}
                     />
                 )}
 
                 {showDeleteModal && (
-                    <DeleteDish
+                    <DeleteCard
                         isOpen={showDeleteModal}
                         handleClose={handleCloseModals}
-                        deleteDish={deleteDish}
-                        refreshDishes={getDishesList}
+                        userId={userId}
+                        deleteCard={deleteCard}
+                        refreshCards={getPaymentMethodsList}
                         isById={isById}
                         attr={attr}
                     />
@@ -238,22 +215,7 @@ function DishesList() {
             </div>
         );
     }
-    // else if (loading) {
-    //     return (<div>
-    //         <Box display="flex" justifyContent="center" alignItems="center" height="100vh">
-    //             <Typography>Loading</Typography>
-    //         </Box>
-    //     </div>);
-    // }
-    // else if (error) {
-    //     return (<div>
-    //         <Box display="flex" justifyContent="center" mt={5}>
-    //             <Typography color="error">Error: {error.message}</Typography>
-    //         </Box>
-    //     </div>
-    //     );
-    // }
 }
 
 
-export default DishesList;
+export default CardsList;

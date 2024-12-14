@@ -32,20 +32,21 @@ export const addOrder = async (
     cookId,
     userId,
     dishes,
-    //paymentMethod,
+    paymentMethod,
     totalCost,
     isMealReq
     // ,
     // invoiceLink
 ) => {
     const orderCollection = await orders();
-    if (!cookId || !userId || !dishes) { // || !paymentMethod || !invoiceLink
+    if (!cookId || !userId || !dishes || !paymentMethod) { //  || !invoiceLink
         throw "All fields need to be supplied";
     }
     cookId = validateId(cookId, 'cookId');
     userId = validateId(userId, 'userId');
     await validateDishesList(dishes, false);
     //TO DO validate payment method
+    paymentMethod = validateId(paymentMethod, 'paymentMethod');
     totalCost = validateCost(totalCost, 'totalCost');
     isMealReq = checkisValidBoolean(isMealReq, 'isMealReq');
     //invoiceLink = validateCloudUrl(invoiceLink, 'invoiceLink');
@@ -54,7 +55,7 @@ export const addOrder = async (
         userId: ObjectId.createFromHexString(userId),
         status: "placed",
         dishes: dishes,
-        //paymentMethod: paymentMethod,
+        paymentMethod: ObjectId.createFromHexString(paymentMethod),
         isMealReq: isMealReq,
         totalCost: totalCost,
         createdAt: new Date().toUTCString(),

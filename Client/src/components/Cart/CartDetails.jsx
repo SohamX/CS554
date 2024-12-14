@@ -1,15 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react';
-// import AddDish from './AddDish.jsx';
-// import EditDish from './EditDish.jsx';
-// import DeleteDish from './DeleteDish.jsx';
-// import { Link } from 'react-router-dom';
+
 import { Button, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, FormControlLabel, Switch } from '@mui/material';
 import { useApi } from '../../contexts/ApiContext';
 import { AuthContext } from '../../contexts/AccountContext';
+import { useNavigate } from 'react-router-dom';
 
 
 function CartDetails() {
     const { apiCall } = useApi();
+    const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
     let str = JSON.stringify(currentUser, null, 2);
     let studentId;
@@ -25,13 +24,7 @@ function CartDetails() {
         console.error("Student Id not found!");
     }
     const [showAddForm, setShowAddForm] = useState(false);
-    // const [showEditModal, setShowEditModal] = useState(false);
-    // const [showDeleteModal, setShowDeleteModal] = useState(false);
-    // const [editDish, setEditDish] = useState(null);
-    // const [deleteDish, setDeleteDish] = useState(null);
     const [cartItems, setCartItems] = useState(null);
-    // const isById = false;
-    // const attr = 'cart';
     const getCartItemList = async () => {
         try {
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/${studentId}`, {
@@ -44,7 +37,7 @@ function CartDetails() {
                 throw response;
             }
 
-            console.log("Dishes successfully fetched:", response.cart);
+            console.log("Cart Items successfully fetched:", response.cart);
             setCartItems(response.cart);
         } catch (error) {
             alert(error);
@@ -55,52 +48,14 @@ function CartDetails() {
         getCartItemList();
     }, [])
 
-    // const handleToggleChange = async (event, id) => {
-    //     const isAvail = event.target.checked;
-    //     console.log('event.target.checked: ' + event.target.checked);
-    //     //const updateDish = async () => {
-    //     try {
-    //         const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/dishes/${id}`, {
-    //             method: 'PATCH',
-    //             headers: {
-    //                 'Content-Type': 'application/json',
-    //             },
-    //             body: JSON.stringify({
-    //                 cookId: studentId,
-    //                 isAvailable: isAvail
-    //             }),
-    //         });
-    //         if (response.error) {
-    //             throw response;
-    //         }
-
-    //         console.log("Dish successfully updated:", response.dish);
-    //         await getCartItemList();
-    //     } catch (error) {
-    //         alert(error);
-    //     }
-    //     // };
-    //     // await updateDish();
-
-    //     console.log(`Dish is now ${isAvail ? "Available" : "Unavailable"}`);
-    // };
-    // const handleOpenEditModal = (dish) => {
-    //     setShowEditModal(true);
-    //     setEditDish(dish);
-    // };
-
-    // const handleOpenDeleteModal = (dish) => {
-    //     setShowDeleteModal(true);
-    //     setDeleteDish(dish);
-    // };
-    const closeAddFormState = () => {
-        setShowAddForm(false);
+    const handleCheckout = () => {
+        if (!cartItems || cartItems.length === 0) {
+            alert('Your cart is empty. Please add items to proceed.');
+            return;
+        }
+        navigate('/student/checkout', { state: { cartItems, studentId } });
     };
 
-    // const handleCloseModals = () => {
-    //     setShowEditModal(false);
-    //     setShowDeleteModal(false);
-    // };
 
     if (cartItems) {
 
@@ -111,19 +66,17 @@ function CartDetails() {
                     variant="contained"
                     color="primary"
                     sx={{ mt: 1, mr: 1, width: '150px' }}
-                    onClick={() => setShowAddForm(!showAddForm)}
+                    onClick={handleCheckout}
                 >
                     Checkout
                 </Button>
-                {showAddForm && (
-                    <AddDish type='dish' cookId={studentId} refreshDishes={getCartItemList} closeAddFormState={closeAddFormState} />
-                )}
+
                 <br />
                 <br />
                 <Box
                     sx={{
                         mx: 'auto',
-                        width: '75%',
+                        width: '65%',
                         mt: 3,
                         p: 3,
                         display: 'flex',

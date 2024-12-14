@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { dishes } from '../config/mongoCollections.js';
-import { cuisineType, S3UrlPattern, imageMagicUrlPattern, orderStatus } from './constants.js';
+import { cuisineType, S3UrlPattern, imageMagicUrlPattern, orderStatus, cardNumberPattern, cvvPattern, zipCodePattern } from './constants.js';
 import { dishData } from '../data/index.js';
 
 const validateCuisineType = (cuisineName) => {
@@ -121,7 +121,23 @@ const errorMsg = (e) => {
     return { error: e.message ? e.message : e }
 }
 
+const validateCardNumber = (cardNumber, variable) => {
+    if (!(cardNumberPattern.test(cardNumber))) throw `Please enter valid card number.`;
+    return cardNumber;
+};
+
+const validateCvv = (cvv, variable) => {
+    if (!(cvvPattern.test(cvv))) throw `Please enter valid cvv.`;
+    return cvv;
+};
+
+const validateZipCode = (zipcode, variable) => {
+    if (!(zipCodePattern.test(zipcode))) throw `Please enter valid zipcode.`;
+    return zipcode;
+};
+
 export {
-    validateCuisineType, validateCost, checkisValidImageArray, validateId, checkisValidBoolean, validateOrderStatus,
-    validateUniqueDishesPerCook, checkisValidDishesArray, validateDishesList, validateCloudUrl, checkDishDesc, errorMsg
+    validateCuisineType, validateCost, checkisValidImageArray, validateId, checkisValidBoolean, validateOrderStatus, checkisValidString,
+    validateUniqueDishesPerCook, checkisValidDishesArray, validateDishesList, validateCloudUrl, checkDishDesc, errorMsg, validateCardNumber,
+    validateCvv, validateZipCode
 }

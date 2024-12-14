@@ -5,6 +5,7 @@ import orderRoutes from './order.js';
 import dishRoutes from './dishes.js';
 import cookRoutes from './cooks.js'
 import searchRoutes from './search.js'
+import paymentRoutes from './payment.js';
 const constructorMethod = (app) => {
   app.use('/mealReqs', mealReqRoutes);
   app.use('/users', userRoutes);
@@ -12,6 +13,7 @@ const constructorMethod = (app) => {
   app.use('/dishes', dishRoutes);
   app.use('/cooks', cookRoutes);
   app.use('/searchQuery', searchRoutes);
+  app.use('/payment', paymentRoutes);
 
   app.use('*', (req, res) => {
     res.status(404).json({ error: 'Route Not found' });

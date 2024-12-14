@@ -32,7 +32,8 @@ export const addDish = async (
     name,
     description,
     cuisineType,
-    cost
+    cost,
+    imageName
     // ,
     // images
 ) => {
@@ -61,7 +62,8 @@ export const addDish = async (
         //images: images,
         rating: '-',
         createdAt: new Date().toUTCString(),
-        isAvailable: true
+        isAvailable: true,
+        imageName: imageName
     };
 
     const insertInfo = await dishCollection.insertOne(newDish);
@@ -136,6 +138,7 @@ export const deleteDish = async (
 ) => {
     id = validateId(id, 'id');
     const dishCollection = await dishes();
+    const dish = await getDishById(id);
     const deletionInfo = await dishCollection.findOneAndDelete({
         _id: ObjectId.createFromHexString(id)
     });
@@ -145,7 +148,8 @@ export const deleteDish = async (
     }
     let resObj = {
         "_id": id,
-        "deleted": true
+        "deleted": true,
+        "imageName": dish.imageName
     }
     return resObj;
 }

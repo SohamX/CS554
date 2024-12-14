@@ -1,8 +1,31 @@
 import { Router } from 'express';
+import multer from 'multer';
+import sharp from 'sharp'
+import crypto from 'crypto'
 const router = Router();
 import helpers from '../helpers/pranHelpers.js';
 import { validateCuisineType, validateCost, checkisValidImageArray, validateId, validateUniqueDishesPerCook, checkDishDesc, checkisValidBoolean, errorMsg } from '../helpers/validationHelper.js';
 import { dishData } from '../data/index.js';
+import { S3Client,PutObjectCommand,GetObjectCommand, DeleteObjectCommand} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import dotenv from 'dotenv';
+dotenv.config();
+const generateFileName = (bytes = 32) => crypto.randomBytes(bytes).toString('hex')
+const bucketName = process.env.BUCKET_NAME;
+const bucketRegion = process.env.BUCKET_REGION;
+const accessKey = process.env.ACCESS_KEY;
+const secretKey = process.env.SECRET_ACCESS_KEY;
+console.log("Bucket Region:", bucketRegion);
+const s3Client = new S3Client({
+    region: bucketRegion,
+    credentials: {
+        accessKeyId: accessKey, 
+        secretAccessKey: secretKey,
+    }
+  })
+
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage })
 
 router
     .route('/')
@@ -15,8 +38,26 @@ router
             return;
         }
     })
-    .post(async (req, res) => {
+    .post(upload.single('image'),async (req, res) => {
+        // console.log(req.body);
+        // console.log(req.file);
+
+        const imageName = generateFileName()
+
+        const fileBuffer = await sharp(req.file.buffer).resize({ height: 1920, width: 1080, fit: "contain" }).toBuffer();
+        const params = {
+            Bucket: bucketName,
+            Key: imageName,
+            Body: fileBuffer,
+            ContentType: req.file.mimetype,
+        }
+
+        const command = new PutObjectCommand(params);
+
+        await s3Client.send(command);
+
         const dishFormData = req.body;
+        // console.log(dishFormData);
         let {
             cookId,
             name,
@@ -52,7 +93,8 @@ router
                 name,
                 description,
                 cuisineType,
-                cost
+                cost,
+                imageName
                 // ,
                 // images
             );
@@ -81,6 +123,16 @@ router
         }
         try {
             const dish = await dishData.getDishById(req.params.id);
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: dish.imageName
+              }
+            
+              
+              const command = new GetObjectCommand(getObjectParams);
+              
+              const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+              dish.imageUrl = url;
             res.status(200).json({ status: "success", dish: dish });
         } catch (e) {
             res.status(404).json(errorMsg(e));
@@ -171,9 +223,18 @@ router
         }
         try {
             const dishDeleted = await dishData.deleteDish(req.params.id);
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: dishDeleted.imageName
+              }
+            
+              
+            const command = new DeleteObjectCommand(getObjectParams);
+            await s3Client.send(command);
+
             res.status(200).json({ status: "success", dish: dishDeleted });
         } catch (e) {
-            res.status(404).json(errorMsg(e));
+            res.status(400).json(errorMsg(e));
             return;
         }
     })
@@ -189,6 +250,21 @@ router
         }
         try {
             const dishes = await dishData.getAllDishesByCookId(req.params.cookId);
+
+            for (const dish of dishes) {
+                const getObjectParams = {
+                    Bucket: bucketName,
+                    Key: dish.imageName
+                  }
+                
+                  
+                  const command = new GetObjectCommand(getObjectParams);
+                  
+                  const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+                  dish.imageUrl = url;
+            }
+
+            
             res.status(200).json({ status: "success", dishes: dishes });
         } catch (e) {
             res.status(404).json(errorMsg(e));
