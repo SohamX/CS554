@@ -92,7 +92,7 @@ const exportedMethods = {
     const regex = /^(0[1-9]|1[0-2])\/\d{2}$/;
 
     if (!regex.test(expirationDate)) {
-      return false; // Invalid format
+      throw `Expiration Date format is invalid. Expected format 'MM/YY'.`;
     }
 
     // Extract month and year

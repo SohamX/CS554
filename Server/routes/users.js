@@ -2,7 +2,7 @@ import { Router } from "express";
 import {userData} from '../data/index.js';
 import helpers from '../helpers/pranHelpers.js'
 import { checkisValidString } from '../helpers/validationHelper.js';
-import { errorMsg } from '../helpers/validationHelper.js';
+import { errorMsg, validateCardNumber, validateCvv, validateZipCode } from '../helpers/validationHelper.js';
 
 const router = Router();
 
@@ -424,39 +424,106 @@ router
       
       if (typeof cardNumber !== 'string') throw `Error: ${cardNumber} must be a string!`;
       cardNumber = cardNumber.trim();
-      
-      if(!/^\d{16}$/.test(cardNumber)) throw 'Please enter valid card number';
+      cardNumber = validateCardNumber(cardNumber, 'cardNumber');
+      //if (!/^\d{16}$/.test(cardNumber)) throw 'Please enter valid card number';
       cardHolderName = helpers.checkString(cardHolderName, 'cardHolderName');
       cardHolderName = helpers.checkSpecialCharsAndNum(cardHolderName, 'cardHolderName');
-      if(!helpers.isValidExpirationDate(expirationDate)) throw 'Your Card is Expired';
-      if(typeof cvv !== 'string') throw `Error: ${cvv} must be a string!`;
+      if (!helpers.isValidExpirationDate(expirationDate)) throw 'Your Card is Expired';
+      if (typeof cvv !== 'string') throw `Error: ${cvv} must be a string!`;
       cvv = cvv.trim();
-      if(!/^\d{3}$/.test(cvv)) throw 'Please enter valid cvv';
-      if(typeof zipcode!=="string"){
+      cvv = validateCvv(cvv, 'cvv');
+      //if (!/^\d{3}$/.test(cvv)) throw 'Please enter valid cvv';
+      if (typeof zipcode !== "string") {
         throw 'zipcode should be of type string'
       }
       
       zipcode = zipcode.trim();
-      if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
-      country = helpers.checkString(country,'country');
-      country = helpers.checkSpecialCharsAndNum(country,'country');
+      zipcode = validateZipCode(zipcode, 'zipcode');
+      //if (!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
+      country = helpers.checkString(country, 'country');
+      country = helpers.checkSpecialCharsAndNum(country, 'country');
       req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
 
       if (nickName) {
         nickName = checkisValidString(nickName, 'nickName');
       }
     } catch (e) {
-      res.status(400).json({error:e});
+      res.status(400).json({ error: e });
       return;
     }
     try {
       const statObj = await userData.addCardDetails(req.params.userId, type, provider, cardNumber, cardHolderName, expirationDate, cvv, zipcode, country, isDefault, nickName);
       res.status(200).json({ status: "success" });
     } catch (e) {
-      res.status(400).json({error:e});
+      res.status(400).json(errorMsg(e));
       return;
     }
   })
+
+
+router
+  .route('/paymentCard/:userId/:id')
+  .patch(async (req, res) => {
+    //const { id, userId } = req.params;
+    let { cardHolderName, expirationDate, cvv, zipcode, country, isDefault, nickName } = req.body;
+    console.log('HERE 1' + JSON.stringify(req.body));
+    try {
+      req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
+      req.params.id = helpers.checkId(req.params.id, 'cardId URL Param');
+      let existCard = userData.getPayementMethodByUserIdCardId(req.params.userId, req.params.id);
+      if (!cardHolderName || !expirationDate || !cvv || !zipcode || !country || isDefault === undefined || !nickName) {
+        throw 'At least one field must be updated';
+      }
+      if (cardHolderName) {
+        cardHolderName = helpers.checkString(cardHolderName, 'cardHolderName');
+        cardHolderName = helpers.checkSpecialCharsAndNum(cardHolderName, 'cardHolderName');
+      }
+      if (expirationDate && !helpers.isValidExpirationDate(expirationDate)) {
+        throw 'Invalid expiration date';
+      }
+      if (cvv) {
+        if (typeof cvv !== 'string') throw `Error: CVV must be a string!`;
+        cvv = cvv.trim();
+        cvv = validateCvv(cvv, 'cvv');
+      }
+      if (zipcode) {
+        if (typeof zipcode !== 'string') throw 'Zipcode should be of type string';
+        zipcode = zipcode.trim();
+        zipcode = validateZipCode(zipcode, 'zipcode');
+      }
+      if (country) {
+        country = helpers.checkString(country, 'country');
+        country = helpers.checkSpecialCharsAndNum(country, 'country');
+      }
+      if (nickName) {
+        nickName = helpers.checkString(nickName, 'nickName');
+      }
+      if (isDefault !== undefined && typeof isDefault !== 'boolean') {
+        throw 'isDefault must be a boolean';
+      }
+      const updatedCard = await userData.updateCardDetails(req.params.userId, req.params.id, cardHolderName, expirationDate, cvv, nickName, zipcode, country, isDefault);
+      return res.status(200).json({
+        status: 'success',
+        message: 'Card details updated successfully',
+        updatedCard
+      });
+
+    } catch (e) {
+      return res.status(400).json(errorMsg(e));
+    }
+  })
+  .delete(async (req, res) => {
+    try {
+      req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
+      req.params.id = helpers.checkId(req.params.id, 'cardId URL Param');
+
+      const deleteCard = await userData.deleteCard(req.params.userId, req.params.id);
+      return res.status(200).json({ status: "success", dish: deleteCard });
+    } catch (e) {
+      return res.status(400).json(errorMsg(e));
+    }
+  });
+
 
   
 

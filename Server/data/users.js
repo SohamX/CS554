@@ -2,7 +2,8 @@
 import {users,cooks,dishes} from '../config/mongoCollections.js';
 import {ObjectId} from 'mongodb';
 import helpers from '../helpers/pranHelpers.js'
-import { checkisValidString } from '../helpers/validationHelper.js';
+import { checkisValidString, validateCardNumber, validateCvv, validateZipCode } from '../helpers/validationHelper.js';
+
 import bcrypt from 'bcryptjs';
 const dishCollection = await dishes();
 const userCollection = await users();
@@ -584,26 +585,27 @@ export const addCardDetails = async (userId, type, provider, cardNumber, cardHol
   cardNumber = cardNumber.trim();
   let lastFourDigits = cardNumber.slice(-4);
   
-  if(!/^\d{16}$/.test(cardNumber)) throw 'Please enter valid card number';
+  cardNumber = validateCardNumber(cardNumber, 'cardNumber');
   cardHolderName = helpers.checkString(cardHolderName, 'cardHolderName');
   cardHolderName = helpers.checkSpecialCharsAndNum(cardHolderName, 'cardHolderName');
-  if(!helpers.isValidExpirationDate(expirationDate)) throw 'Your Card is Expired';
-  if(typeof cvv !== 'string') throw `Error: ${cvv} must be a string!`;
+  if (!helpers.isValidExpirationDate(expirationDate)) throw 'Your Card is Expired';
+  if (typeof cvv !== 'string') throw `Error: ${cvv} must be a string!`;
   cvv = cvv.trim();
-  if(!/^\d{3}$/.test(cvv)) throw 'Please enter valid cvv';
-  if(typeof zipcode!=="string"){
+  cvv = validateCvv(cvv, 'cvv');
+  if (typeof zipcode !== "string") {
     throw 'zipcode should be of type string'
   }
   
   zipcode = zipcode.trim();
-  if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
-  country = helpers.checkString(country,'country');
-  country = helpers.checkSpecialCharsAndNum(country,'country');
+  zipcode = validateZipCode(zipcode, 'zipcode');
+  country = helpers.checkString(country, 'country');
+  country = helpers.checkSpecialCharsAndNum(country, 'country');
   
   const hashcardNumber = await bcrypt.hash(cardNumber, saltRounds);
   const hashcvv = await bcrypt.hash(cvv, saltRounds);
-  if(isDefault ==="true"){
-    isDefault = true;}else{
+  if (isDefault === "true") {
+    isDefault = true;
+  } else {
       isDefault = false;
     }
   if (nickName) {
@@ -626,11 +628,108 @@ export const addCardDetails = async (userId, type, provider, cardNumber, cardHol
   };
   
   
-  const updateInfo = await userCollection.findOneAndUpdate({_id: new ObjectId(userId)}, {$push: {paymentCards: carddetails}}, {returnDocument: 'after'});
-  if(!updateInfo){
-    throw("Card details not added")
+  const updateInfo = await userCollection.findOneAndUpdate({ _id: new ObjectId(userId) }, { $push: { paymentCards: carddetails } }, { returnDocument: 'after' });
+  if (!updateInfo) {
+    throw ("Card details not added")
   }
-  return {added:true};
+  return { added: true };
+}
+
+export const updateCardDetails = async (userId, cardId, cardHolderName, expirationDate, cvv, nickName, zipcode, country, isDefault) => {
+  if (!userId || !cardId) {
+    throw ("User ID and Payment Card ID must be provided");
+  }
+
+  userId = helpers.checkId(userId, 'userId');
+  cardId = helpers.checkId(cardId, 'cardId');
+  let existCard = getPayementMethodByUserIdCardId(userId, cardId);
+
+  if (cardHolderName) {
+    cardHolderName = helpers.checkString(cardHolderName, 'cardHolderName');
+    cardHolderName = helpers.checkSpecialCharsAndNum(cardHolderName, 'cardHolderName');
+    existCard.cardHolderName = cardHolderName;
+  }
+
+  if (expirationDate) {
+    if (!helpers.isValidExpirationDate(expirationDate)) {
+      throw 'Invalid Expiration Date';
+    }
+    existCard.expirationDate = expirationDate;
+  }
+
+  if (cvv) {
+    if (typeof cvv !== 'string') throw `Error: ${cvv} must be a string!`;
+    cvv = cvv.trim();
+    cvv = validateCvv(cvv, 'cvv');
+    const hashcvv = await bcrypt.hash(cvv, saltRounds);
+    existCard.cvv = hashcvv;
+  }
+
+  if (zipcode) {
+    if (typeof zipcode !== 'string') throw 'Zipcode should be of type string';
+    zipcode = zipcode.trim();
+    zipcode = validateZipCode(zipcode, 'zipcode');
+    existCard.zipcode = zipcode;
+  }
+
+  if (country) {
+    country = helpers.checkString(country, 'country');
+    country = helpers.checkSpecialCharsAndNum(country, 'country');
+    existCard.country = country;
+  }
+
+  if (isDefault !== undefined || isDefault !== null) {
+    isDefault = isDefault === 'true';
+    existCard.isDefault = isDefault;
+  }
+  if (nickName) {
+    nickName = checkisValidString(nickName, 'nickName');
+    existCard.nickName = nickName;
+  }
+
+
+  const updateFields = {};
+
+  if (cardHolderName) updateFields['paymentCards.$.cardHolderName'] = existCard.cardHolderName;
+  if (expirationDate) updateFields['paymentCards.$.expirationDate'] = existCard.expirationDate;
+  if (cvv) updateFields['paymentCards.$.cvv'] = existCard.cvv;
+  if (nickName) updateFields['paymentCards.$.nickName'] = existCard.nickName;
+  if (zipcode) updateFields['paymentCards.$.zipcode'] = existCard.zipcode;
+  if (country) updateFields['paymentCards.$.country'] = existCard.country;
+  if (isDefault !== undefined) updateFields['paymentCards.$.isDefault'] = existCard.isDefault;
+
+  const updateResult = await userCollection.findOneAndUpdate(
+    { _id: new ObjectId(userId), 'paymentCards._id': new ObjectId(cardId) },
+    { $set: updateFields },
+    { returnDocument: 'after' }
+  );
+
+  if (!updateResult) {
+    throw ("Payment card details not updated");
+  }
+
+  return { updated: true, card: updateResult };
+};
+
+export const deleteCard = async (
+  userId,
+  id
+) => {
+  userId = helpers.checkId(userId, 'userId');
+  id = helpers.checkId(id, 'id');
+  let existCard = await getPayementMethodByUserIdCardId(userId, id);
+  const updateResult = await userCollection.updateOne(
+    { _id: ObjectId.createFromHexString(userId) },
+    { $pull: { paymentCards: { _id: ObjectId.createFromHexString(id) } } }
+  );
+  if (!updateResult) {
+    throw `Could not delete card with id of ${id}`;
+  }
+  let resObj = {
+    "_id": id,
+    "deleted": true
+  }
+  return resObj;
 }
 
 export const getAllPayementMethodByUserId = async (
@@ -643,4 +742,26 @@ export const getAllPayementMethodByUserId = async (
   const paymentMethods = await userCollection.find({ _id: ObjectId.createFromHexString(userId) }).project({ _id: 0, paymentCards: 1 }).toArray();
   if (paymentMethods === null || paymentMethods.length === 0 || paymentMethods[0].paymentCards === null || paymentMethods[0].paymentCards.length === 0) throw `No payment method added for User.`;
   return paymentMethods[0].paymentCards;
+}
+
+export const getPayementMethodByUserIdCardId = async (
+  userId, id
+) => {
+  if (!userId) {
+    throw ("User Id need to be supplied");
+  }
+  if (!id) {
+    throw ("Card Id need to be supplied");
+  }
+  userId = helpers.checkId(userId, 'userId');
+  id = helpers.checkId(id, 'cardId');
+  const card = await userCollection.findOne({ _id: ObjectId.createFromHexString(userId), 'paymentCards._id': ObjectId.createFromHexString(id) },
+    {
+      projection: { _id: 0, 'paymentCards.$': 1 }
+    }
+  );
+  console.log('card : ' + JSON.stringify(card));
+  //const paymentMethods = await userCollection.find({ _id: ObjectId.createFromHexString(userId) }).project({ _id: 0, paymentCards: 1 }).toArray();
+  if (card === null || card.length === 0 || card.paymentCards.length === 0 || card.paymentCards[0] === null) throw `No payment method added for User.`;
+  return card.paymentCards[0];
 }

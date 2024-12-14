@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Button, Typography, Box, TextField, Card, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { useApi } from '../../contexts/ApiContext.jsx';
+import { checkisValidString, validateCardNumber, validateCvv, validateZipCode } from '../../helpers/validationHelper.js';
+import helpers from '../../helpers/pranHelpers.js'
 
 function AddCard(props) {
     const { apiCall } = useApi();
@@ -19,19 +21,25 @@ function AddCard(props) {
     const [isDefault, setIsDefault] = useState(false);
     const [nickName, setNickName] = useState('');
     const userId = props.userId;
-    // Handlers
-    const handleCardNumberChange = (e) => setCardNumber(e.target.value);
+
+    const handleCardNumberChange = (e) => {
+        setCardNumber(e.target.value);
+    }
+
     const handleCardHolderNameChange = (e) => setCardHolderName(e.target.value);
     const handleExpirationDateChange = (e) => setExpirationDate(e.target.value);
     const handleCvvChange = (e) => setCvv(e.target.value);
     const handleZipcodeChange = (e) => setZipcode(e.target.value);
     const handleCountryChange = (e) => setCountry(e.target.value);
-    const handleIsDefaultChange = (e) => setIsDefault(e.target.checked);
+    const handleIsDefaultChange = (e) => {
+        const isDefaultVal = e.target.value;
+        console.log('event.target.value: ' + e.target.value);
+        setIsDefault(isDefaultVal);
+    }
 
     const handleSubmitCard = async (e) => {
         e.preventDefault();
         let errors = [];
-
         setLoading(true);
         setError(false);
         setErrorMsg('');
@@ -39,42 +47,60 @@ function AddCard(props) {
         if (!cardType || !provider || !cardNumber || !cardHolderName || !expirationDate || !cvv || !zipcode || !country) {
             errors.push('All required fields must be filled.');
         }
-
-        if (!/^\d{16}$/.test(cardNumber.trim())) {
-            errors.push('Card number must be a 16-digit number.');
+        try {
+            let cardNumberVal = validateCardNumber(cardNumber.trim(), 'Card Number');
+            setCardNumber(cardNumberVal);
+        } catch (e) {
+            errors.push(e);
         }
 
-        if (!/^[a-zA-Z\s]+$/.test(cardHolderName.trim())) {
-            errors.push('Cardholder name must only contain letters and spaces.');
+        try {
+            let cardHolderNameVal = helpers.checkString(cardHolderName.trim(), 'Cardholder Name');
+            cardHolderNameVal = helpers.checkSpecialCharsAndNum(cardHolderNameVal, 'Cardholder Name');
+            setCardHolderName(cardHolderNameVal);
+        } catch (e) {
+            errors.push(e);
+        }
+        try {
+            if (!helpers.isValidExpirationDate(expirationDate.trim())) throw 'Your Card is Expired';
+        } catch (e) {
+            errors.push(e);
         }
 
-        if (!/^\d{2}\/\d{2}$/.test(expirationDate.trim())) {
-            errors.push('Expiration date must be in MM/YY format.');
+
+        try {
+            let cvvVal = validateCvv(cvv.trim(), 'CVV');
+            setCvv(cvvVal);
+        } catch (e) {
+            errors.push(e);
+        }
+        try {
+            let zipcodeVal = validateZipCode(zipcode.trim(), 'Zipcode');
+            setZipcode(zipcodeVal);
+        } catch (e) {
+            errors.push(e);
+        }
+        try {
+            let countryVal = helpers.checkString(country.trim(), 'Country');
+            countryVal = helpers.checkSpecialCharsAndNum(countryVal, 'Country');
+            setCountry(countryVal);
+        } catch (e) {
+            errors.push(e);
         }
 
-        const [month, year] = expirationDate.split('/').map((val) => parseInt(val, 10));
-        const currentDate = new Date();
-        const currentMonth = currentDate.getMonth() + 1;
-        const currentYear = parseInt(currentDate.getFullYear().toString().slice(-2));
-
-        if (month < 1 || month > 12 || year < currentYear || (year === currentYear && month < currentMonth)) {
-            errors.push('Card expiration date is invalid or expired.');
+        if (nickName) {
+            try {
+                let nickNameVal = checkisValidString(nickName.trim(), 'Nickname');
+                setNickName(nickNameVal);
+            } catch (e) {
+                errors.push(e);
+            }
         }
 
-        if (!/^\d{3}$/.test(cvv.trim())) {
-            errors.push('CVV must be a 3-digit number.');
-        }
-
-        if (!/^\d{5}(-\d{4})?$/.test(zipcode.trim())) {
-            errors.push('Please enter a valid ZIP code.');
-        }
-
-        if (!/^[a-zA-Z\s]+$/.test(country.trim())) {
-            errors.push('Country name must only contain letters and spaces.');
-        }
         if (errors.length > 0) {
             setError(true);
             setErrorMsg(errors.join('\n'));
+            setLoading(false);
             return;
         }
 
@@ -127,16 +153,21 @@ function AddCard(props) {
                     Add Card
                 </Typography>
 
-                {error && (
-                    <Typography color="error" align="center" gutterBottom>
-                        {errorMsg}
-                    </Typography>
-                )}
+                {error && <Typography
+                    variant="body1"
+                    align="center"
+                    gutterBottom
+                    className='errorMessage'
+                    style={{ whiteSpace: 'pre-line' }}
+                >
+                    {errorMsg}
+                </Typography>}
+
 
                 <form id="add-card" onSubmit={handleSubmitCard}>
                     <Box display="flex" flexDirection="column" gap={3}>
-                        <FormControl fullWidth>
-                            <InputLabel id="cardType-label">Card Type</InputLabel>
+                        <FormControl fullWidth disabled={loading}>
+                            <InputLabel id="cardType-label">Card Type *</InputLabel>
                             <Select
                                 labelId="cardType-label"
                                 id="cardType"
@@ -149,14 +180,15 @@ function AddCard(props) {
                             </Select>
                         </FormControl>
 
-                        <FormControl fullWidth>
-                            <InputLabel id="provider-label">Card Provider</InputLabel>
+                        <FormControl fullWidth disabled={loading}>
+                            <InputLabel id="provider-label">Card Provider *</InputLabel>
                             <Select
                                 labelId="provider-label"
                                 id="provider"
                                 value={provider}
                                 onChange={(e) => setProvider(e.target.value)}
                                 label="Card Provider"
+
                             >
                                 <MenuItem value="Visa">Visa</MenuItem>
                                 <MenuItem value="Mastercard">Mastercard</MenuItem>
@@ -166,10 +198,12 @@ function AddCard(props) {
 
                         <TextField
                             label="Card Number"
+                            type="password"
                             value={cardNumber}
                             onChange={handleCardNumberChange}
                             fullWidth
                             required
+                            disabled={loading}
                         />
                         <TextField
                             label="Cardholder Name"
@@ -177,6 +211,7 @@ function AddCard(props) {
                             onChange={handleCardHolderNameChange}
                             fullWidth
                             required
+                            disabled={loading}
                         />
                         <TextField
                             label="Expiration Date (MM/YY)"
@@ -184,23 +219,31 @@ function AddCard(props) {
                             onChange={handleExpirationDateChange}
                             fullWidth
                             required
+                            disabled={loading}
+                            inputProps={{
+                                maxLength: 5,
+                            }}
                         />
                         <TextField
                             label="CVV"
+                            type="password"
                             value={cvv}
                             onChange={handleCvvChange}
                             fullWidth
                             required
+                            disabled={loading}
                         />
                         <TextField
                             label="Zip Code"
+                            type="number"
                             value={zipcode}
                             onChange={handleZipcodeChange}
                             fullWidth
                             required
+                            disabled={loading}
                         />
-                        <FormControl fullWidth>
-                            <InputLabel id="country-label">Country</InputLabel>
+                        <FormControl fullWidth disabled={loading}>
+                            <InputLabel id="country-label">Country *</InputLabel>
                             <Select
                                 labelId="country-label"
                                 id="country"
@@ -215,8 +258,8 @@ function AddCard(props) {
                             </Select>
                         </FormControl>
 
-                        <FormControl fullWidth>
-                            <InputLabel id="isDefault-label">Set as Default</InputLabel>
+                        <FormControl fullWidth disabled={loading}>
+                            <InputLabel id="isDefault-label">Set as Default *</InputLabel>
                             <Select
                                 labelId="isDefault-label"
                                 id="isDefault"
@@ -234,6 +277,7 @@ function AddCard(props) {
                             value={nickName}
                             onChange={(e) => setNickName(e.target.value)}
                             sx={{ mb: 2 }}
+                            disabled={loading}
                         />
                     </Box>
 

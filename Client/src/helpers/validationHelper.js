@@ -2,7 +2,7 @@
 // import { dishes } from '../config/mongoCollections.js';
 //import { dishData } from '../data/index.js';
 
-
+import { cardNumberPattern, cvvPattern, zipCodePattern } from './constants.js';
 // const validateOrderStatus = (status) => {
 //     if (orderStatus.get(status) === undefined)
 //         throw new Error('Invalid cuisine type passed.');
@@ -115,7 +115,23 @@ const errorMsg = (e) => {
     return { error: e.message ? e.message : e }
 }
 
+const validateCardNumber = (cardNumber, variable) => {
+    if (!(cardNumberPattern.test(cardNumber))) throw `Card number must be a 16-digit number.`;
+    return cardNumber;
+};
+
+const validateCvv = (cvv, variable) => {
+    if (!(cvvPattern.test(cvv))) throw `CVV must be a 3-digit number.`;
+    return cvv;
+};
+
+const validateZipCode = (zipcode, variable) => {
+    if (!(zipCodePattern.test(zipcode))) throw `Please enter a valid ZIP code.`;
+    return zipcode;
+};
+
 export {
     validateCost, checkisValidImageArray, validateId, checkisValidBoolean,
-    validateUniqueDishesPerCook, checkisValidDishesArray, checkDishDesc, errorMsg
+    validateUniqueDishesPerCook, checkisValidDishesArray, checkDishDesc, errorMsg,
+    validateCardNumber, validateCvv, validateZipCode, checkisValidString
 }
