@@ -18,7 +18,7 @@ function CartDetails() {
         const userId = currentUserObj._id;
         studentId = userId;
 
-        console.log("User ID:", userId);
+        console.log("User ID:", studentId);
     } catch (error) {
         console.error("Failed to parse JSON:", error.message);
         console.error("Student Id not found!");
@@ -100,7 +100,7 @@ function CartDetails() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {cartItems.map((cartItem) => (
+                                {cartItems && cartItems.dishes.map((cartItem) => (
                                     <TableRow key={cartItem._id}>
                                         <TableCell>
                                             <Typography

@@ -31,12 +31,12 @@ const user = {
         "_id": new ObjectId(),
         "type": "creditCard" | "debitCard" | "PayPal" | "Stripe",
         "provider": "visa" | "masterCard" | "americanExpress" | "discover" | "PayPal" | "Stripe",
-        "cardNumber": String,   // hashed cardNumber
+        "cardNumber": String,   // encrypted cardNumber
         "last4Digits": String, //last four digits on the card
         "expirationDate": "MM/YY",
-        "cvv": String,   // hashed cv
+        "cvv": String,   // encrypted cv
 
-        "isDefault": Boolean,
+        // "isDefault": Boolean,
 
         "zipCode": String,
         "country": String,

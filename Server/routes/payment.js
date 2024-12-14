@@ -3,7 +3,7 @@ import { Router } from 'express';
 const router = Router();
 import helpers from '../helpers/pranHelpers.js';
 import { validateCuisineType, validateCost, checkisValidImageArray, validateId, validateUniqueDishesPerCook, checkDishDesc, checkisValidBoolean, errorMsg } from '../helpers/validationHelper.js';
-import { paymentData, orderData } from '../data/index.js';
+import { paymentData, orderData, userData } from '../data/index.js';
 
 
 router
@@ -11,11 +11,10 @@ router
     .post(async (req, res) => {
         try {
             const { cookId, userId, items, totalCost, paymentMethod } = req.body;
-            console.log('totalCost 1' + totalCost);
-            if (!cookId || !userId || !items || items.length === 0 || !totalCost || !paymentMethod) {
+
+            if (!cookId || !userId || !items || !items.dishes || items.dishes.length === 0 || !totalCost || !paymentMethod) {
                 return res.status(400).json({ error: 'Invalid request data.' });
             }
-            console.log('totalCost 2' + totalCost);
 
             try {
                 // Process payment
@@ -25,8 +24,10 @@ router
                     return res.status(400).json({ error: 'Payment failed.' });
                 }
                 console.log('totalCost ' + totalCost);
-                //remove from cart
-                //TO DO
+
+
+
+                let paymentDetails = await userData.getPaymentMethodByUserIdCardId(userId, paymentMethod);
                 const orderAdded = await orderData.addOrder(
                     cookId,
                     userId,
@@ -40,6 +41,10 @@ router
                 if (!orderAdded) {
                     res.status(400).json({ error: "Error creating an order." });
                 }
+
+                //remove from cart
+                //TO DO
+                let emptyCart = await userData.emptyCart(userId);
 
                 res.status(200).json({ message: 'Checkout successful!', orderAdded });
             } catch (error) {

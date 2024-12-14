@@ -1,5 +1,5 @@
 import { Router } from "express";
-import {userData} from '../data/index.js';
+import { userData } from '../data/index.js';
 import helpers from '../helpers/pranHelpers.js'
 import { checkisValidString } from '../helpers/validationHelper.js';
 import { errorMsg, validateCardNumber, validateCvv, validateZipCode } from '../helpers/validationHelper.js';
@@ -416,10 +416,10 @@ router
 
   })
   .post(async (req, res) => {
-    let { type, provider, cardNumber, cardHolderName, expirationDate, cvv, zipcode, country, isDefault, nickName } = req.body;
+    let { type, provider, cardNumber, cardHolderName, expirationDate, cvv, zipcode, country, nickName } = req.body;
     try {
-      if(!type||!provider||!cardNumber||!cardHolderName||!expirationDate||!cvv||!zipcode||!country){
-        throw("All fields need to be supplied")
+      if (!type || !provider || !cardNumber || !cardHolderName || !expirationDate || !cvv || !zipcode || !country) {
+        throw ("All fields need to be supplied")
       }
       
       if (typeof cardNumber !== 'string') throw `Error: ${cardNumber} must be a string!`;
@@ -452,9 +452,10 @@ router
       return;
     }
     try {
-      const statObj = await userData.addCardDetails(req.params.userId, type, provider, cardNumber, cardHolderName, expirationDate, cvv, zipcode, country, isDefault, nickName);
+      const statObj = await userData.addCardDetails(req.params.userId, type, provider, cardNumber, cardHolderName, expirationDate, cvv, zipcode, country, nickName);
       res.status(200).json({ status: "success" });
     } catch (e) {
+      console.error("Card with the provided Card Number, CVV and Expiration Date is already present." + JSON.stringify(errorMsg(e)));
       res.status(400).json(errorMsg(e));
       return;
     }
@@ -465,13 +466,13 @@ router
   .route('/paymentCard/:userId/:id')
   .patch(async (req, res) => {
     //const { id, userId } = req.params;
-    let { cardHolderName, expirationDate, cvv, zipcode, country, isDefault, nickName } = req.body;
+    let { cardHolderName, expirationDate, cvv, zipcode, country, nickName } = req.body;
     console.log('HERE 1' + JSON.stringify(req.body));
     try {
       req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
       req.params.id = helpers.checkId(req.params.id, 'cardId URL Param');
       let existCard = userData.getPayementMethodByUserIdCardId(req.params.userId, req.params.id);
-      if (!cardHolderName || !expirationDate || !cvv || !zipcode || !country || isDefault === undefined || !nickName) {
+      if (!cardHolderName || !expirationDate || !cvv || !zipcode || !country || !nickName) {
         throw 'At least one field must be updated';
       }
       if (cardHolderName) {
@@ -498,10 +499,10 @@ router
       if (nickName) {
         nickName = helpers.checkString(nickName, 'nickName');
       }
-      if (isDefault !== undefined && typeof isDefault !== 'boolean') {
-        throw 'isDefault must be a boolean';
-      }
-      const updatedCard = await userData.updateCardDetails(req.params.userId, req.params.id, cardHolderName, expirationDate, cvv, nickName, zipcode, country, isDefault);
+      // if (isDefault !== undefined && typeof isDefault !== 'boolean') {
+      //   throw 'isDefault must be a boolean';
+      // }
+      const updatedCard = await userData.updateCardDetails(req.params.userId, req.params.id, cardHolderName, expirationDate, cvv, nickName, zipcode, country);
       return res.status(200).json({
         status: 'success',
         message: 'Card details updated successfully',
