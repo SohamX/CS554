@@ -52,28 +52,28 @@ function EditDish(props) {
         // };
 
         const handleCuisineTypeChange = (event) => {
-            if (dish.cuisineType != event.target.value) {
+            if (dish.cuisineType != event.target.value.trim()) {
                 setDataMofidied(true);
             }
             setCuisineType(event.target.value);
         };
 
         const handleNameChange = (event) => {
-            if (dish.name != event.target.value) {
+            if (dish.name != event.target.value.trim()) {
                 setDataMofidied(true);
             }
             setName(event.target.value);
         };
 
         const handleDescChange = (event) => {
-            if (dish.description != event.target.value) {
+            if (dish.description != event.target.value.trim()) {
                 setDataMofidied(true);
             }
             setDescription(event.target.value);
         };
 
         const handleCostChange = (e) => {
-            let value = e.target.value;
+            let value = e.target.value.trim();
             console.log('value: ' + value);
             if (cost != value) {
                 setDataMofidied(true);
@@ -147,7 +147,7 @@ function EditDish(props) {
                                 if (nameF) {
                                     try {
                                         if (name != nameF.value.trim()) {
-                                           setDataMofidied(true);
+                                            setDataMofidied(true);
                                         }
                                         nameVal = helpers.checkString(nameF.value, 'Dish Name');
                                     } catch (err) {

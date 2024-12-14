@@ -64,3 +64,9 @@ export const S3UrlPattern = new RegExp(
 export const imageMagicUrlPattern = new RegExp(
     /^https:\/\/(?:[a-zA-Z0-9.-]+)\/(?:convert|mogrify)\/(?:[a-zA-Z0-9%._+~#=,-]+)\?(?:[a-zA-Z0-9=&]+)$/
 );
+
+export const cardNumberPattern = new RegExp(/^\d{16}$/);
+
+export const cvvPattern = new RegExp(/^\d{3}$/);
+
+export const zipCodePattern = new RegExp(/^\d{5}(-\d{4})?$/);

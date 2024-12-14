@@ -173,7 +173,7 @@ router
             const dishDeleted = await dishData.deleteDish(req.params.id);
             res.status(200).json({ status: "success", dish: dishDeleted });
         } catch (e) {
-            res.status(404).json(errorMsg(e));
+            res.status(400).json(errorMsg(e));
             return;
         }
     })

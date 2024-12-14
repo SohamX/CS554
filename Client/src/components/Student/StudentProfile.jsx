@@ -9,7 +9,20 @@ const StudentProfile = () => {
     const { currentUser } = useContext(AuthContext);
     const [editPersonalInfo, setEditPersonalInfo] = useState(false);
     const [editAddress, setEditAddress] = useState(false);
+    const navigate = useNavigate();
+    let str = JSON.stringify(currentUser, null, 2);
+    let userId;
+    try {
+        const currentUserObj = JSON.parse(str);
+        console.log('currentUserObj: ' + currentUserObj);
+        const studentId = currentUserObj._id;
+        userId = studentId;
 
+        console.log("User ID:", userId);
+    } catch (error) {
+        console.error("Failed to parse JSON:", error.message);
+        console.error("User Id not found!");
+    }
     //Mohini add states and variables below here
     const [personalInfo, setPersonalInfo] = useState({
         firstName: currentUser.firstName,
@@ -43,6 +56,11 @@ const StudentProfile = () => {
     };
 
     //Mohini add functions below here
+    const handleViewPaymentDetails = () => {
+        navigate('/student/cardDetails', { state: { userId } });
+    };
+
+
 
     return (
         <Container maxWidth="sm" style={{ marginTop: "3%", marginBottom: "4%" }}>
@@ -60,7 +78,7 @@ const StudentProfile = () => {
                         value={personalInfo.firstName}
                         disabled
                     />
-                        <TextField
+                    <TextField
                         fullWidth
                         margin="normal"
                         label="Last Name"
@@ -166,9 +184,14 @@ const StudentProfile = () => {
             </Box>
             <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
                 <Typography variant="h5">Payment Info</Typography>
-                <p>Payment information will be displayed here.</p>
-                <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                    Edit
+                <p>Press the button below to view your payment details.</p>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    sx={{ mt: 2 }}
+                    onClick={handleViewPaymentDetails}
+                >
+                    View
                 </Button>
             </Box>
             <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
@@ -178,7 +201,7 @@ const StudentProfile = () => {
                     Edit
                 </Button>
             </Box>
-                <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
+            <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
                 <Typography variant="h5">Past Orders</Typography>
                 <p>Past orders will be displayed here.</p>
                 <Button variant="contained" color="primary" sx={{ mt: 2 }}>
