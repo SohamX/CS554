@@ -107,6 +107,7 @@ router.route('/pending/:mealReqId/responses').get(async (req, res) => {
      // req.params.userId =  helpers.checkId(req.params.userId, 'userId URL Param');
       req.params.mealReqId =  helpers.checkId(req.params.mealReqId, 'mealReqId URL Param');
     } catch (e) {
+      console.log(e);
       res.status(400).json({ error: e });
       return;
     }
@@ -114,6 +115,7 @@ router.route('/pending/:mealReqId/responses').get(async (req, res) => {
       const responses = await mealReqData.getResponsesForMealReq(req.params.mealReqId);
       res.status(200).json({ responses: responses });
     } catch (e) {
+      console.log(e);
       res.status(404).json({ error: e });
       return;
     }
@@ -152,12 +154,13 @@ router.route('/:cookId/pendingMr/').get(async (req, res) => {
       const pendingMealReqs = await mealReqData.getPendingMealReqsWithoutCook(req.params.cookId);
       res.status(200).json({ pendingMealReqs: pendingMealReqs });
     } catch (e) {
+      console.log(e);
       res.status(404).json({ error: e });
       return;
     }
   });
 
-router.route('/:cookId/acccepted/').get(async (req, res) => {
+router.route('/:cookId/accceptedMr/').get(async (req, res) => {
     try {
         req.params.cookId =  helpers.checkId(req.params.cookId, 'cookId URL Param');
         
@@ -171,6 +174,7 @@ router.route('/:cookId/acccepted/').get(async (req, res) => {
         const pendingMealReqs = await mealReqData.getAcceptedMealReqsByCook(req.params.cookId);
         res.status(200).json({ accpetedMealReqs: pendingMealReqs });
       } catch (e) {
+        console.log(e);
         res.status(404).json({ error: e });
         return;
       }

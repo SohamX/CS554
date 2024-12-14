@@ -25,7 +25,9 @@ import StudentProfile from './components/Student/StudentProfile.jsx';
 import CookProfile from './components/Cooks/CookProfile.jsx';
 import CheckoutDetails from './components/Payment/CheckoutDetails.jsx';
 import AddCard from './components/Payment/AddCard.jsx';
-
+import PendingMRCook from './components/Cooks/MealReqs/PendingMRCook.jsx';
+import AwaitingMRCook from './components/Cooks/MealReqs/AwaitingMRCook.jsx';
+import AcceptedMRCook from './components/Cooks/MealReqs/AcceptedMRCook.jsx';
 
 const AuthProviderWithRouter = withRouter(AuthProvider);
 
@@ -66,6 +68,9 @@ function App() {
                 <Route path="/mealReqs/users/pending" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/mealReqs/users/pending" element={<PendingMR />} />
                 </Route>
+                <Route path="/mealReqs/cooks/pending" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/mealReqs/cooks/pending" element={<PendingMRCook />} />
+                </Route>
                 <Route path="/mealReqs/add" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/mealReqs/add" element={<AddMealReq />} />
                 </Route>
@@ -74,6 +79,12 @@ function App() {
                 </Route>
                 <Route path="/mealReqs/users/accepted" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/mealReqs/users/accepted" element={<AcceptedMR />} />
+                </Route>
+                <Route path="/mealReqs/cooks/awaiting" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/mealReqs/cooks/awaiting" element={<AwaitingMRCook />} />
+                </Route>
+                <Route path="/mealReqs/cooks/accepted" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/mealReqs/cooks/accepted" element={<AcceptedMRCook />} />
                 </Route>
                 <Route path="/cook" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook" element={<Cook />} />
