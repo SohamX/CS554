@@ -37,7 +37,7 @@ function EditCard(props) {
     const [cvv, setCvv] = useState('');
     const [zipcode, setZipcode] = useState(card.zipcode || '');
     const [country, setCountry] = useState(card.country || '');
-    const [isDefault, setIsDefault] = useState(card.isDefault || false);
+    // const [isDefault, setIsDefault] = useState(card.isDefault || false);
     const [nickName, setNickName] = useState(card.nickName || '');
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
@@ -186,7 +186,7 @@ function EditCard(props) {
                     cvv: cvv,
                     zipcode: zipcode,
                     country: country,
-                    isDefault: isDefault,
+                    // isDefault: isDefault,
                     nickName: nickName
                 })
             });
@@ -304,7 +304,7 @@ function EditCard(props) {
                             value={country}
                             disabled
                         />
-                        <FormControl fullWidth disabled={loading}>
+                        {/* <FormControl fullWidth disabled={loading}>
                             <InputLabel id="isDefault-label">Set as Default</InputLabel>
                             <Select
                                 labelId="isDefault-label"
@@ -317,17 +317,7 @@ function EditCard(props) {
                                 <MenuItem value={true}>Yes</MenuItem>
                                 <MenuItem value={false}>No</MenuItem>
                             </Select>
-                        </FormControl>
-                        {/* <FormControlLabel
-                            control={
-                                <Switch
-                                    checked={isDefault}
-                                    onChange={handleIsDefaultChange}
-                                    color="primary"
-                                />
-                            }
-                            label={isDefault ? "Set as Default" : "Not Default"}
-                        /> */}
+                        </FormControl> */}
                         <TextField
                             label="Nickname (Optional)"
                             fullWidth

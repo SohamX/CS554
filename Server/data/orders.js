@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 import helpers from '../helpers/pranHelpers.js';
 import { validateDishesList, validateId, validateCost, validateCloudUrl, checkisValidBoolean, validateOrderStatus } from '../helpers/validationHelper.js';
 import { getDishById } from './dishes.js';
+import { userData } from '../data/index.js';
 
 export const getOrderById = async (id) => {
     id = validateId(id, 'id');
@@ -33,6 +34,8 @@ export const addOrder = async (
     userId,
     dishes,
     paymentMethod,
+    totalCostBeforeTax,
+    tax,
     totalCost,
     isMealReq
     // ,
@@ -47,6 +50,10 @@ export const addOrder = async (
     await validateDishesList(dishes, false);
     //TO DO validate payment method
     paymentMethod = validateId(paymentMethod, 'paymentMethod');
+    //get getPaymentMethodByUserIdCardId
+    let paymentDetails = await userData.getPaymentMethodByUserIdCardId(userId, paymentMethod);
+    totalCostBeforeTax = validateCost(totalCostBeforeTax, 'totalCostBeforeTax');
+    tax = validateCost(tax, 'tax');
     totalCost = validateCost(totalCost, 'totalCost');
     isMealReq = checkisValidBoolean(isMealReq, 'isMealReq');
     //invoiceLink = validateCloudUrl(invoiceLink, 'invoiceLink');
@@ -55,8 +62,10 @@ export const addOrder = async (
         userId: ObjectId.createFromHexString(userId),
         status: "placed",
         dishes: dishes,
-        paymentMethod: ObjectId.createFromHexString(paymentMethod),
+        paymentMethod: paymentDetails,//ObjectId.createFromHexString(paymentMethod),
         isMealReq: isMealReq,
+        totalCostBeforeTax: totalCostBeforeTax,
+        tax: tax,
         totalCost: totalCost,
         createdAt: new Date().toUTCString(),
         updatedAt: new Date().toUTCString(),

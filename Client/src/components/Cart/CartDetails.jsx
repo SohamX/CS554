@@ -18,7 +18,7 @@ function CartDetails() {
         const userId = currentUserObj._id;
         studentId = userId;
 
-        console.log("User ID:", userId);
+        console.log("User ID:", studentId);
     } catch (error) {
         console.error("Failed to parse JSON:", error.message);
         console.error("Student Id not found!");
@@ -49,7 +49,7 @@ function CartDetails() {
     }, [])
 
     const handleCheckout = () => {
-        if (!cartItems || cartItems.length === 0) {
+        if (!cartItems || !cartItems.dishes || !cartItems.dishes.length || !(cartItems.dishes.length > 0)) {
             alert('Your cart is empty. Please add items to proceed.');
             return;
         }
@@ -100,8 +100,8 @@ function CartDetails() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {cartItems.map((cartItem) => (
-                                    <TableRow key={cartItem._id}>
+                                {cartItems && cartItems.dishes.map((cartItem) => (
+                                    <TableRow key={cartItem.dishId}>
                                         <TableCell>
                                             <Typography
                                                 variant='h6'

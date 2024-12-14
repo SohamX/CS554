@@ -42,7 +42,9 @@ function CardsList() {
             });
             if (response.error) {
                 if (response.error === 'No payment method added for User.') {
-                    throw `No payment method found for your account. Please add a payment method.`;
+                    console.log(`No payment method found for your account. Please add a payment method.`);
+                    setCards([]);
+                    return;
                 } else {
                     throw response;
                 }

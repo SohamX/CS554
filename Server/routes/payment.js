@@ -3,19 +3,18 @@ import { Router } from 'express';
 const router = Router();
 import helpers from '../helpers/pranHelpers.js';
 import { validateCuisineType, validateCost, checkisValidImageArray, validateId, validateUniqueDishesPerCook, checkDishDesc, checkisValidBoolean, errorMsg } from '../helpers/validationHelper.js';
-import { paymentData, orderData } from '../data/index.js';
+import { paymentData, orderData, userData } from '../data/index.js';
 
 
 router
     .route('/placeOrder')
     .post(async (req, res) => {
         try {
-            const { cookId, userId, items, totalCost, paymentMethod } = req.body;
-            console.log('totalCost 1' + totalCost);
-            if (!cookId || !userId || !items || items.length === 0 || !totalCost || !paymentMethod) {
+            const { cookId, userId, items, totalCostBeforeTax, tax, totalCost, paymentMethod } = req.body;
+
+            if (!cookId || !userId || !items || !items.dishes || items.dishes.length === 0 || !totalCostBeforeTax || !tax || !totalCost || !paymentMethod) {
                 return res.status(400).json({ error: 'Invalid request data.' });
             }
-            console.log('totalCost 2' + totalCost);
 
             try {
                 // Process payment
@@ -25,13 +24,17 @@ router
                     return res.status(400).json({ error: 'Payment failed.' });
                 }
                 console.log('totalCost ' + totalCost);
-                //remove from cart
-                //TO DO
+
+
+
+                let paymentDetails = await userData.getPaymentMethodByUserIdCardId(userId, paymentMethod);
                 const orderAdded = await orderData.addOrder(
                     cookId,
                     userId,
                     items,
                     paymentMethod,
+                    parseFloat(totalCostBeforeTax),
+                    parseFloat(tax),
                     parseFloat(totalCost),
                     false
                     // ,
@@ -41,7 +44,12 @@ router
                     res.status(400).json({ error: "Error creating an order." });
                 }
 
-                res.status(200).json({ message: 'Checkout successful!', orderAdded });
+                //remove from cart
+                //TO DO
+                let emptyCart = await userData.emptyCart(userId);
+                const orderDetails = await orderData.getOrderById(orderAdded.insertedId.toString());
+                //console.log('orderDetails: ' + JSON.stringify(orderDetails));
+                res.status(200).json({ message: 'Checkout successful!', orderDetails });
             } catch (error) {
                 console.error(errorMsg(error));
                 res.status(500).json({ error: `Checkout failed. Please try again.` });

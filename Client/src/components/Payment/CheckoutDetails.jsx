@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Typography, Card, CardContent, Box, RadioGroup, FormControlLabel, Radio } from '@mui/material';
+import { Button, Typography, Card, CardContent, Box, RadioGroup, FormControlLabel, Radio, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
 import { useApi } from '../../contexts/ApiContext.jsx';
 import AddCard from './AddCard.jsx';
+import { taxPercent } from '../../helpers/constants.js';
 
 
 function CheckoutDetails() {
     const location = useLocation();
     const { apiCall } = useApi();
     const navigate = useNavigate();
-    const [cartItems, setCartItems] = useState(location.state?.cartItems || []);
+    const [cartItems, setCartItems] = useState(location.state?.cartItems || {});
     const [userId, setUserId] = useState(location.state?.studentId || '');
+    const [cookId, setCookId] = useState();
     const [totalCostBeforeTax, setTotalCostBeforeTax] = useState(0);
     const [totalCost, setTotalCost] = useState(0);
     const [tax, setTax] = useState(0);
@@ -20,10 +22,11 @@ function CheckoutDetails() {
 
     useEffect(() => {
         // Calculate the total cost
-        if (cartItems.length > 0) {
-            const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
-            let totB4Tax = total.toFixed(2);
-            let calcTax = (totB4Tax * 0.06).toFixed(2);
+        if (cartItems && cartItems.dishes && cartItems.dishes.length && cartItems.dishes.length > 0) {
+            setCookId(cartItems.cookId);
+            //const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+            let totB4Tax = cartItems.totalCost.toFixed(2);
+            let calcTax = (totB4Tax * taxPercent).toFixed(2);
             let finalTotal = (parseFloat(totB4Tax) + parseFloat(calcTax)).toFixed(2);
             setTotalCostBeforeTax(totB4Tax);
             setTax(calcTax);
@@ -64,17 +67,18 @@ function CheckoutDetails() {
         }
 
         try {
-            // Call the API to place the order
-            console.log("selectedPaymentMethod: " + selectedPaymentMethod);
+
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/payment/placeOrder`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    cookId: '6758d17e11319fce50ef3d88',
+                    cookId: cookId,//'6758d17e11319fce50ef3d88',
                     userId: userId,
                     items: cartItems,
+                    totalCostBeforeTax: totalCostBeforeTax,
+                    tax: tax,
                     totalCost: totalCost,
                     paymentMethod: selectedPaymentMethod,
                 }),
@@ -84,7 +88,8 @@ function CheckoutDetails() {
                 throw new Error(response.error || 'Failed to place the order.');
             } else {
                 alert('Order placed successfully!');
-                //navigate('/orderConfirmation', { state: { orderDetails: response.orderAdded } });
+                //console.log('orderDetails: ' + JSON.stringify(response));
+                navigate('/student/orderConfirmation', { state: { orderDetails: response.orderDetails } });
             }
         } catch (error) {
             console.error('Error placing order:', error);
@@ -100,14 +105,14 @@ function CheckoutDetails() {
     };
 
     return (
-        <Box sx={{ mx: 'auto', width: '70%', mt: 5 }}>
+        <Box sx={{ mx: 'auto', width: '80%', mt: 5 }}>
             <Typography variant="h4" gutterBottom>
                 Order Summary
             </Typography>
-            <Card sx={{ mb: 3 }}>
+            <Card sx={{ m: 3 }}>
                 <CardContent>
-                    {/* <Typography variant="h6">{item.cookName}</Typography> */}
-                    {cartItems.map((item) => (
+                    <Typography variant="h6">Cook: {cartItems.cookName}</Typography>
+                    {/* {cartItems && cartItems.dishes.map((item) => (
                         <Box key={item._id} sx={{
                             display: "flex",
                             width: '80%',
@@ -117,9 +122,30 @@ function CheckoutDetails() {
                         }}>
                             <Typography>{item.quantity}</Typography>
                             <Typography variant="h6">{item.dishName}</Typography>
-                            <Typography>${item.subtotal}</Typography>
+                            <Typography>${item.subTotal}</Typography>
                         </Box>
-                    ))}
+                    ))} */}
+
+                    <TableContainer component={Box} sx={{ width: '90%', maxHeight: 400, overflowY: 'auto', m: 2 }}>
+                        <Table sx={{ minWidth: '100%' }} aria-label="cart items table">
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>Quantity</TableCell>
+                                    <TableCell>Dish Name</TableCell>
+                                    <TableCell>Subtotal</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {cartItems?.dishes.map((item) => (
+                                    <TableRow key={item.dishId}>
+                                        <TableCell>{item.quantity}</TableCell>
+                                        <TableCell>{item.dishName}</TableCell>
+                                        <TableCell>${item.subTotal}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                     <Typography variant="h5" sx={{ mt: 3 }}>
                         SubTotal: ${totalCostBeforeTax}
                     </Typography>
@@ -144,7 +170,7 @@ function CheckoutDetails() {
                         key={card._id}
                         value={card._id}
                         control={<Radio />}
-                        label={`${card.type} ${card.provider} (**** **** **** ${card.last4Digits})${card.isDefault ? ' - Default' : ''}`}
+                        label={`${card.type.toUpperCase()} ${card.provider} (**** **** **** ${card.last4Digits})`}
                     />
                 ))}
             </RadioGroup>
@@ -160,22 +186,6 @@ function CheckoutDetails() {
             {showAddForm && (
                 <AddCard userId={userId} paymentMethods={paymentMethods} refreshPaymentMethods={getPaymentMethodsList} closeAddFormState={closeAddFormState} />
             )}
-            {/* <Button
-                variant="contained"
-                color="primary"
-                sx={{ mt: 1, mr: 1, width: '150px' }}
-                onClick={handleAddPaymentMethod}
-            >
-                Add Payment Method
-            </Button> */}
-            {/* <RadioGroup
-                value={paymentMethod}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-            >
-                <FormControlLabel value="credit_card" control={<Radio />} label="Credit Card" />
-                <FormControlLabel value="paypal" control={<Radio />} label="PayPal" />
-                <FormControlLabel value="cash_on_delivery" control={<Radio />} label="Cash on Delivery" />
-            </RadioGroup> */}
 
             <Button
                 variant="contained"
