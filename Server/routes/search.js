@@ -3,6 +3,23 @@ const router = Router();
 import helpers from "../helpers/pranHelpers.js";
 import { dishData } from "../data/index.js";
 import { validateCuisineType } from "../helpers/validationHelper.js";
+import { S3Client,GetObjectCommand} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import dotenv from 'dotenv';
+dotenv.config();
+const bucketName = process.env.BUCKET_NAME;
+const bucketRegion = process.env.BUCKET_REGION;
+const accessKey = process.env.ACCESS_KEY;
+const secretKey = process.env.SECRET_ACCESS_KEY;
+
+const s3Client = new S3Client({
+    region: bucketRegion,
+    credentials: {
+        accessKeyId: accessKey, 
+        secretAccessKey: secretKey,
+    }
+  })
+
 
 router.route("/").get(async (req, res) => {
   try {
@@ -36,17 +53,29 @@ router.route("/").get(async (req, res) => {
     //location validation to be implemented
 
     // get data from data functions
-    const data = await dishData.searchQuery(
+    const dishes = await dishData.searchQuery(
       dish,
       cuisine,
       location,
       minPrice,
       maxPrice
     );
-    if (!data) {
+    if (!dishes) {
       res.status(404).json({ error: "No Data Found" });
     }
-    return res.status(200).json({ status: "success", dishes: data });
+    for (const dish of dishes) {
+      const getObjectParams = {
+          Bucket: bucketName,
+          Key: dish.imageName
+        }
+      
+        
+        const command = new GetObjectCommand(getObjectParams);
+        
+        const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+        dish.imageUrl = url;
+  }
+    return res.status(200).json({ status: "success", dishes: dishes });
   } catch (e) {
     return res.status(400).json({ error: e });
   }

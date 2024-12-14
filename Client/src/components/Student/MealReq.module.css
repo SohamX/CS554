@@ -110,6 +110,12 @@ Center the container vertically and horizontally
   ul {
     list-style: none;
   }
+  .cardImage {
+    width: 100%; /* Make the image responsive */
+    height: auto; /* Maintain aspect ratio */
+    border-radius: 8px; /* Optional: add rounded corners */
+    margin-bottom: 10px; /* Add spacing below the image */
+  }
   
   .navlink {
     padding: 10px;
@@ -177,8 +183,9 @@ Center the container vertically and horizontally
   
   .card {
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-    width: 40%;
-    margin: 10px auto 20px;
+    width: 30%;
+    max-width: 1000px;
+    margin: 10px auto 30px;
     height: auto;
     padding: 20px;
   }
@@ -196,6 +203,41 @@ Center the container vertically and horizontally
   
   div {
     width: 100%;
+  }
+  .buttonContainer {
+    display: flex;
+    justify-content: space-between; /* Space out buttons */
+    gap: 1rem;
+    margin-top: 1rem; /* Add spacing above the buttons */
+  }
+  
+  .buttonPrimary,
+  .buttonSecondary {
+    padding: 10px 15px;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .buttonPrimary {
+    background-color: #28a745; /* Green for Add to Cart */
+    color: white;
+  }
+  
+  .buttonPrimary:hover {
+    background-color: #218838;
+  }
+  
+  .buttonSecondary {
+    background-color: #007bff; /* Blue for Checkout */
+    color: white;
+  }
+  
+  .buttonSecondary:hover {
+    background-color: #0056b3;
   }
   
   @media (max-width: 820px) {

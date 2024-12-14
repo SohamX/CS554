@@ -9,6 +9,7 @@ import { TextField, Container, Grid2, Select } from "@mui/material";
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import axios from "axios";
+import styles from './MealReq.module.css'
 
 const student = () => {
   const { apiCall, loading, error } = useApi();
@@ -106,11 +107,22 @@ const student = () => {
     if (!currentUser) {
       navigate("/");
     }
+    async function fetchData() {
+      try {
+        const { data: { dishes } } = await axios.get(`http://localhost:3000/dishes/`);
+        setDishes(dishes);
+        setLoading(false);
+      } catch (e) {
+        console.log(e);
+        navigate('/404page');
+      }
+    }
+    fetchData();
   }, [currentUser]);
 
   return (
     <>
-      <Container maxWidth="md" style={{ marginTop: "3%", marginBottom: "4%" }}>
+      <Container maxWidth="md" style={{ marginTop: "-5px", marginBottom: "4%" }}>
         <Box sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
           <Typography variant="h4" component="h1" gutterBottom>
             Search For The Food That You Like...!
@@ -200,40 +212,43 @@ const student = () => {
       </Box>
       </Container>
       {dishes && dishes.length > 0 && (
-        <div style={{ width: '100%', alignContent: 'center' }}>
-          <Grid2 container spacing={2}>
-            {dishes.map((dish) => (
-              <Link to={`/student/dishes/${dish._id}`}>
-                <Grid2 dish key={dish._id}>
-                  <Card>
-                    {/* <CardMedia
-                    component="img"
-                    height="140"
-                    image={item.image}
-                    alt={item.title}
-                  /> */}
-                    <CardContent>
-                      <Typography gutterBottom variant="h5" component="div">
-                        {dish.name}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        {dish.description}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        CUISINE: {dish.cuisineType}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        COST: {dish.cost} $
-                      </Typography>
-                    </CardContent>
-                  </Card>
-                </Grid2>
-              </Link>
-            ))}
-          </Grid2>
-          <br />
-        </div>
-      )
+        dishes.map((mealReq) => (
+          <div className={styles.card} key={mealReq._id}>
+            <div className={styles.cardBody}>
+            <img style={{
+                            width: '100%',
+                            height: 'auto',
+                            maxHeight: '400px',
+                            objectFit: 'cover',
+                            borderTopLeftRadius: '4px',
+                            borderTopRightRadius: '4px'
+                        }}
+              src={mealReq.imageUrl} 
+              alt={mealReq.name} 
+              // className={styles.cardImage} // Add styles for the image
+            />
+              <h3 className={styles.cardTitle}>
+                <Link to={``}>
+                  {mealReq.name}
+                </Link>
+              </h3>
+              <p className={styles.cardText}>
+                <span className={styles.cardSubtitle}>Cuisine Type:</span> {mealReq.cuisineType}
+              </p>
+              <p className={styles.cardText}>
+                <span className={styles.cardSubtitle}>Cost :</span> {'$'+ mealReq.cost}
+              </p>
+              
+              
+              <div className={styles.buttonContainer}>
+          <button className={styles.buttonPrimary}>Add to Cart</button>
+          
+          <button className={styles.buttonSecondary}>Checkout</button>
+             </div>
+            </div>
+          </div>
+        ))
+      ) 
       } {
         dishes && dishes.length == 0 && <div>
           Sorry, we can't find the dishes you are looking for!

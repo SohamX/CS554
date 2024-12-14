@@ -32,6 +32,19 @@ router
     .get(async (req, res) => {
         try {
             const dishes = await dishData.getAvailableDishes();
+            for (const dish of dishes) {
+                const getObjectParams = {
+                    Bucket: bucketName,
+                    Key: dish.imageName
+                  }
+                
+                  
+                  const command = new GetObjectCommand(getObjectParams);
+                  
+                  const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+                  dish.imageUrl = url;
+            }
+
             res.status(200).json({ status: "success", dishes: dishes });
         } catch (e) {
             res.status(404).json(errorMsg(e));
@@ -135,6 +148,7 @@ router
               dish.imageUrl = url;
             res.status(200).json({ status: "success", dish: dish });
         } catch (e) {
+            console.log(e);
             res.status(404).json(errorMsg(e));
             return;
         }

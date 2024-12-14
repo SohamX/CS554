@@ -8,7 +8,7 @@ import helpers from './helpers'
 //import helpers from '../../../helpers'
 //import helpers from '../../../../../Server/helpers/pranHelpers'
 import axios from 'axios';
-import styles from './MealReq.module.css'
+import styles from '../MealReq.module.css'
 
 function AddMealReq(props) {
   const { currentUser } = useContext(AuthContext);

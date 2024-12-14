@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../../../contexts/AccountContext';
-import styles from '../../Student/MealReqs/MealReq.module.css';
+import styles from '../../Student/MealReq.module.css';
 
 function AwaitingMRCook() {
   const { currentUser } = useContext(AuthContext);
