@@ -9,6 +9,7 @@ function AddCard(props) {
     const { apiCall } = useApi();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
+    const cards = props.paymentMethods;
     const [errorMsg, setErrorMsg] = useState('');
     const [cardType, setCardType] = useState('debit');
     const [provider, setProvider] = useState('Visa');
@@ -18,9 +19,10 @@ function AddCard(props) {
     const [cvv, setCvv] = useState('');
     const [zipcode, setZipcode] = useState('');
     const [country, setCountry] = useState('United States');
-    const [isDefault, setIsDefault] = useState(false);
+    // const [isDefault, setIsDefault] = useState(cards.length === 0 ? "true" : "false");
     const [nickName, setNickName] = useState('');
     const userId = props.userId;
+
 
     const handleCardNumberChange = (e) => {
         setCardNumber(e.target.value);
@@ -30,12 +32,12 @@ function AddCard(props) {
     const handleExpirationDateChange = (e) => setExpirationDate(e.target.value);
     const handleCvvChange = (e) => setCvv(e.target.value);
     const handleZipcodeChange = (e) => setZipcode(e.target.value);
-    const handleCountryChange = (e) => setCountry(e.target.value);
-    const handleIsDefaultChange = (e) => {
-        const isDefaultVal = e.target.value;
-        console.log('event.target.value: ' + e.target.value);
-        setIsDefault(isDefaultVal);
-    }
+    //const handleCountryChange = (e) => setCountry(e.target.value);
+    // const handleIsDefaultChange = (e) => {
+    //     const isDefaultVal = e.target.value;
+    //     console.log('event.target.value: ' + e.target.value);
+    //     setIsDefault(isDefaultVal);
+    // }
 
     const handleSubmitCard = async (e) => {
         e.preventDefault();
@@ -121,13 +123,14 @@ function AddCard(props) {
                     cvv: cvv,
                     zipcode: zipcode,
                     country: country,
-                    isDefault: "false",
+                    // isDefault: isDefault,
                     nickName: nickName,
 
                 }),
             });
 
             if (response.error) {
+
                 console.error('Failed to store payment method');
                 throw response.error;
             }
@@ -140,7 +143,7 @@ function AddCard(props) {
             console.error('Error sending payment method to backend:', error);
             //alert(error);
             setError(true);
-            setErrorMsg(`Could not add card: ${error.message}`);
+            setErrorMsg(`Could not add card: ${error}`);
         } finally {
             setLoading(false);
         }
@@ -163,7 +166,13 @@ function AddCard(props) {
                     {errorMsg}
                 </Typography>}
 
-
+                {cards.length === 0 && (
+                    <Typography variant="body2" color="textSecondary" align="center">
+                        The first card added will automatically be set as the default payment method.
+                    </Typography>
+                )}
+                <br>
+                </br>
                 <form id="add-card" onSubmit={handleSubmitCard}>
                     <Box display="flex" flexDirection="column" gap={3}>
                         <FormControl fullWidth disabled={loading}>
@@ -242,7 +251,15 @@ function AddCard(props) {
                             required
                             disabled={loading}
                         />
-                        <FormControl fullWidth disabled={loading}>
+                        <TextField
+                            label="Country"
+                            variant="outlined"
+                            fullWidth
+                            required
+                            value={country}
+                            disabled
+                        />
+                        {/* <FormControl fullWidth disabled={loading}>
                             <InputLabel id="country-label">Country *</InputLabel>
                             <Select
                                 labelId="country-label"
@@ -252,13 +269,12 @@ function AddCard(props) {
                                 label="Country"
                             >
                                 <MenuItem value="United States">United States</MenuItem>
-                                {/* <MenuItem value="Canada">Canada</MenuItem>
-                                <MenuItem value="United Kingdom">United Kingdom</MenuItem> */}
-                                {/* Add more countries as needed */}
+                                <MenuItem value="Canada">Canada</MenuItem>
+                                <MenuItem value="United Kingdom">United Kingdom</MenuItem>                                
                             </Select>
-                        </FormControl>
+                        </FormControl> */}
 
-                        <FormControl fullWidth disabled={loading}>
+                        {/* <FormControl fullWidth disabled={loading || cards.length === 0}>
                             <InputLabel id="isDefault-label">Set as Default *</InputLabel>
                             <Select
                                 labelId="isDefault-label"
@@ -267,10 +283,10 @@ function AddCard(props) {
                                 onChange={(e) => handleIsDefaultChange(e)}
                                 label="Set as Default"
                             >
-                                <MenuItem value={true}>Yes</MenuItem>
-                                <MenuItem value={false}>No</MenuItem>
+                                <MenuItem value={"true"}>Yes</MenuItem>
+                                <MenuItem value={"false"}>No</MenuItem>
                             </Select>
-                        </FormControl>
+                        </FormControl> */}
                         <TextField
                             label="Nickname (Optional)"
                             fullWidth
