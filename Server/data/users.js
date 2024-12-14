@@ -737,7 +737,7 @@ export const addCardDetails = async (userId, type, provider, cardNumber, cardHol
   return { added: true };
 }
 
-export const updateCardDetails = async (userId, cardId, cardHolderName, expirationDate, cvv, nickName, zipcode, country, isDefault) => {
+export const updateCardDetails = async (userId, cardId, cardHolderName, expirationDate, cvv, nickName, zipcode, country) => {
   if (!userId || !cardId) {
     throw ("User ID and Payment Card ID must be provided");
   }

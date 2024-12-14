@@ -22,7 +22,7 @@ function CheckoutDetails() {
 
     useEffect(() => {
         // Calculate the total cost
-        if (cartItems && cartItems.dishes) {
+        if (cartItems && cartItems.dishes && cartItems.dishes.length && cartItems.dishes.length > 0) {
             setCookId(cartItems.cookId);
             //const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
             let totB4Tax = cartItems.totalCost.toFixed(2);
@@ -67,8 +67,7 @@ function CheckoutDetails() {
         }
 
         try {
-            // Call the API to place the order
-            console.log("selectedPaymentMethod: " + selectedPaymentMethod);
+
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/payment/placeOrder`, {
                 method: 'POST',
                 headers: {
@@ -78,6 +77,8 @@ function CheckoutDetails() {
                     cookId: cookId,//'6758d17e11319fce50ef3d88',
                     userId: userId,
                     items: cartItems,
+                    totalCostBeforeTax: totalCostBeforeTax,
+                    tax: tax,
                     totalCost: totalCost,
                     paymentMethod: selectedPaymentMethod,
                 }),
@@ -87,7 +88,8 @@ function CheckoutDetails() {
                 throw new Error(response.error || 'Failed to place the order.');
             } else {
                 alert('Order placed successfully!');
-                //navigate('student/orderConfirmation', { state: { orderDetails: response.orderAdded } });
+                //console.log('orderDetails: ' + JSON.stringify(response));
+                navigate('/student/orderConfirmation', { state: { orderDetails: response.orderDetails } });
             }
         } catch (error) {
             console.error('Error placing order:', error);

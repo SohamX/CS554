@@ -10,9 +10,9 @@ router
     .route('/placeOrder')
     .post(async (req, res) => {
         try {
-            const { cookId, userId, items, totalCost, paymentMethod } = req.body;
+            const { cookId, userId, items, totalCostBeforeTax, tax, totalCost, paymentMethod } = req.body;
 
-            if (!cookId || !userId || !items || !items.dishes || items.dishes.length === 0 || !totalCost || !paymentMethod) {
+            if (!cookId || !userId || !items || !items.dishes || items.dishes.length === 0 || !totalCostBeforeTax || !tax || !totalCost || !paymentMethod) {
                 return res.status(400).json({ error: 'Invalid request data.' });
             }
 
@@ -33,6 +33,8 @@ router
                     userId,
                     items,
                     paymentMethod,
+                    parseFloat(totalCostBeforeTax),
+                    parseFloat(tax),
                     parseFloat(totalCost),
                     false
                     // ,
@@ -45,8 +47,9 @@ router
                 //remove from cart
                 //TO DO
                 let emptyCart = await userData.emptyCart(userId);
-
-                res.status(200).json({ message: 'Checkout successful!', orderAdded });
+                const orderDetails = await orderData.getOrderById(orderAdded.insertedId.toString());
+                //console.log('orderDetails: ' + JSON.stringify(orderDetails));
+                res.status(200).json({ message: 'Checkout successful!', orderDetails });
             } catch (error) {
                 console.error(errorMsg(error));
                 res.status(500).json({ error: `Checkout failed. Please try again.` });

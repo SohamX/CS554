@@ -34,6 +34,8 @@ export const addOrder = async (
     userId,
     dishes,
     paymentMethod,
+    totalCostBeforeTax,
+    tax,
     totalCost,
     isMealReq
     // ,
@@ -50,6 +52,8 @@ export const addOrder = async (
     paymentMethod = validateId(paymentMethod, 'paymentMethod');
     //get getPaymentMethodByUserIdCardId
     let paymentDetails = await userData.getPaymentMethodByUserIdCardId(userId, paymentMethod);
+    totalCostBeforeTax = validateCost(totalCostBeforeTax, 'totalCostBeforeTax');
+    tax = validateCost(tax, 'tax');
     totalCost = validateCost(totalCost, 'totalCost');
     isMealReq = checkisValidBoolean(isMealReq, 'isMealReq');
     //invoiceLink = validateCloudUrl(invoiceLink, 'invoiceLink');
@@ -60,6 +64,8 @@ export const addOrder = async (
         dishes: dishes,
         paymentMethod: paymentDetails,//ObjectId.createFromHexString(paymentMethod),
         isMealReq: isMealReq,
+        totalCostBeforeTax: totalCostBeforeTax,
+        tax: tax,
         totalCost: totalCost,
         createdAt: new Date().toUTCString(),
         updatedAt: new Date().toUTCString(),

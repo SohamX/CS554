@@ -49,7 +49,7 @@ function CartDetails() {
     }, [])
 
     const handleCheckout = () => {
-        if (!cartItems || cartItems.length === 0) {
+        if (!cartItems || !cartItems.dishes || !cartItems.dishes.length || !(cartItems.dishes.length > 0)) {
             alert('Your cart is empty. Please add items to proceed.');
             return;
         }
@@ -101,7 +101,7 @@ function CartDetails() {
                             </TableHead>
                             <TableBody>
                                 {cartItems && cartItems.dishes.map((cartItem) => (
-                                    <TableRow key={cartItem._id}>
+                                    <TableRow key={cartItem.dishId}>
                                         <TableCell>
                                             <Typography
                                                 variant='h6'
