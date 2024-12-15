@@ -30,6 +30,7 @@ import AwaitingMRCook from './components/Cooks/MealReqs/AwaitingMRCook.jsx';
 import AcceptedMRCook from './components/Cooks/MealReqs/AcceptedMRCook.jsx';
 import CardsList from './components/Payment/CardsList.jsx';
 import OrderConfirmation from './components/Orders/OrderConfirmation.jsx';
+import CookDetails from './components/Cooks/CookDetails.jsx';
 
 
 
@@ -53,6 +54,7 @@ function App() {
                 <Route path="/student" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/student" element={<Student />} />
                   <Route path="/student/dishes/:id" element={<DishDetail />} />
+                  <Route path="/student/cook/:id" element={<CookDetails />} />
                 </Route>
                 <Route path="/student/cart" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/student/cart" element={<CartDetails />} />
