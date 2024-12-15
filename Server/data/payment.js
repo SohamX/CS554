@@ -98,7 +98,7 @@ export const processPayment = async (
             currency,
             'card'
         );
-        console.log(paymentIntent);
+        //console.log(paymentIntent);
         if (paymentIntent) {
             //confirmIntent
             const confirmPayIntent = await confirmPaymentIntent(paymentIntent.paymentIntent.id);

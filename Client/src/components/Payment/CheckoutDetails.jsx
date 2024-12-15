@@ -1,18 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Typography, Card, CardContent, Box, RadioGroup, FormControlLabel, Radio, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Paper } from '@mui/material';
 import { useApi } from '../../contexts/ApiContext.jsx';
 import AddCard from './AddCard.jsx';
 import { taxPercent } from '../../helpers/constants.js';
+import { AuthContext } from '../../contexts/AccountContext.jsx';
 
 
 function CheckoutDetails() {
     const location = useLocation();
     const { apiCall } = useApi();
     const navigate = useNavigate();
+    const { currentUser } = useContext(AuthContext);
     const [cartItems, setCartItems] = useState(location.state?.cartItems || {});
     const [userId, setUserId] = useState(location.state?.studentId || '');
     const [isMealReq, setIsMealReq] = useState(location.state?.isMealReq || false);
+    const [mealReqId, setMealReqId] = useState(location.state?.mealReqId || '');
+    const [username, setUsername] = useState(currentUser.username);
     const [cookId, setCookId] = useState();
     const [totalCostBeforeTax, setTotalCostBeforeTax] = useState(0);
     const [totalCost, setTotalCost] = useState(0);
@@ -77,12 +81,14 @@ function CheckoutDetails() {
                 body: JSON.stringify({
                     cookId: cookId,//'6758d17e11319fce50ef3d88',
                     userId: userId,
+                    username: username,
                     items: cartItems,
                     totalCostBeforeTax: totalCostBeforeTax,
                     tax: tax,
                     totalCost: totalCost,
                     paymentMethod: selectedPaymentMethod,
-                    isMealReq: isMealReq
+                    isMealReq: isMealReq,
+                    mealReqId: mealReqId
                 }),
             });
 

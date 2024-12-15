@@ -30,6 +30,8 @@ import AwaitingMRCook from './components/Cooks/MealReqs/AwaitingMRCook.jsx';
 import AcceptedMRCook from './components/Cooks/MealReqs/AcceptedMRCook.jsx';
 import CardsList from './components/Payment/CardsList.jsx';
 import OrderConfirmation from './components/Orders/OrderConfirmation.jsx';
+import OrdersList from './components/Orders/OrdersList.jsx';
+import OrderDetail from './components/Orders/OrderDetail.jsx';
 import CookDetails from './components/Cooks/CookDetails.jsx';
 
 
@@ -71,6 +73,18 @@ function App() {
                 <Route path="/student/orderConfirmation" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/student/orderConfirmation" element={<OrderConfirmation />} />
                 </Route>
+                <Route path="/student/orders" element={<PrivateRoute requiredRole="user" />} >
+                  <Route path="/student/orders" element={<OrdersList />} />
+                </Route>
+                <Route path="/student/orders/:id" element={<PrivateRoute requiredRole="user" />} >
+                  <Route path="/student/orders/:id" element={<OrderDetail />} />
+                </Route>
+                <Route path="/cook/orders" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/cook/orders" element={<OrdersList />} />
+                </Route>
+                <Route path="/cook/orders/:id" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/cook/orders/:id" element={<OrderDetail />} />
+                </Route>
                 <Route path="/cook/dishes" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook/dishes" element={<DishesList />} />
                 </Route>
@@ -100,9 +114,6 @@ function App() {
                 </Route>
                 <Route path="/cook" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook" element={<Cook />} />
-                </Route>
-                <Route path="/cook/orders" element={<PrivateRoute requiredRole="cook" />} >
-                  <Route path="/cook/orders" element={<DishDetail />} />
                 </Route>
                 <Route path="/student/account" element={<PrivateRoute requiredRole="user" />} >
                   <Route path="/student/account" element={<StudentProfile />} />

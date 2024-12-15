@@ -34,7 +34,7 @@ function DishDetail(props) {
                 throw response;
             }
 
-            console.log("Dish successfully added:", response.dish);
+            console.log("Dish successfully fetched:", response.dish);
             setDish(response.dish);
             if (currentUser.role === 'user') {
                 let cartItems = currentUser.cart
@@ -100,75 +100,51 @@ function DishDetail(props) {
 
     const addToCart = async (dish) => {
         try {
-            if (count == 0) {
+           
                 const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/add/${id}/to/${currentUser._id}`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
+                
                 });
-                if (response.addedItem) {
-                    let cartItems = response.addedItem.cart
-                    for (let i = 0; i < cartItems.length; i++) {
-                        if (cartItems[i].dishId === dish._id) {
-                            setCount(cartItems[i].quantity)
-                            setItemId(cartItems[i]._id)
-                        }
-                    }
-                    // setItemCount(response.addedItem.cart._id)
-                }
-                if (response.error) {
-                    throw response;
-                }
-            } else {
-                const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/update/${itemId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                if (response.updatedCartTotal) {
-                    let cartItems = response.updatedCartTotal.cart
-                    for (let i = 0; i < cartItems.length; i++) {
-                        if (cartItems[i].dishId === dish._id) {
-                            setCount(cartItems[i].quantity)
-                            setItemId(cartItems[i]._id)
-                        }
-                    }
-                    // setItemCount(response.addedItem.cart._id)
-                }
-                if (response.error) {
-                    throw response;
-                }
-            }
+               if(response.status==="success"){
+                alert("Dish successfully added to your cart")
+
+               }
+               else{
+                alert(response.error)
+               }
+               
+                
         } catch (error) {
-            alert(error);
+            alert("You cannot dishes from different cooks in your cart");
         }
     }
 
-    const removeFromCart = async (dish) => {
-        try {
-            if (count == 0) {
-                return
-            } else if (itemId) {
-                const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/delete/${itemId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                });
-                if (response.error) {
-                    throw response;
-                }
-                if (response.status === 'success') {
-                    setCount(0)
-                    setItemId(null)
-                }
-            }
-        } catch (error) {
-            alert(error);
-        }
-    }
+    // const removeFromCart = async (dish) => {
+    //     try {
+    //         if (count == 0) {
+    //             return
+    //         } else if (itemId) {
+    //             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/delete/${itemId}`, {
+    //                 method: 'POST',
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                 },
+    //             });
+    //             if (response.error) {
+    //                 throw response;
+    //             }
+    //             if (response.status === 'success') {
+    //                 setCount(0)
+    //                 setItemId(null)
+    //             }
+    //         }
+    //     } catch (error) {
+    //         alert(error);
+    //     }
+    // }
 
     if (dish) {
 
@@ -244,21 +220,21 @@ function DishDetail(props) {
                             >
                                 Add To Cart
                             </Button>
-                            <Button
+                            {/* <Button
                                 variant="contained"
                                 color="error"
                                 onClick={() => removeFromCart(dish)}
                             >
                                 Remove From Cart
-                            </Button>
+                            </Button> */}
                         </Box>
                     )
                     }
-                    {currentUser.role === 'user' && (
+                    {/* {currentUser.role === 'user' && (
                         <Typography variant="body1" >
                             <strong>{count}</strong> in the cart
                         </Typography>
-                    )}
+                    )} */}
                     {currentUser.role === 'cook' && showEditModal && (
                         <EditDish
                             isOpen={showEditModal}

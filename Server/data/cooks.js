@@ -46,10 +46,9 @@ export const registerCook = async (
   if (username.length < 5 || username.length > 10) {
     throw "username should be at least 5 characters long with a max of 10 characters ";
   }
-  username = username.toLowerCase();
 
-  const sameUsername = await userCollection.findOne({ username: username });
-  const sameCookname = await cookCollection.findOne({ username: username });
+  const sameUsername = await userCollection.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });
+  const sameCookname = await cookCollection.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });
   if (sameUsername || sameCookname) {
       throw `Error: User/Cook with ${username} already exists`;
   }
@@ -168,148 +167,122 @@ export const registerCook = async (
 };
 
 export const updateCook = async (
-  userId,
-  firstName,
-  lastName,
-  username,
-  gmail,
-  mobileNumber,
-  address,
-  city,
-  state,
-  zipcode,
-  country,
-  bio,
-  latitude,
-  longitude
+  userId, updateData
 ) => {
   if (
-    !userId ||
-    !firstName ||
-    !lastName ||
-    !username ||
-    !address ||
-    !city ||
-    !state ||
-    !zipcode ||
-    !country ||
-    !gmail ||
-    !mobileNumber ||
-    !latitude ||
-    !longitude
+    !updateData.userId &&
+    !updateData.firstName &&
+    !updateData.lastName &&
+    !updateData.username &&
+    !updateData.address &&
+    !updateData.city &&
+    !updateData.state &&
+    !updateData.zipcode &&
+    !updateData.country &&
+    !updateData.gmail &&
+    !updateData.mobileNumber &&
+    !updateData.latitude &&
+    !updateData.longitude &&
+    !updateData.bio
   ) {
-    throw "All mandatory field are not provided";
+    throw "Please provide atleast one field to update";
   }
   userId = helpers.checkId(userId, "userId");
   const currUser = await cookCollection.findOne({ _id: new ObjectId(userId) });
   if (!currUser) {
     throw "No cook with that ID";
   }
-  firstName = helpers.checkString(firstName, "firstName");
-  firstName = helpers.checkSpecialCharsAndNum(firstName, "firstName");
-  lastName = helpers.checkString(lastName, "lastName");
-  lastName = helpers.checkSpecialCharsAndNum(lastName, "lastName");
-  username = helpers.checkString(username, "username");
-  username = helpers.checkSpecialCharsAndNum(username, "username");
-  if (username.length < 5 || username.length > 10) {
-    throw "username should be at least 5 characters long with a max of 10 characters ";
+
+  const updatedCookData = {};
+
+  if (updateData.firstName) {
+    updatedCookData.firstName = helpers.checkString(updateData.firstName, 'firstName');
+    updatedCookData.firstName = helpers.checkSpecialCharsAndNum(updatedCookData.firstName, 'firstName');
   }
-  username = username.toLowerCase();
-  if (currUser.username !== username) {
-    const matchedCount = await userCollection.countDocuments({
-      username: username,
-    });
-    const cookMatched = await cookCollection.countDocuments({
-      username: username,
-    });
-    if (matchedCount > 0 || cookMatched > 0) {
-      throw "Already username exists";
+  if (updateData.lastName) {
+    updatedCookData.lastName = helpers.checkString(updateData.lastName, 'lastName');
+    updatedCookData.lastName = helpers.checkSpecialCharsAndNum(updatedCookData.lastName, 'lastName');
+  }
+  if (updateData.username) {
+    updatedCookData.username = helpers.checkString(updateData.username, 'username');
+    updatedCookData.username = helpers.checkSpecialCharsAndNum(updatedCookData.username, 'username');
+    if (updatedCookData.username.length < 5 || updatedCookData.username.length > 10) {
+      throw 'Username should be at least 5 characters long with a max of 10 characters';
+    }
+    if (currUser.username !== updatedCookData.username) {
+      const matchedCount = await userCollection.countDocuments({ username: { $regex: new RegExp(`^${updatedCookData.username}$`, 'i') } });
+      const cookMatched = await cookCollection.countDocuments({ username: { $regex: new RegExp(`^${updatedCookData.username}$`, 'i') } });
+      if (matchedCount > 0 || cookMatched > 1) {
+        throw 'Username already exists';
+      }
     }
   }
-  address = helpers.checkString(address, "address");
-  if (/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(address)) {
-    throw `address cannot contains special characters`;
+  if (updateData.address) {
+    updatedCookData['location.address'] = helpers.checkString(updateData.address, 'address');
+    if (/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(updatedCookData['location.address'])) {
+      throw 'Address cannot contain special characters';
+    }
   }
-  city = helpers.checkString(city, "city");
-  city = helpers.checkSpecialCharsAndNum(city, "city");
-  state = helpers.checkString(state, "state");
-  state = helpers.checkSpecialCharsAndNum(state, "state");
-  if (typeof zipcode !== "string") {
-    throw "zipcode should be of type string";
+  if (updateData.city) {
+    updatedCookData['location.city'] = helpers.checkString(updateData.city, 'city');
+    updatedCookData['location.city'] = helpers.checkSpecialCharsAndNum(updatedCookData['location.city'], 'city');
+  }
+  if (updateData.state) {
+    updatedCookData['location.state'] = helpers.checkString(updateData.state, 'state');
+    updatedCookData['location.state'] = helpers.checkSpecialCharsAndNum(updatedCookData['location.state'], 'state');
+  }
+  if (updateData.zipcode) {
+    if (typeof updateData.zipcode !== 'string') {
+      throw 'Zipcode should be of type string';
+    }
+    updatedCookData['location.zipcode'] = updateData.zipcode.trim();
+    if (!/^\d{5}(-\d{4})?$/.test(updatedCookData['location.zipcode'])) {
+      throw 'Please enter a valid zipcode';
+    }
+  }
+  if (updateData.country) {
+    updatedCookData['location.country'] = helpers.checkString(updateData.country, 'country');
+    updatedCookData['location.country'] = helpers.checkSpecialCharsAndNum(updatedCookData['location.country'], 'country');
   }
 
-  zipcode = zipcode.trim();
-  if (!/^\d{5}(-\d{4})?$/.test(zipcode)) throw "Please enter valid zipcode";
-  if (typeof gmail !== "string") {
-    throw "gmail should be of type string";
+  if (updateData.latitude) {
+    updatedCookData['location.coordinates.latitude'] = helpers.latitudeAndLongitude(updateData.latitude, 'Latitude');
+  }
+  if (updateData.longitude) {
+    updatedCookData['location.coordinates.longitude'] = helpers.latitudeAndLongitude(updateData.longitude, 'Longitude');
   }
 
-  // latitude_float = parseFloat(latitude.trim());
-  let latitude_float = helpers.latitudeAndLongitude(latitude, 'Latitude')
-
-  // longitude_float = parseFloat(longitude.trim());
-  let longitude_float = helpers.latitudeAndLongitude(longitude, 'Longitude')
-
-  gmail = gmail.trim();
-  if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail))
-    throw "Please enter valid gmail";
-  if (currUser.gmail !== gmail) {
-    const matchedCount = await userCollection.countDocuments({ gmail: gmail });
-    const cookMatched = await cookCollection.countDocuments({ gmail: gmail });
-    if (matchedCount > 0 || cookMatched > 0) {
-      throw "Already gmail exists";
+  if (updateData.mobileNumber) {
+    if (typeof updateData.mobileNumber !== 'string') {
+      throw 'Mobile number should be of type string';
+    }
+    updatedCookData.mobileNumber = updateData.mobileNumber.trim();
+    if (!/^\d{3}-\d{3}-\d{4}$/.test(updatedCookData.mobileNumber)) {
+      throw 'Please enter a valid mobile number in 000-000-0000 format';
+    }
+    if (currUser.mobileNumber !== updatedCookData.mobileNumber) {
+      const matchedCount = await userCollection.countDocuments({ mobileNumber: mobileNumber,});
+      const cookMatched = await cookCollection.countDocuments({ mobileNumber: mobileNumber,});
+      if (matchedCount > 0 || cookMatched > 0) {
+        throw 'Mobile number already exists';
+      }
+    }
+  }
+  if (updateData.bio) {
+    updatedCookData.bio = helpers.checkString(updateData.bio, 'bio');
+    if (/^[^a-zA-Z]+$/.test(updatedCookData.bio)) {
+      throw 'Bio contains only numeric and special characters';
     }
   }
 
-  if (typeof mobileNumber !== "string") {
-    throw "mobileNumber should be of type string";
-  }
-
-  mobileNumber = mobileNumber.trim();
-  if (!/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber))
-    throw "Please enter valid mobileNumber in 000-000-0000 format";
-  if (currUser.mobileNumber !== mobileNumber) {
-    const matchedCount = await userCollection.countDocuments({
-      mobileNumber: mobileNumber,
-    });
-    const cookMatched = await cookCollection.countDocuments({
-      mobileNumber: mobileNumber,
-    });
-    if (matchedCount > 0 || cookMatched > 0) {
-      throw "Already mobileNumber exists";
-    }
-  }
-  country = helpers.checkString(country, "country");
-  country = helpers.checkSpecialCharsAndNum(country, "country");
-  bio = helpers.checkString(bio, "bio");
-  if (/^[^a-zA-Z]+$/.test(bio)) {
-    throw "Bio contains only numeric and special characters";
-  }
-
-  let updateduserData = {
-    firstName: firstName,
-    lastName: lastName,
-    username: username,
-    gmail: gmail,
-    mobileNumber: mobileNumber,
-    bio: bio,
-    location: {
-      address: address,
-      city: city,
-      state: state,
-      zipcode: zipcode,
-      country: country,
-      coordinates: { longitude: longitude_float, latitude: latitude_float }, //Calculated and stored?
-    },
-  };
   const updateInfo = await cookCollection.findOneAndUpdate(
     { _id: new ObjectId(userId) },
-    { $set: updateduserData },
+    { $set: updatedCookData },
     { returnDocument: "after" }
   );
   if (!updateInfo)
     throw `Error: Update failed! Could not update cook's data with id ${userId}`;
-  return { cookDataUpdated: true };
+  return { cookDataUpdated: true, cook: updateInfo };
 };
 
 export const deleteCook = async (userId) => {
