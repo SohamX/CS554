@@ -432,7 +432,7 @@ export const addItemtoCart = async (
     updatedUser.cart.dishes[0].subTotat = dish.cost;
     updatedUser.cart.totalCost = dish.cost;
 
-    return updatedUser;
+    return updatedUser.cart;
 
   }
 
@@ -496,6 +496,7 @@ export const getCartItems = async (userId) => {
   if (!user) throw 'No user with that userId';
   
   if(user.cart.cookId===""){
+
     return user.cart;
   }
   let cook = await cookCollection.findOne({_id:new ObjectId(user.cart.cookId)});
@@ -874,3 +875,139 @@ export const getPaymentMethodByUserIdCardId = async (
   if (card === null || card.length === 0 || card.paymentCards.length === 0 || card.paymentCards[0] === null) throw `No payment method added for User.`;
   return card.paymentCards[0];
 }
+
+
+
+
+export const decreaseItemQuantity = async (userId, dishId) => {
+  if (!userId || !dishId) {
+    throw "All fields need to be supplied";
+  }
+  
+  userId = helpers.checkId(userId, "userId");
+  dishId = helpers.checkId(dishId, "dishId");
+
+  const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+  if (!user) throw "No user with that userId";
+
+  if (!user.cart || !user.cart.dishes || user.cart.dishes.length === 0) {
+    throw "Cart is empty";
+  }
+
+  // Find the dish in the cart
+  const dishIndex = user.cart.dishes.findIndex((item) => item.dishId === dishId);
+
+  if (dishIndex === -1) {
+    throw "Dish not found in the cart";
+  }
+
+  // Decrease the quantity
+  user.cart.dishes[dishIndex].quantity -= 1;
+
+  // If quantity is 0, remove the dish from the cart
+  if (user.cart.dishes[dishIndex].quantity === 0) {
+    user.cart.dishes.splice(dishIndex, 1);
+  }
+
+  // If no more dishes in the cart, reset cookId and totalCost
+  if (user.cart.dishes.length === 0) {
+    user.cart.cookId = "";
+    user.cart.totalCost = 0;
+  } else {
+    // Recalculate subtotals and totalCost
+    for (const element of user.cart.dishes) {
+      const dish = await dishCollection.findOne({ _id: new ObjectId(element.dishId) });
+      element.dishName = dish.name;
+      element.subTotal = dish.cost * element.quantity;
+    }
+
+    user.cart.totalCost = user.cart.dishes.reduce((sum, element) => {
+      return sum + element.subTotal;
+    }, 0);
+  }
+
+  // Update the user's cart
+  const updatedUserData = await userCollection.findOneAndUpdate(
+    { _id: new ObjectId(userId) },
+    { $set: { cart: user.cart } },
+    { returnDocument: "after" }
+  );
+
+  if (!updatedUserData) {
+    throw "Failed to update the cart";
+  }
+
+  return updatedUserData.cart;
+};
+
+
+export const deleteItemFromCart = async (userId, dishId) => {
+  if (!userId || !dishId) {
+    throw "All fields need to be supplied";
+  }
+
+  userId = helpers.checkId(userId, "userId");
+  dishId = helpers.checkId(dishId, "dishId");
+
+  const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+  if (!user) throw "No user with that userId";
+
+  // Check if the cart is empty
+  if (!user.cart || !user.cart.dishes || user.cart.dishes.length === 0) {
+    throw "Cart is already empty!";
+  }
+
+  // Find the dish to remove
+  const dishIndex = user.cart.dishes.findIndex((item) => item.dishId === dishId);
+  if (dishIndex === -1) throw "Dish not found in the cart";
+
+  // Remove the dish from the cart
+  user.cart.dishes.splice(dishIndex, 1);
+
+  // Check if the cart is now empty
+  if (user.cart.dishes.length === 0) {
+    // Reset the cart if no dishes remain
+    user.cart = {
+      cookId: "",
+      cookName: "",
+      dishes: [],
+      totalCost: 0,
+    };
+  } else {
+    // If dishes remain, update cookName and subTotal values
+    const firstDish = await dishCollection.findOne({
+      _id: new ObjectId(user.cart.dishes[0].dishId),
+    });
+    const cook = await cookCollection.findOne({
+      _id: new ObjectId(firstDish.cookId),
+    });
+
+    user.cart.cookName = cook.username;
+
+    for (const element of user.cart.dishes) {
+      const dish = await dishCollection.findOne({
+        _id: new ObjectId(element.dishId),
+      });
+      element.dishName = dish.name;
+      element.subTotal = dish.cost * element.quantity;
+    }
+
+    // Calculate the total cost of the cart
+    user.cart.totalCost = user.cart.dishes.reduce((sum, element) => {
+      return sum + element.subTotal;
+    }, 0);
+  }
+
+  // Update the user's cart in the database
+  const updatedUser = await userCollection.findOneAndUpdate(
+    { _id: new ObjectId(userId) },
+    { $set: { cart: user.cart } },
+    { returnDocument: "after" }
+  );
+
+  if (!updatedUser) {
+    throw "Failed to update cart after deleting the item";
+  }
+
+  return updatedUser.cart;
+};

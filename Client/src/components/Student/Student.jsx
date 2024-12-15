@@ -46,6 +46,28 @@ const student = () => {
   const [location, setLocation] = useState('');
   const [minPrice, setMinPrice] = useState(undefined);
   const [maxPrice, setMaxPrice] = useState(undefined);
+  const [AddedtoCart, setAddedtoCart] = useState({});
+  const [Errors,setErrors]= useState({});
+
+  const handleAdd = async (dishId) => {
+    try {
+      const  { data: { status } } = await axios.post(`http://localhost:3000/users/cart/add/${dishId}/to/${currentUser._id}`);
+      console.log(status);
+      setAddedtoCart((prevState) => ({
+        ...prevState,
+        [dishId]: true,
+      }));
+      
+      
+    } catch (err) {
+      console.log(err)
+      setErrors((prevState) => ({
+        ...prevState,
+        [dishId]: true,
+      }));
+      
+    }
+  };
 
   const clearFields = async () => {
     document.getElementById('nameValue').value = ''
@@ -367,7 +389,7 @@ const student = () => {
               // className={styles.cardImage} // Add styles for the image
             />
               <h3 className={styles.cardTitle}>
-                <Link to={``}>
+                <Link to={`/student/dishes/${mealReq._id}`}>
                   {mealReq.name}
                 </Link>
               </h3>
@@ -380,10 +402,16 @@ const student = () => {
               
               
               <div className={styles.buttonContainer}>
-          <button className={styles.buttonPrimary}>Add to Cart</button>
+          <button className={styles.buttonPrimary} onClick={()=>handleAdd(mealReq._id)}>Add to Cart</button>
           
           <button className={styles.buttonSecondary}>Checkout</button>
              </div>
+             {AddedtoCart[mealReq._id] && (
+                <p style={{ color: 'green' }}>Successfully Added to your cart</p>
+              )}
+              {Errors[mealReq._id] && (
+                <p style={{ color: 'red' }}>You can't add dishes from different cooks</p>
+              )}
             </div>
           </div>
         ))

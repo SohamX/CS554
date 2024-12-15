@@ -201,6 +201,9 @@ function DishDetail(props) {
                             <Typography variant="body1" >
                                 <strong>Cost:</strong> {dish.cost}
                             </Typography>
+                            {currentUser.role==='user'&&(<Typography variant="body1" >
+                                <strong>Made by :</strong> {dish.cookName}
+                            </Typography>)}
                             {currentUser.role === 'cook' && (<FormControlLabel
                                 control={
                                     <Switch
