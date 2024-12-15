@@ -52,7 +52,6 @@ router
         if(username.length<5||username.length>10){
           throw 'username should be at least 5 characters long with a max of 10 characters '
         }
-        username=username.toLowerCase();
 
         address = helpers.checkString(address,'address');
         if(/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(address)){
@@ -165,20 +164,20 @@ router.route('/login').post(async (req, res) => {     // AFTER LOGIN
   })
   //UPDATE USER BY ID ROUTE
 
-  .post(async (req, res) => {
+  .put(async (req, res) => {
       try {
           req.params.id = helpers.checkId(req.params.id, 'id URL Param');
       } catch (e) {
           res.status(400).json({error:e});
           return;
       }
+
+      const updateData = {};
       
       let {
         firstName,
         lastName,
         username,
-        
-        gmail,
         mobileNumber,
         address,
         city,
@@ -188,112 +187,97 @@ router.route('/login').post(async (req, res) => {     // AFTER LOGIN
         latitude,
         longitude } = req.body
 
-        let latitude_float
-        let longitude_float
       try {
-        if(!firstName ||
-          !lastName ||
-          !username ||
-          
-          !address ||
-        !city ||
-        !state ||
-        !zipcode ||
-        !country ||
-        !gmail||
-        !mobileNumber||
-        !latitude ||
-        !longitude
-        ){
-            throw "Some fields cannot be empty"
+        if(!firstName &&
+          !lastName &&
+          !username &&      
+          !address &&
+          !city &&
+          !state &&
+          !zipcode &&
+          !country &&
+          !mobileNumber&&
+          !latitude &&
+          !longitude
+          )
+        {
+          throw "All fields cannot be empty"
+        }
+        if (firstName) {
+          updateData.firstName = helpers.checkString(firstName, 'firstName');
+          updateData.firstName = helpers.checkSpecialCharsAndNum(updateData.firstName, 'firstName');
+        }
+        if (lastName) {
+          updateData.lastName = helpers.checkString(lastName, 'lastName');
+          updateData.lastName = helpers.checkSpecialCharsAndNum(updateData.lastName, 'lastName');
+        }
+        if (username) {
+          updateData.username = helpers.checkString(username, 'username');
+          updateData.username = helpers.checkSpecialCharsAndNum(updateData.username, 'username');
+          if (updateData.username.length < 5 || updateData.username.length > 10) {
+            throw 'username should be at least 5 characters long with a max of 10 characters';
           }
-        
-        
-  
-        firstName = helpers.checkString(firstName,'firstName');
-        firstName = helpers.checkSpecialCharsAndNum(firstName,'firstName');
-        lastName = helpers.checkString(lastName,'lastName');
-        lastName = helpers.checkSpecialCharsAndNum(lastName,'lastName');
-        username = helpers.checkString(username,'username');
-        username = helpers.checkSpecialCharsAndNum(username,'username');
-        if(username.length<5||username.length>10){
-          throw 'username should be at least 5 characters long with a max of 10 characters '
         }
-        username=username.toLowerCase();
-        
-        
-        address = helpers.checkString(address,'address');
-        if(/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(address)){
-          throw `address cannot contains special characters`
+        if (address) {
+          updateData.address = helpers.checkString(address, 'address');
+          if (/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(updateData.address)) {
+            throw 'address cannot contain special characters';
+          }
         }
-        city = helpers.checkString(city,'city');
-        city = helpers.checkSpecialCharsAndNum(city,'city');
-        state = helpers.checkString(state,'state');
-        state = helpers.checkSpecialCharsAndNum(state,'state');
-        if(typeof zipcode!=="string"){
-          throw 'zipcode should be of type string'
+        if (city) {
+          updateData.city = helpers.checkString(city, 'city');
+          updateData.city = helpers.checkSpecialCharsAndNum(updateData.city, 'city');
         }
-        
-        zipcode = zipcode.trim();
-        if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
-        if(typeof gmail!=="string"){
-          throw 'gmail should be of type string'
+        if (state) {
+          updateData.state = helpers.checkString(state, 'state');
+          updateData.state = helpers.checkSpecialCharsAndNum(updateData.state, 'state');
         }
-        
-        latitude_float = parseFloat(latitude.trim());
-        latitude_float = helpers.latitudeAndLongitude(latitude_float, 'Latitude')
-        
-        longitude_float = parseFloat(longitude.trim());
-        longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
-
-        gmail = gmail.trim();
-        if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
-        
-        
-      
-        if(typeof mobileNumber!=="string"){
-          throw 'mobileNumber should be of type string'
+        if (zipcode) {
+          if (typeof zipcode !== 'string') {
+            throw 'zipcode should be of type string';
+          }
+          updateData.zipcode = zipcode.trim();
+          if (!/^\d{5}(-\d{4})?$/.test(updateData.zipcode)) {
+            throw 'Please enter a valid zipcode';
+          }
         }
-        
-        mobileNumber = mobileNumber.trim();
-        if(!/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber)) throw 'Please enter valid mobileNumber in 000-000-0000 format'
-        
-      
-        country = helpers.checkString(country,'country');
-        country = helpers.checkSpecialCharsAndNum(country,'country');
-      
-        
-        
+        if (latitude) {
+          updateData.latitude = latitude;
+          updateData.latitude = helpers.latitudeAndLongitude(updateData.latitude, 'Latitude');
+        }
+        if (longitude) {
+          updateData.longitude = longitude;
+          updateData.longitude = helpers.latitudeAndLongitude(updateData.longitude, 'Longitude');
+        }
+        if (mobileNumber) {
+          if (typeof mobileNumber !== 'string') {
+            throw 'mobileNumber should be of type string';
+          }
+          updateData.mobileNumber = mobileNumber.trim();
+          if (!/^\d{3}-\d{3}-\d{4}$/.test(updateData.mobileNumber)) {
+            throw 'Please enter a valid mobileNumber in 000-000-0000 format';
+          }
+        }
+        if (country) {
+          updateData.country = helpers.checkString(country, 'country');
+          updateData.country = helpers.checkSpecialCharsAndNum(updateData.country, 'country');
+        }
       } catch (e) {
           return res.status(400).json({error:e})
       }
 
-
       try {
-          const updateInfo = await userData.updateUser(req.params.id,
-              firstName,
-              lastName,
-              username,
-              
-              gmail,
-              mobileNumber,
-              address,
-              city,
-              state,
-              zipcode,
-              country,
-              latitude_float,
-              longitude_float);
-          if (updateInfo) {
-              res.status(200).json({ status: "success", user: updateInfo });
-          }
-          else {
-              res.status(500).json({ error: "Internal Server Error" });
-          }
+          const updateInfo = await userData.updateUser(req.params.id,updateData);
+        if (updateInfo) {
+          res.status(200).json({ status: "success", user: updateInfo });
+        }
+        else {
+          res.status(500).json({ error: "Internal Server Error" });
+        }
 
       } catch (e) {
-          res.status(400).json({ error: e });
-          return;
+        res.status(500).json({ error: e, message: e.message });
+        return;
       }
 
   })

@@ -8,6 +8,7 @@ import helpers from '../helpers/pranHelpers.js'
 import { checkisValidString, validateCardNumber, validateCvv, validateZipCode } from '../helpers/validationHelper.js';
 
 import bcrypt from 'bcryptjs';
+import { console } from 'inspector';
 const dishCollection = await dishes();
 const userCollection = await users();
 const cookCollection = await cooks();
@@ -71,10 +72,9 @@ export const registerUser = async (
   if(username.length<5||username.length>10){
     throw 'username should be at least 5 characters long with a max of 10 characters '
   }
-  username=username.toLowerCase();
   
-  const sameUsername = await userCollection.findOne({username:username});
-  const sameCookname = await cookCollection.findOne({username:username});
+  const sameUsername = await userCollection.findOne({username: { $regex: new RegExp(`^${username}$`, 'i') } });
+  const sameCookname = await cookCollection.findOne({username: { $regex: new RegExp(`^${username}$`, 'i') } });
   if(sameUsername || sameCookname){
     throw `Error : Already username exists with ${username}`
   }
@@ -107,11 +107,11 @@ export const registerUser = async (
     throw 'gmail should be of type string'
   }
 
-    // latitude_float = parseFloat(latitude.trim());
-    let latitude_float = helpers.latitudeAndLongitude(latitude, 'Latitude')
+  // latitude_float = parseFloat(latitude.trim());
+  let latitude_float = helpers.latitudeAndLongitude(latitude, 'Latitude')
 
-    // longitude_float = parseFloat(longitude.trim());
-    let longitude_float = helpers.latitudeAndLongitude(longitude, 'Longitude')
+  // longitude_float = parseFloat(longitude.trim());
+  let longitude_float = helpers.latitudeAndLongitude(longitude, 'Longitude')
   
   
   gmail = gmail.trim();
@@ -216,141 +216,115 @@ export const loginUser = async (gmail) => {
 
 
 
-  export const updateUser = async (userId, firstName,
-    lastName,
-    username,
-    gmail,
-    mobileNumber,
-    address,
-    city,
-    state,
-    zipcode,
-    country,
-    latitude,
-    longitude) => {
-      if(!userId||!firstName ||
-        !lastName ||
-        !username ||
-        !address ||
-      !city ||
-      !state ||
-      !zipcode ||
-      !country ||
-      !gmail||
-      !mobileNumber ||
-      !latitude || 
-      !longitude
-      ){
-          throw "Some fields cannot be empty"
-        }
-      userId = helpers.checkId(userId,'userId');
-      const currUser = await userCollection.findOne({_id: new ObjectId(userId)});
-      if(!currUser){
-        throw 'No user with that ID';
-      }
-
-      firstName = helpers.checkString(firstName,'firstName');
-      firstName = helpers.checkSpecialCharsAndNum(firstName,'firstName');
-      lastName = helpers.checkString(lastName,'lastName');
-      lastName = helpers.checkSpecialCharsAndNum(lastName,'lastName');
-      username = helpers.checkString(username,'username');
-      username = helpers.checkSpecialCharsAndNum(username,'username');
-      if(username.length<5||username.length>10){
-        throw 'username should be at least 5 characters long with a max of 10 characters '
-      }
-      username=username.toLowerCase();
-      if(currUser.username!==username){
-        const matchedCount = await userCollection.countDocuments({ username: username });
-        const cookMatched =  await cookCollection.countDocuments({ username: username });
-        if(matchedCount>0||cookMatched>0){
-          throw 'Already username exists'
-        }
-      }
-      
-      address = helpers.checkString(address,'address');
-      if(/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(address)){
-        throw `address cannot contains special characters`
-      }
-      city = helpers.checkString(city,'city');
-      city = helpers.checkSpecialCharsAndNum(city,'city');
-      state = helpers.checkString(state,'state');
-      state = helpers.checkSpecialCharsAndNum(state,'state');
-      if(typeof zipcode!=="string"){
-        throw 'zipcode should be of type string'
-      }
-      
-      zipcode = zipcode.trim();
-      if(!/^\d{5}(-\d{4})?$/.test(zipcode)) throw 'Please enter valid zipcode'
-      if(typeof gmail!=="string"){
-        throw 'gmail should be of type string'
-      }
-      
-      // latitude_float = parseFloat(latitude.trim());
-      let latitude_float = helpers.latitudeAndLongitude(latitude, 'Latitude')
-  
-      // longitude_float = parseFloat(longitude.trim());
-      let longitude_float = helpers.latitudeAndLongitude(longitude, 'Longitude')
-  
-      gmail = gmail.trim();
-      if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
-      if(currUser.gmail!==gmail){
-        const matchedCount = await userCollection.countDocuments({ gmail: gmail });
-        const cookMatched =  await cookCollection.countDocuments({ gmail: gmail });
-        if(matchedCount>0||cookMatched>0){
-          throw 'Already gmail exists'
-        } 
-      }
-      
-    
-      if(typeof mobileNumber!=="string"){
-        throw 'mobileNumber should be of type string'
-      }
-      
-      mobileNumber = mobileNumber.trim();
-      if(!/^\d{3}-\d{3}-\d{4}$/.test(mobileNumber)) throw 'Please enter valid mobileNumber in 000-000-0000 format'
-      if(currUser.mobileNumber!==mobileNumber){
-        const matchedCount = await userCollection.countDocuments({ mobileNumber:mobileNumber });
-        const cookMatched =  await cookCollection.countDocuments({ mobileNumber:mobileNumber });
-        if(matchedCount>0||cookMatched>0){
-          throw 'Already mobileNumber exists'
-        } 
-      }
-    
-      country = helpers.checkString(country,'country');
-      country = helpers.checkSpecialCharsAndNum(country,'country');
-    
-      let updateduserData = {
-        firstName:firstName,
-        lastName:lastName,  
-        username:username, 
-        gmail:gmail,
-        mobileNumber:mobileNumber,
-        location: {
-            address: address,
-            city: city,
-            state: state,
-            zipcode: zipcode,
-            country: country,
-            coordinates : {
-              longitude: longitude_float,
-              latitude: latitude_float
-            }
-        }
-        
-        
-      };
-      
-      const updateInfo = await userCollection.findOneAndUpdate(
-        {_id: new ObjectId(userId)},
-        {$set: updateduserData},
-        {returnDocument: 'after'}
-      );
-      if (!updateInfo)
-        throw `Error: Update failed! Could not update post with productId ${productId}`;
-      return updateInfo;
-    
-      
+  export const updateUser = async (userId,updateData) => {
+    if (!userId) {
+      throw "User ID cannot be empty";
+    } 
+    userId = helpers.checkId(userId,'userId');
+    const currUser = await userCollection.findOne({_id: new ObjectId(userId)});
+    if(!currUser){
+      throw 'No user with that ID';
+    } 
+    if(!updateData.firstName &&
+      !updateData.lastName &&
+      !updateData.username &&      
+      !updateData.address &&
+      !updateData.city &&
+      !updateData.state &&
+      !updateData.zipcode &&
+      !updateData.country &&
+      !updateData.mobileNumber&&
+      !updateData.latitude &&
+      !updateData.longitude
+      )
+    {
+      throw "All fields cannot be empty"
     }
+
+    const updatedUserData = {};
+    if (updateData.firstName) {
+      updatedUserData.firstName = helpers.checkString(updateData.firstName, 'firstName');
+      updatedUserData.firstName = helpers.checkSpecialCharsAndNum(updatedUserData.firstName, 'firstName');
+    }
+    if (updateData.lastName) {
+      updatedUserData.lastName = helpers.checkString(updateData.lastName, 'lastName');
+      updatedUserData.lastName = helpers.checkSpecialCharsAndNum(updatedUserData.lastName, 'lastName');
+    }
+    if (updateData.username) {
+      updatedUserData.username = helpers.checkString(updateData.username, 'username');
+      updatedUserData.username = helpers.checkSpecialCharsAndNum(updatedUserData.username, 'username');
+      if (updatedUserData.username.length < 5 || updatedUserData.username.length > 10) {
+        throw 'Username should be at least 5 characters long with a max of 10 characters';
+      }
+      if (currUser.username !== updatedUserData.username) {
+        const matchedCount = await userCollection.countDocuments({ username: { $regex: new RegExp(`^${updatedUserData.username}$`, 'i') } });
+        const cookMatched = await cookCollection.countDocuments({ username: { $regex: new RegExp(`^${updatedUserData.username}$`, 'i') } });
+        if (matchedCount > 1 || cookMatched > 0) {
+          throw 'Username already exists';
+        }
+      }
+    }
+    if (updateData.address) {
+      updatedUserData['location.address'] = helpers.checkString(updateData.address, 'address');
+      if (/[@!#$%^&*()_+{}\[\]:;"'<>,.?~]/.test(updatedUserData['location.address'])) {
+        throw 'Address cannot contain special characters';
+      }
+    }
+    if (updateData.city) {
+      updatedUserData['location.city'] = helpers.checkString(updateData.city, 'city');
+      updatedUserData['location.city'] = helpers.checkSpecialCharsAndNum(updatedUserData['location.city'], 'city');
+    }
+    if (updateData.state) {
+      updatedUserData['location.state'] = helpers.checkString(updateData.state, 'state');
+      updatedUserData['location.state'] = helpers.checkSpecialCharsAndNum(updatedUserData['location.state'], 'state');
+    }
+    if (updateData.zipcode) {
+      if (typeof updateData.zipcode !== 'string') {
+        throw 'Zipcode should be of type string';
+      }
+      updatedUserData['location.zipcode'] = updateData.zipcode.trim();
+      if (!/^\d{5}(-\d{4})?$/.test(updatedUserData['location.zipcode'])) {
+        throw 'Please enter a valid zipcode';
+      }
+    }
+    if (updateData.country) {
+      updatedUserData['location.country'] = helpers.checkString(updateData.country, 'country');
+      updatedUserData['location.country'] = helpers.checkSpecialCharsAndNum(updatedUserData['location.country'], 'country');
+    }
+    if (updateData.latitude) {
+      updatedUserData['location.coordinates.latitude'] = updateData.latitude;
+      updatedUserData['location.coordinates.latitude'] = helpers.latitudeAndLongitude(updatedUserData['location.coordinates.latitude'], 'Latitude');
+    }
+    if (updateData.longitude) {
+      updatedUserData['location.coordinates.longitude'] = updateData.longitude;
+      updatedUserData['location.coordinates.longitude'] = helpers.latitudeAndLongitude(updatedUserData['location.coordinates.longitude'], 'Longitude');
+    }
+    if (updateData.mobileNumber) {
+      if (typeof updateData.mobileNumber !== 'string') {
+        throw 'Mobile number should be of type string';
+      }
+      updatedUserData.mobileNumber = updateData.mobileNumber.trim();
+      if (!/^\d{3}-\d{3}-\d{4}$/.test(updatedUserData.mobileNumber)) {
+        throw 'Please enter a valid mobile number in 000-000-0000 format';
+      }
+      if (currUser.mobileNumber !== updatedUserData.mobileNumber) {
+        const matchedCount = await userCollection.countDocuments({ mobileNumber: updatedUserData.mobileNumber });
+        const cookMatched = await cookCollection.countDocuments({ mobileNumber: updatedUserData.mobileNumber });
+        if (matchedCount > 0 || cookMatched > 0) {
+          throw 'Mobile number already exists';
+        }
+      }
+    }
+      
+    const updateInfo = await userCollection.findOneAndUpdate(
+      {_id: new ObjectId(userId)},
+      {$set: updatedUserData},
+      {returnDocument: 'after'}
+    );
+    if (!updateInfo)
+      throw `Error: Update failed! Could not update post with productId ${productId}`;
+    return updateInfo;
+  }
 
 
   export const deleteUser = async(userId) =>{
