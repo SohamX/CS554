@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 const router = Router();
 import { errorMsg } from '../helpers/validationHelper.js';
-import { paymentData, orderData, userData } from '../data/index.js';
+import { paymentData, orderData, userData,mealReqData } from '../data/index.js';
 
 
 router
@@ -30,6 +30,7 @@ router
 
                 if (isMealReq) {
                     //TO DO update the mealReq obj - seletectedByUser true
+                    let updateMealReqStatus = await mealReqData.acceptMealRequest(mealReqId, cookId);
                 }
 
                 let paymentDetails = await userData.getPaymentMethodByUserIdCardId(userId, paymentMethod);
