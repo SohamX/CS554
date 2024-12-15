@@ -1,8 +1,7 @@
 import { Router } from 'express';
 
 const router = Router();
-import helpers from '../helpers/pranHelpers.js';
-import { validateCuisineType, validateCost, checkisValidImageArray, validateId, validateUniqueDishesPerCook, checkDishDesc, checkisValidBoolean, errorMsg } from '../helpers/validationHelper.js';
+import { errorMsg } from '../helpers/validationHelper.js';
 import { paymentData, orderData, userData } from '../data/index.js';
 
 
@@ -10,12 +9,16 @@ router
     .route('/placeOrder')
     .post(async (req, res) => {
         try {
-            const { cookId, userId, items, totalCostBeforeTax, tax, totalCost, paymentMethod, isMealReq } = req.body;
+            const { cookId, userId, items, totalCostBeforeTax, tax, totalCost, paymentMethod, isMealReq, mealReqId } = req.body;
+            //console.log('req.body: ' + JSON.stringify(req.body));
 
             if (!cookId || !userId || !items || !items.dishes || items.dishes.length === 0 || !totalCostBeforeTax || !tax || !totalCost || !paymentMethod || isMealReq === undefined) {
                 return res.status(400).json({ error: 'Invalid request data.' });
             }
-
+            if (isMealReq && !mealReqId) {
+                return res.status(400).json({ error: 'Invalid request data.' });
+            }
+            console.log('mealReqId: ' + mealReqId);
             try {
                 // Process payment
                 const paymentResult = await paymentData.processPayment(totalCost);
@@ -23,7 +26,7 @@ router
                 if (paymentResult.error) {
                     return res.status(400).json({ error: 'Payment failed.' });
                 }
-                console.log('totalCost ' + totalCost);
+                //console.log('totalCost ' + totalCost);
 
                 if (isMealReq) {
                     //TO DO update the mealReq obj - seletectedByUser true
@@ -46,8 +49,7 @@ router
                     res.status(400).json({ error: "Error creating an order." });
                 }
 
-                //remove from cart
-                //TO DO
+                //remove from cart                
                 let emptyCart = await userData.emptyCart(userId);
                 const orderDetails = await orderData.getOrderById(orderAdded.insertedId.toString());
                 //console.log('orderDetails: ' + JSON.stringify(orderDetails));

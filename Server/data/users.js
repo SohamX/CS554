@@ -870,7 +870,7 @@ export const getPaymentMethodByUserIdCardId = async (
       projection: { _id: 0, 'paymentCards.$': 1 }
     }
   );
-  console.log('card : ' + JSON.stringify(card));
+  //console.log('card : ' + JSON.stringify(card));
   //const paymentMethods = await userCollection.find({ _id: ObjectId.createFromHexString(userId) }).project({ _id: 0, paymentCards: 1 }).toArray();
   if (card === null || card.length === 0 || card.paymentCards.length === 0 || card.paymentCards[0] === null) throw `No payment method added for User.`;
   return card.paymentCards[0];

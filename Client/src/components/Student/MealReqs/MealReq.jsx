@@ -97,7 +97,7 @@ function MealReq() {
         alert('Please check your meal request data.');
         return;
       }
-      navigate('/student/checkout', { state: { cartItems, studentId, isMealReq: true } });
+      navigate('/student/checkout', { state: { cartItems, studentId, isMealReq: true, mealReqId } });
     } catch (error) {
       console.error(error);
       navigate('/404page');

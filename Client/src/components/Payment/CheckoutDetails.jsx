@@ -13,6 +13,7 @@ function CheckoutDetails() {
     const [cartItems, setCartItems] = useState(location.state?.cartItems || {});
     const [userId, setUserId] = useState(location.state?.studentId || '');
     const [isMealReq, setIsMealReq] = useState(location.state?.isMealReq || false);
+    const [mealReqId, setMealReqId] = useState(location.state?.mealReqId || '');
     const [cookId, setCookId] = useState();
     const [totalCostBeforeTax, setTotalCostBeforeTax] = useState(0);
     const [totalCost, setTotalCost] = useState(0);
@@ -82,7 +83,8 @@ function CheckoutDetails() {
                     tax: tax,
                     totalCost: totalCost,
                     paymentMethod: selectedPaymentMethod,
-                    isMealReq: isMealReq
+                    isMealReq: isMealReq,
+                    mealReqId: mealReqId
                 }),
             });
 
