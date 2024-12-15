@@ -76,11 +76,9 @@ function AcceptedMR() {
               <p className={styles.cardText}>
                 <span className={styles.cardSubtitle}>No of People:</span> {mealReq.noOfPeople}
               </p>
-              <p className={styles.cardText}>
-                <span className={styles.cardSubtitle}>{mealReq.responses.length} responses</span>
-              </p>
+              
               <p className={styles.cardText}> 
-                <span className={styles.cardSubtitle}>Accepted by</span> {mealReq.acceptedCookusername}
+                <span className={styles.cardSubtitle}>You selected :</span> {mealReq.AcceptedcookName}
               </p>
               <br />
             </div>
