@@ -76,8 +76,16 @@ export const addDish = async (
     if (!insertInfo.acknowledged || !insertInfo.insertedId)
         throw 'Could not add Dish';
 
-    return insertInfo;
+    let cooksDetails = await cookCollection.findOne({ _id: new ObjectId(cookId) });
+    if (!cooksDetails) {
+      throw `Could not find cook to add dish to their profile`;
+    }
+    cooksDetails.dishes.push(new ObjectId(insertInfo.insertedId))
 
+    const insertDishToCooksPage = await cookCollection.updateOne({ _id: new ObjectId(cookId) }, { $set: cooksDetails })
+    if (!insertDishToCooksPage.acknowledged) throw `Could not add dish to cooks details`
+
+    return insertInfo;
 }
 
 export const updateDish = async (
@@ -151,6 +159,9 @@ export const deleteDish = async (
 
     if (!deletionInfo) {
         throw `Could not delete dish with id of ${id}`;
+    } else {
+        const removeDishFromCooksPage = await cookCollection.updateMany({}, { $pull: { dishes: new ObjectId(id) } })
+        if (!removeDishFromCooksPage.acknowledged) throw `Could not delete dish from cooks details`
     }
     let resObj = {
         "_id": id,

@@ -32,6 +32,7 @@ export const getAllOrderByUserId = async (userId) => {
 export const addOrder = async (
     cookId,
     userId,
+    username,
     dishes,
     paymentMethod,
     totalCostBeforeTax,
@@ -60,6 +61,7 @@ export const addOrder = async (
     let newOrder = {
         cookId: ObjectId.createFromHexString(cookId),
         userId: ObjectId.createFromHexString(userId),
+        username: username,
         status: "placed",
         dishes: dishes,
         paymentMethod: paymentDetails,//ObjectId.createFromHexString(paymentMethod),
