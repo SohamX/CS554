@@ -10,9 +10,9 @@ router
     .route('/placeOrder')
     .post(async (req, res) => {
         try {
-            const { cookId, userId, items, totalCostBeforeTax, tax, totalCost, paymentMethod } = req.body;
+            const { cookId, userId, items, totalCostBeforeTax, tax, totalCost, paymentMethod, isMealReq } = req.body;
 
-            if (!cookId || !userId || !items || !items.dishes || items.dishes.length === 0 || !totalCostBeforeTax || !tax || !totalCost || !paymentMethod) {
+            if (!cookId || !userId || !items || !items.dishes || items.dishes.length === 0 || !totalCostBeforeTax || !tax || !totalCost || !paymentMethod || isMealReq === undefined) {
                 return res.status(400).json({ error: 'Invalid request data.' });
             }
 
@@ -25,7 +25,9 @@ router
                 }
                 console.log('totalCost ' + totalCost);
 
-
+                if (isMealReq) {
+                    //TO DO update the mealReq obj - seletectedByUser true
+                }
 
                 let paymentDetails = await userData.getPaymentMethodByUserIdCardId(userId, paymentMethod);
                 const orderAdded = await orderData.addOrder(
@@ -36,7 +38,7 @@ router
                     parseFloat(totalCostBeforeTax),
                     parseFloat(tax),
                     parseFloat(totalCost),
-                    false
+                    isMealReq
                     // ,
                     // invoiceLink
                 );

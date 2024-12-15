@@ -46,14 +46,14 @@ function CartDetails() {
 
     useEffect(() => {
         getCartItemList();
-    }, [])
+    }, [studentId])
 
     const handleCheckout = () => {
         if (!cartItems || !cartItems.dishes || !cartItems.dishes.length || !(cartItems.dishes.length > 0)) {
             alert('Your cart is empty. Please add items to proceed.');
             return;
         }
-        navigate('/student/checkout', { state: { cartItems, studentId } });
+        navigate('/student/checkout', { state: { cartItems, studentId, isMealReq: false } });
     };
 
     const handleAdd=async(dishId)=>{
