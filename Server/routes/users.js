@@ -312,6 +312,7 @@ router
     try {
       req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
     } catch (e) {
+      
       res.status(400).json({error:e});
       return;
     }
@@ -319,6 +320,7 @@ router
       const cart = await userData.getCartItems(req.params.userId);
       res.status(200).json({ status: "success", cart: cart });
     } catch (e) {
+      console.log(e);
       res.status(404).json({error:e});
       return;
     }
@@ -343,6 +345,46 @@ router
       return;
     }
   })
+router
+   .route('/cart/dec/:dishId/to/:userId')
+   .post(async (req, res) => {
+    try {
+      req.params.dishId = helpers.checkId(req.params.dishId, 'dishId URL Param');
+      // req.params.cookId = helpers.checkId(req.params.cookId, 'cookId URL Param');
+      req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
+    } catch (e) {
+      res.status(400).json({error:e});
+      return;
+    }
+    try {
+      const decItem = await userData.decreaseItemQuantity(req.params.userId, req.params.dishId);
+      res.status(200).json({ status: "success", decItem: decItem });
+    } catch (e) {
+      res.status(404).json({error:e});
+      return;
+    }
+  })
+
+router
+    .route('/cart/rem/:dishId/to/:userId')
+    .post(async(req,res)=>{
+      try {
+        req.params.dishId = helpers.checkId(req.params.dishId, 'dishId URL Param');
+        // req.params.cookId = helpers.checkId(req.params.cookId, 'cookId URL Param');
+        req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
+      } catch (e) {
+        res.status(400).json({error:e});
+        return;
+      }
+      try {
+        const remItem = await userData.deleteItemFromCart(req.params.userId, req.params.dishId);
+        res.status(200).json({ status: "success", remItem: remItem });
+      } catch (e) {
+        res.status(404).json({error:e});
+        return;
+      }
+
+    })
   //UPDATE ITEM QUANT ROUTE
 router.route('/cart/update/:itemId').post(async (req, res) => {
     try {

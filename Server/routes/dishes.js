@@ -4,6 +4,7 @@ import sharp from 'sharp'
 import crypto from 'crypto'
 const router = Router();
 import helpers from '../helpers/pranHelpers.js';
+import resizeImage from '../data/resizeImage.js';
 import { validateCuisineType, validateCost, checkisValidImageArray, validateId, validateUniqueDishesPerCook, checkDishDesc, checkisValidBoolean, errorMsg } from '../helpers/validationHelper.js';
 import { dishData } from '../data/index.js';
 import { S3Client,PutObjectCommand,GetObjectCommand, DeleteObjectCommand} from "@aws-sdk/client-s3";
@@ -15,7 +16,7 @@ const bucketName = process.env.BUCKET_NAME;
 const bucketRegion = process.env.BUCKET_REGION;
 const accessKey = process.env.ACCESS_KEY;
 const secretKey = process.env.SECRET_ACCESS_KEY;
-console.log("Bucket Region:", bucketRegion);
+//console.log("Bucket Region:", bucketRegion);
 const s3Client = new S3Client({
     region: bucketRegion,
     credentials: {
@@ -57,7 +58,8 @@ router
 
         const imageName = generateFileName()
 
-        const fileBuffer = await sharp(req.file.buffer).resize({ height: 1920, width: 1080, fit: "contain" }).toBuffer();
+        const fileBuffer = await resizeImage(req.file.buffer);
+
         const params = {
             Bucket: bucketName,
             Key: imageName,

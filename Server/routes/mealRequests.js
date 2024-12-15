@@ -211,7 +211,26 @@ router.route('/:cookId/awaiting/').get(async (req, res) => {
       }
       try {
         const awaitingResponseMealReqs = await mealReqData.getPendingMealReqsByCook(req.params.cookId);
-        res.status(200).json({ awaitingResponseMealReqs:awaitingResponseMealReqs });
+    res.status(200).json({ awaitingResponseMealReqs: awaitingResponseMealReqs });
+  } catch (e) {
+    res.status(404).json({ error: e });
+    return;
+  }
+});
+
+router
+  .route('/:mealReqId')
+  .get(async (req, res) => {
+    try {
+      req.params.mealReqId = helpers.checkId(req.params.mealReqId, 'mealReqId URL Param');
+    } catch (e) {
+      res.status(400).json({ error: e });
+      return;
+    }
+
+    try {
+      const mealReqDetails = await mealReqData.getMealReqsById(req.params.mealReqId);
+      res.status(200).json({ mealReqDetails: mealReqDetails });
       } catch (e) {
         res.status(404).json({ error: e });
         return;

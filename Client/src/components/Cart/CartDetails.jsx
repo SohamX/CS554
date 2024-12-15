@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 
-import { Button, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, FormControlLabel, Switch } from '@mui/material';
+import { Button, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, FormControlLabel, Switch,ButtonGroup  } from '@mui/material';
 import { useApi } from '../../contexts/ApiContext';
 import { AuthContext } from '../../contexts/AccountContext';
 import { useNavigate } from 'react-router-dom';
@@ -23,7 +23,7 @@ function CartDetails() {
         console.error("Failed to parse JSON:", error.message);
         console.error("Student Id not found!");
     }
-    const [showAddForm, setShowAddForm] = useState(false);
+    //const [showAddForm, setShowAddForm] = useState(false);
     const [cartItems, setCartItems] = useState(null);
     const getCartItemList = async () => {
         try {
@@ -46,15 +46,68 @@ function CartDetails() {
 
     useEffect(() => {
         getCartItemList();
-    }, [])
+    }, [studentId])
 
     const handleCheckout = () => {
         if (!cartItems || !cartItems.dishes || !cartItems.dishes.length || !(cartItems.dishes.length > 0)) {
             alert('Your cart is empty. Please add items to proceed.');
             return;
         }
-        navigate('/student/checkout', { state: { cartItems, studentId } });
+        navigate('/student/checkout', { state: { cartItems, studentId, isMealReq: false } });
     };
+
+    const handleAdd=async(dishId)=>{
+        try {
+            
+            const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/add/${dishId}/to/${studentId}`, {
+                method: 'POST',
+            });
+            setCartItems(response.addedItem);
+    
+            
+            
+        } catch (error) {
+            console.error("API call failed:", error);
+        }
+
+
+    }
+
+    const handleDec=async(dishId)=>{
+        try {
+            
+            const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/dec/${dishId}/to/${studentId}`, {
+                method: 'POST',
+            });
+            setCartItems(response.decItem);
+    
+            
+            
+        } catch (error) {
+            console.error("API call failed:", error);
+        }
+
+
+    }
+
+    const handleRem=async(dishId)=>{
+        try {
+            
+            const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/rem/${dishId}/to/${studentId}`, {
+                method: 'POST',
+            });
+            setCartItems(response.remItem);
+    
+            
+            
+        } catch (error) {
+            console.error("API call failed:", error);
+        }
+
+
+    }
+
+
 
 
     if (cartItems) {
@@ -96,6 +149,9 @@ function CartDetails() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
+                                    
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Quantity</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>SubTotal</TableCell>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -112,49 +168,63 @@ function CartDetails() {
 
                                         </TableCell>
                                         <TableCell>
-                                            {/* <Button
-                                                variant="contained"
-                                                color="secondary"
-                                                sx={{ mt: 1 }}
-                                                onClick={() => handleOpenEditModal(cartItem)}
-                                            >
-                                                Edit
-                                            </Button>
-                                            <Button
-                                                variant="contained"
-                                                color="error"
-                                                sx={{ mt: 1 }}
-                                                onClick={() => handleOpenDeleteModal(cartItem)}
-                                            >
-                                                Delete
-                                            </Button> */}
+                                            <Typography variant='body1'>
+                                                {cartItem.quantity}
+                                            </Typography>
                                         </TableCell>
+
+                                        {/* SubTotal */}
+                                        <TableCell>
+                                            <Typography variant='body1'>
+                                                ${cartItem.subTotal.toFixed(2)}
+                                            </Typography>
+                                        </TableCell>
+
+                                        <TableCell>
+                                            <ButtonGroup variant="outlined" size="small">
+                                                <Button
+                                                    color="primary"
+                                                    onClick={()=>handleAdd(cartItem.dishId)}
+                                                >
+                                                    +
+                                                </Button>
+                                                <Button
+                                                    color="secondary"
+                                                    onClick={()=>handleDec(cartItem.dishId)}
+                                                >
+                                                    -
+                                                </Button>
+                                                <Button
+                                                    color="error"
+                                                    onClick={()=>handleRem(cartItem.dishId)}
+                                                >
+                                                    Remove
+                                                </Button>
+                                            </ButtonGroup>
+                                        </TableCell>
+
                                     </TableRow>
                                 ))}
                             </TableBody>
                         </Table>
                     </TableContainer>
                 </Box>
-                {/* {showEditModal && (
-                    <EditDish
-                        isOpen={showEditModal}
-                        dish={editDish}
-                        handleClose={handleCloseModals}
-                        refreshDishes={getCartItemList}
-                        attr={attr}
-                    />
-                )}
-
-                {showDeleteModal && (
-                    <DeleteDish
-                        isOpen={showDeleteModal}
-                        handleClose={handleCloseModals}
-                        deleteDish={deleteDish}
-                        refreshDishes={getCartItemList}
-                        isById={isById}
-                        attr={attr}
-                    />
-                )} */}
+                <Box
+                    sx={{
+                        mx: 'auto',
+                        width: '65%',
+                        mt: 3,
+                        p: 2,
+                        textAlign: 'center',
+                        boxShadow: 2,
+                        borderRadius: 2,
+                        backgroundColor: '#f9f9f9',
+                    }}
+                >
+                    <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                        Total: ${cartItems.totalCost}
+                    </Typography>
+                </Box>
             </div>
         );
     }

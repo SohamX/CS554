@@ -1,14 +1,16 @@
-import { dishes } from '../config/mongoCollections.js';
+import { dishes,cooks } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import helpers from '../helpers/pranHelpers.js';
 import { validateCuisineType, validateCost, checkisValidImageArray, validateId, validateUniqueDishesPerCook, checkDishDesc } from '../helpers/validationHelper.js';
 
-
+const cookCollection = await cooks();
 export const getDishById = async (id) => {
     id = validateId(id, 'id');
     const dishCollection = await dishes();
     const existingDish = await dishCollection.findOne({ _id: ObjectId.createFromHexString(id) })
     if (existingDish === null) throw `No dish with id '${id}'.`;
+    const cook = await cookCollection.findOne({_id:existingDish.cookId})
+    existingDish.cookName = cook.username;
     return existingDish;
 };
 
@@ -16,6 +18,10 @@ export const getAvailableDishes = async (id) => {
     const dishCollection = await dishes();
     const existingDishes = await dishCollection.find({ isAvailable: true }).toArray();
     if (existingDishes.length === 0) throw `No dish available.`;
+    for(const dish of existingDishes){
+        const cook = await cookCollection.findOne({_id:dish.cookId});
+        dish.cookName = cook.username;
+    }
     return existingDishes;
 };
 

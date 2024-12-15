@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Typography, Card, CardContent, TableContainer, Table, TableHead, TableRow, TableCell, TableBody, Button, Paper } from '@mui/material';
 
@@ -6,6 +6,7 @@ function OrderConfirmation() {
     const location = useLocation();
     const navigate = useNavigate();
     const orderDetails = location.state?.orderDetails;
+    const [isMealReq, setIsMealReq] = useState(location.state?.isMealReq || false);
 
     if (!orderDetails) {
         return (
@@ -60,8 +61,8 @@ function OrderConfirmation() {
                 <Table sx={{ minWidth: '100%' }} aria-label="order details table">
                     <TableHead>
                         <TableRow>
-                            <TableCell>Quantity</TableCell>
-                            <TableCell>Dish Name</TableCell>
+                            <TableCell>{isMealReq ? 'No. of People' : 'Quantity'}</TableCell>
+                            <TableCell>{isMealReq ? 'Meal Request Description' : 'Dish Name'}</TableCell>
                             <TableCell>Subtotal</TableCell>
                         </TableRow>
                     </TableHead>

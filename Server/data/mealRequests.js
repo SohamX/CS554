@@ -318,3 +318,13 @@ export const getNoResponseMealReqsByCook = async (cookId) => {
   return noResponseMealReqs;
 };
 
+export const getMealReqsById = async (mealReqId) => {
+
+  mealReqId = helpers.checkId(mealReqId, 'mealReqId');
+
+  const mealReq = await mealReqsCollection.findOne({ _id: new ObjectId(mealReqId) });
+
+  if (mealReq === null) throw `No meal request with id '${id}'.`;
+  return mealReq;
+};
+
