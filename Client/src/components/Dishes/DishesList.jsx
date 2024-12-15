@@ -12,18 +12,11 @@ function DishesList() {
     const { apiCall } = useApi();
     const { currentUser } = useContext(AuthContext);
     let str = JSON.stringify(currentUser, null, 2);
-    let cookId;
-    try {
-        const currentUserObj = JSON.parse(str);
-        console.log('currentUserObj: ' + currentUserObj);
-        const userId = currentUserObj._id;
-        cookId = userId;
+    const [cookId, setCookId] = useState(currentUser._id || '');
 
-        console.log("User ID:", userId);
-    } catch (error) {
-        console.error("Failed to parse JSON:", error.message);
-        console.error("Cook Id not found!");
-    }
+    useEffect(() => {
+        setCookId(currentUser._id);
+    }, [currentUser]);
     const [showAddForm, setShowAddForm] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -53,7 +46,7 @@ function DishesList() {
 
     useEffect(() => {
         getDishesList();
-    }, [])
+    }, [cookId])
 
     const handleToggleChange = async (event, id) => {
         const isAvail = event.target.checked;
@@ -150,36 +143,36 @@ function DishesList() {
                                 {dishes.map((dish) => (
                                     <TableRow key={dish._id}>
                                         <TableCell>
-                                        <Box display="flex" alignItems="center" gap={2}>
-                                            <img
-                                                src={dish.imageUrl}
-                                                alt={dish.name}
-                                                style={{
-                                                    width: 80,
-                                                    height: 80,
-                                                    objectFit: 'cover',
-                                                    borderRadius: 8,
-                                                    boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
-                                                }}
-                                            />
-                                            <Link to={{
-                                                pathname: `/cook/dishes/${dish._id}`,
-                                                state: { refreshDishes: getDishesList }
-                                            }}>
-                                                <Typography
-                                                    sx={{
-                                                        fontWeight: 'bold',
-                                                        '&:hover': {
-                                                            textDecoration: 'underline'
-                                                        }
+                                            <Box display="flex" alignItems="center" gap={2}>
+                                                <img
+                                                    src={dish.imageUrl}
+                                                    alt={dish.name}
+                                                    style={{
+                                                        width: 80,
+                                                        height: 80,
+                                                        objectFit: 'cover',
+                                                        borderRadius: 8,
+                                                        boxShadow: '0 2px 5px rgba(0,0,0,0.2)'
                                                     }}
-                                                    variant='h6'
-                                                    component='h3'
-                                                >
-                                                    {dish.name}
-                                                </Typography>
-                                            </Link>
-                                        </Box>
+                                                />
+                                                <Link to={{
+                                                    pathname: `/cook/dishes/${dish._id}`,
+                                                    state: { refreshDishes: getDishesList }
+                                                }}>
+                                                    <Typography
+                                                        sx={{
+                                                            fontWeight: 'bold',
+                                                            '&:hover': {
+                                                                textDecoration: 'underline'
+                                                            }
+                                                        }}
+                                                        variant='h6'
+                                                        component='h3'
+                                                    >
+                                                        {dish.name}
+                                                    </Typography>
+                                                </Link>
+                                            </Box>
                                         </TableCell>
                                         <TableCell>
                                             <FormControlLabel

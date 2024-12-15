@@ -2,17 +2,17 @@ import { Router } from 'express';
 
 const router = Router();
 import { errorMsg } from '../helpers/validationHelper.js';
-import { paymentData, orderData, userData,mealReqData } from '../data/index.js';
+import { paymentData, orderData, userData, mealReqData } from '../data/index.js';
 
 
 router
     .route('/placeOrder')
     .post(async (req, res) => {
         try {
-            const { cookId, userId, items, totalCostBeforeTax, tax, totalCost, paymentMethod, isMealReq, mealReqId } = req.body;
+            const { cookId, userId, username, items, totalCostBeforeTax, tax, totalCost, paymentMethod, isMealReq, mealReqId } = req.body;
             //console.log('req.body: ' + JSON.stringify(req.body));
 
-            if (!cookId || !userId || !items || !items.dishes || items.dishes.length === 0 || !totalCostBeforeTax || !tax || !totalCost || !paymentMethod || isMealReq === undefined) {
+            if (!cookId || !userId || !username || !items || !items.dishes || items.dishes.length === 0 || !totalCostBeforeTax || !tax || !totalCost || !paymentMethod || isMealReq === undefined) {
                 return res.status(400).json({ error: 'Invalid request data.' });
             }
             if (isMealReq && !mealReqId) {
@@ -37,6 +37,7 @@ router
                 const orderAdded = await orderData.addOrder(
                     cookId,
                     userId,
+                    username,
                     items,
                     paymentMethod,
                     parseFloat(totalCostBeforeTax),

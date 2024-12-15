@@ -55,7 +55,7 @@ function OrderConfirmation() {
             </Card>
 
             <Typography variant="h5" gutterBottom>
-                Order Summary
+                Order Summary {isMealReq ? '(Meal Request)' : ''}
             </Typography>
             <TableContainer component={Paper} sx={{ mb: 3 }}>
                 <Table sx={{ minWidth: '100%' }} aria-label="order details table">
