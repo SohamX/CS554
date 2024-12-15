@@ -1,22 +1,55 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../../contexts/AccountContext';
 import axios from 'axios';
+import { useApi } from '../../../contexts/ApiContext';
 
 function MealReq() {
+  const { apiCall } = useApi();
+  const { currentUser } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const [showsData, setShowsData] = useState(null);
+  const [mealReqData, setMealReqData] = useState(null);
+  const [cookId, setCookId] = useState('');
+  const [cookName, setCookName] = useState('');
   let { mealReqId } = useParams();
+  const [cartItems, setCartItems] = useState(null);
   const navigate = useNavigate();
+
+  const [studentId, setStudentId] = useState(currentUser._id);
 
   useEffect(() => {
     console.log('on load useEffect');
     console.log(mealReqId);
+
+    async function fetchMealReqData() {
+      try {
+        const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/mealReqs/${mealReqId}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        if (response.error) {
+          throw response;
+        }
+        console.log('mealReq : ' + JSON.stringify(response.mealReqDetails));
+        setMealReqData(response.mealReqDetails);
+
+        console.log(response.mealReqDetails);
+      } catch (e) {
+        console.log(e);
+        navigate('/404page');
+      }
+    }
+    fetchMealReqData();
     async function fetchData() {
       try {
         const { data: { responses } } = await axios.get(`http://localhost:3000/mealReqs/pending/${mealReqId}/responses`);
+        console.log('data : ' + JSON.stringify(responses));
         setShowsData(responses);
         setLoading(false);
-        
+
         console.log(responses);
       } catch (e) {
         console.log(e);
@@ -24,7 +57,52 @@ function MealReq() {
       }
     }
     fetchData();
+
+
+
+
   }, [mealReqId]);
+
+  const handleCheckout = async (mealReq) => {
+    console.log('mealReq:', JSON.stringify(mealReq, null, 2));
+    const { cookId, noOfPeople, description, budget } = mealReq;
+    try {
+      const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/cooks/${cookId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      if (response.error) throw response;
+
+      const cookName = response.cook.username;
+
+      let cartItems = {
+        cookId,
+        cookName,
+        dishes: [
+          {
+            dishId: mealReqId,
+            quantity: mealReqData.noOfPeople,
+            dishName: mealReqData.description,
+            subTotal: mealReqData.budget,
+          },
+        ],
+        totalCost: mealReqData.budget,
+      };
+
+      console.log('cart :', JSON.stringify(cartItems, null, 2));
+
+      if (!cartItems || !cartItems.dishes || !cartItems.dishes.length || !(cartItems.dishes.length > 0)) {
+        alert('Please check your meal request data.');
+        return;
+      }
+      navigate('/student/checkout', { state: { cartItems, studentId, isMealReq: true } });
+    } catch (error) {
+      console.error(error);
+      navigate('/404page');
+    }
+  };
 
   // Inline styles
   const styles = {
@@ -81,7 +159,7 @@ function MealReq() {
       border: 'none',
       borderRadius: '3px',
       cursor: 'pointer',
-       width: '120px'
+      width: '120px'
     },
   };
 
@@ -110,8 +188,8 @@ function MealReq() {
         </div>
         <h1 style={{ fontSize: "1em" }}>Responses from Cooks</h1>
         {showsData && <h2>{showsData.description}</h2>}
-        
-        
+
+
         <div>
           {showsData && showsData.length > 0 ? (
             showsData.map((mealReq) => (
@@ -120,14 +198,15 @@ function MealReq() {
                   <h3 style={styles.cardTitle}>
                     <Link to={``}>
                       {mealReq.cookName}
-                    </Link> is interested 
+                    </Link> is interested
                   </h3>
                   <p style={styles.cardText}>
                     <span style={styles.cardSubtitle}>Responded at</span> {new Date(mealReq.responseDate).toLocaleDateString()}
                   </p>
                   <br />
                   <button
-                     style={styles.buttonAccept}
+                    style={styles.buttonAccept}
+                    onClick={() => handleCheckout(mealReq)}
                   >
                     Accept
                   </button>

@@ -12,6 +12,7 @@ function CheckoutDetails() {
     const navigate = useNavigate();
     const [cartItems, setCartItems] = useState(location.state?.cartItems || {});
     const [userId, setUserId] = useState(location.state?.studentId || '');
+    const [isMealReq, setIsMealReq] = useState(location.state?.isMealReq || false);
     const [cookId, setCookId] = useState();
     const [totalCostBeforeTax, setTotalCostBeforeTax] = useState(0);
     const [totalCost, setTotalCost] = useState(0);
@@ -81,6 +82,7 @@ function CheckoutDetails() {
                     tax: tax,
                     totalCost: totalCost,
                     paymentMethod: selectedPaymentMethod,
+                    isMealReq: isMealReq
                 }),
             });
 
@@ -89,7 +91,7 @@ function CheckoutDetails() {
             } else {
                 alert('Order placed successfully!');
                 //console.log('orderDetails: ' + JSON.stringify(response));
-                navigate('/student/orderConfirmation', { state: { orderDetails: response.orderDetails } });
+                navigate('/student/orderConfirmation', { state: { orderDetails: response.orderDetails, isMealReq } });
             }
         } catch (error) {
             console.error('Error placing order:', error);
@@ -130,8 +132,9 @@ function CheckoutDetails() {
                         <Table sx={{ minWidth: '100%' }} aria-label="cart items table">
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Quantity</TableCell>
-                                    <TableCell>Dish Name</TableCell>
+
+                                    <TableCell>{isMealReq ? 'No. of People' : 'Quantity'}</TableCell>
+                                    <TableCell>{isMealReq ? 'Meal Request Description' : 'Dish Name'}</TableCell>
                                     <TableCell>Subtotal</TableCell>
                                 </TableRow>
                             </TableHead>
