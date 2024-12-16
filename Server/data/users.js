@@ -403,7 +403,7 @@ export const addItemtoCart = async (
     
     updatedUser.cart.cookName = cook.username;
     updatedUser.cart.dishes[0].dishName = dish.name;
-    updatedUser.cart.dishes[0].subTotat = dish.cost;
+    updatedUser.cart.dishes[0].subTotal = dish.cost;
     updatedUser.cart.totalCost = dish.cost;
 
     return updatedUser.cart;
