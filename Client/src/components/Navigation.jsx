@@ -1,12 +1,18 @@
 import React, { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { AuthContext } from '../contexts/AccountContext';
-import { AppBar, Toolbar, Typography, Button, Box, IconButton, InputBase } from '@mui/material';
+import { AppBar, Toolbar, Typography, Button, Box, IconButton, InputBase, Badge } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
+import DinnerDiningIcon from '@mui/icons-material/DinnerDining';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import HomeIcon from '@mui/icons-material/Home';
 import {doSignOut} from '../firebase/FirebaseFunctions';
+import { CartContext } from '../contexts/CartContext';
 
 const Navigation = () => {
     const { currentUser } = useContext(AuthContext);
+    const { cartItems } = useContext(CartContext);
     const location = useLocation();
 
     return (
@@ -46,6 +52,9 @@ const Navigation = () => {
                                 <Button color="inherit" style={{width: "auto"}}>
                                     <Link to="/student/cart" style={{ color: "white", textDecoration: "none" }}>
                                         Cart
+                                    <Badge badgeContent={cartItems.length} color="secondary">
+                                        <ShoppingCartIcon />
+                                    </Badge>
                                     </Link>
                                 </Button>
                                 <Button color="inherit" style={{width: "auto"}}>

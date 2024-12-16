@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useApi } from "../../contexts/ApiContext";
 import { AuthContext } from "../../contexts/AccountContext";
 import { Container, Typography, TextField, Button, Box } from "@mui/material";
-import { getLocation } from '../../helpers/constants.js';
+import { getLocation, getCoordinatesFromAddress, getDistance } from '../../helpers/constants.js';
 
 const CookProfile = () => {
     const { apiCall, loading, error } = useApi();
@@ -156,6 +156,33 @@ const CookProfile = () => {
             alert("No changes detected");
             return;
         }
+        let fullAddress = `${address.address}, ${address.city}, ${address.state}, ${address.zipcode}, ${address.country}`;
+        const addlocation = await getCoordinatesFromAddress(fullAddress);
+        if(!addlocation){
+            alert("Invalid address");
+            return;
+        }
+        const { latitude: addLat, longitude: addLng } = addlocation;
+        let distance = 0;
+        if(bodied.latitude && bodied.longitude){
+            distance = getDistance(bodied.latitude, bodied.longitude, addLat, addLng);
+        }
+        else{
+            distance = getDistance(location.latitude, location.longitude, addLat, addLng);
+        }
+        if (distance > 50) {
+            const proceed = window.confirm(
+                "Your address is far from current location. If this is intentional note that all the dishes and cooks will be displayed based on your address, not the actual location. Do you want to proceed?"
+            );
+            if (!proceed) {
+                return;
+            }
+            else{
+                bodied.latitude = addLat;
+                bodied.longitude = addLng;
+            }
+        }
+        
         try {
             console.log(bodied);
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/cooks/${userId}`, {

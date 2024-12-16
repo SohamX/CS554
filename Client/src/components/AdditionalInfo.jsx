@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useApi } from '../contexts/ApiContext';
 import { Container, TextField, Button, Typography, Box, Radio, RadioGroup, FormControlLabel, FormControl, FormLabel } from '@mui/material';
 import { AuthContext } from '../contexts/AccountContext';
+import { getLocation, getCoordinatesFromAddress, getDistance } from '../helpers/constants.js';
 
 const AdditionalInfo = () => {
     const [role, setRole] = useState('student');
@@ -68,6 +69,25 @@ const AdditionalInfo = () => {
             if(!location.latitude || !location.longitude){
                 throw {error: 'Please enable location services to continue'};
             }
+            // verification of address
+            let fullAddress = `${formData.address}, ${formData.city}, ${formData.state}, ${formData.zipcode}, ${formData.country}`;
+            const addressLocation = await getCoordinatesFromAddress(fullAddress);
+            if(!addressLocation){
+                throw {error: 'Invalid address'};
+            }
+            const distance = getDistance(location.latitude, location.longitude, addressLocation.latitude, addressLocation.longitude);
+            if(distance > 50){
+                const proceed = window.confirm(
+                    "Your address is far from current location. If this is intentional note that all the dishes and cooks will be displayed based on your address, not the actual location. Do you want to proceed?"
+                );
+                if (!proceed) {
+                    return;
+                }
+                else{
+                    setLocation(addressLocation);
+                }
+            }
+            // over
             let body = {...formData, ...location};
             const response = await apiCall(url, {
                 method: 'POST',

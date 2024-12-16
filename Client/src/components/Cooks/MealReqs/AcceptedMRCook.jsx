@@ -14,9 +14,9 @@ function AcceptedMRCook() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data: { acceptedMealReqs } } = await axios.get(`http://localhost:3000/mealReqs/${currentUser._id}/accceptedMr/`);
-        console.log(acceptedMealReqs);
-        setShowsData(acceptedMealReqs);
+        const { data: { accpetedMealReqs } } = await axios.get(`http://localhost:3000/mealReqs/${currentUser._id}/acceptedMr/`);
+        //console.log(acceptedMealReqs);
+        setShowsData(accpetedMealReqs);
         setLoading(false);
       } catch (e) {
         console.log(e);

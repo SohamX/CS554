@@ -160,7 +160,7 @@ router.route('/:cookId/pendingMr/').get(async (req, res) => {
     }
   });
 
-router.route('/:cookId/accceptedMr/').get(async (req, res) => {
+router.route('/:cookId/acceptedMr/').get(async (req, res) => {
     try {
         req.params.cookId =  helpers.checkId(req.params.cookId, 'cookId URL Param');
         

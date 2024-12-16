@@ -10,6 +10,7 @@ import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import ClearIcon from '@mui/icons-material/Clear';
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import axios from "axios";
+import { CartContext } from "../../contexts/CartContext";
 
   //LIST OF CUISINES
   const cuisinesList = [
@@ -36,6 +37,7 @@ import styles from './MealReq.module.css'
 const student = () => {
   const { apiCall, loading, error } = useApi();
   const { currentUser } = useContext(AuthContext);
+  const { cartItems, addToCart, removeFromCart } = useContext(CartContext);
   const navigate = useNavigate();
   const [dishes, setDishes] = useState(null)
   const [openModal, setOpenModal] = useState(false)
@@ -51,14 +53,10 @@ const student = () => {
 
   const handleAdd = async (dishId) => {
     try {
-      const  { data: { status } } = await axios.post(`http://localhost:3000/users/cart/add/${dishId}/to/${currentUser._id}`);
-      console.log(status);
-      setAddedtoCart((prevState) => ({
-        ...prevState,
-        [dishId]: true,
-      }));
-      
-      
+      // const  { data: { status } } = await axios.post(`http://localhost:3000/users/cart/add/${dishId}/to/${currentUser._id}`);
+      // console.log(status);
+      addToCart(dishId);
+      alert('Successfully added to cart')
     } catch (err) {
       console.log(err)
       setErrors((prevState) => ({
@@ -406,7 +404,7 @@ const student = () => {
           
           <button className={styles.buttonSecondary}>Checkout</button>
              </div>
-             {AddedtoCart[mealReq._id] && (
+             {cartItems[mealReq._id] && (
                 <p style={{ color: 'green' }}>Successfully Added to your cart</p>
               )}
               {Errors[mealReq._id] && (
