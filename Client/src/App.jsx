@@ -33,6 +33,7 @@ import OrderConfirmation from './components/Orders/OrderConfirmation.jsx';
 import OrdersList from './components/Orders/OrdersList.jsx';
 import OrderDetail from './components/Orders/OrderDetail.jsx';
 import CookDetails from './components/Cooks/CookDetails.jsx';
+import StudentDetails from './components/Student/StudentDetails.jsx';
 
 
 
@@ -120,6 +121,9 @@ function App() {
                 </Route>
                 <Route path="/cook/account" element={<PrivateRoute requiredRole="cook" />} >
                   <Route path="/cook/account" element={<CookProfile />} />
+                </Route>
+                <Route path="/cook/student/:id" element={<PrivateRoute requiredRole="cook" />} >
+                  <Route path="/cook/student/:id" element={<StudentDetails />} />
                 </Route>
                 <Route path='/*' element={<PageNotFound />} />
               </Routes>
