@@ -42,81 +42,96 @@ function OrdersList() {
         getOrdersList();
     }, [userId, role]);
 
+    if (!orders) return <Typography>Loading...</Typography>;
 
-    if (orders) {
+    const inProgressOrders = orders.filter(order => order.status !== 'completed');
+    const completedOrders = orders.filter(order => order.status === 'completed');
 
-        return (
-            <div>
-                <h2>Orders</h2>
-                <Box
-                    sx={{
-                        mx: 'auto',
-                        width: '100%',
-                        mt: 3,
-                        p: 3,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        textAlign: 'center'
-                    }}
-                >
-                    <TableContainer component={Card}
-                        sx={{
-                            boxShadow: 3,
-                            p: 2,
-                            borderRadius: 2,
-                            width: '80%',
-                        }}
-                    >
-                        <Table sx={{ minWidth: '80%' }} aria-label="simple table">
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Order Details</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Order Status</TableCell>
-                                    {/* <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell> */}
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {orders.map((order) => (
-                                    <TableRow key={order._id}>
-                                        <TableCell>
-                                            {/* <Box display="flex" alignItems="center" gap={2}> */}
-                                            <Link to={{
+
+    //Note for Soham to implement chat feature
+    // This component is used for both completed and inprogress orders
+    //we can use order.status to conditionally implement functionality
+    //for inprogress use : order.status !== 'completed'
+    //Once you read this please remove these comments and commit along with your chat feature
+    const renderOrdersTable = (ordersList, title) => (
+        <Box
+            sx={{
+                mx: 'auto',
+                width: '100%',
+                mt: 3,
+                p: 3,
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                textAlign: 'center',
+            }}
+        >
+            <Card
+                sx={{
+                    boxShadow: 3,
+                    p: 2,
+                    borderRadius: 2,
+                    width: '80%',
+                }}
+            >
+                <Typography variant="h5" sx={{ mb: 2 }}>
+                    {title}
+                </Typography>
+                {ordersList.length > 0 ? (
+                    <Table sx={{ minWidth: '80%' }} aria-label="orders table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Order Details</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Order Status</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {ordersList.map(order => (
+                                <TableRow key={order._id}>
+                                    <TableCell>
+                                        <Link
+                                            to={{
                                                 pathname: `/${role === 'user' ? 'student' : 'cook'}/orders/${order._id}`,
-                                                state: { refreshOrders: getOrdersList }
-                                            }}>
-                                                <Typography
-                                                    sx={{
-                                                        fontWeight: 'bold',
-                                                        '&:hover': {
-                                                            textDecoration: 'underline'
-                                                        }
-                                                    }}
-                                                    variant='h6'
-                                                    component='h3'
-                                                >
-                                                    {order.dishes.cookName} {order.isMealReq ? '(Meal Request)' : ''}
-                                                </Typography>
-                                            </Link>
-                                            <Typography>${order.totalCost}</Typography>
-                                            {/* </Box> */}
-                                        </TableCell>
-                                        <TableCell>
+                                                state: { refreshOrders: getOrdersList },
+                                            }}
+                                        >
                                             <Typography
-                                                component='h3'
+                                                sx={{
+                                                    fontWeight: 'bold',
+                                                    '&:hover': {
+                                                        textDecoration: 'underline',
+                                                    },
+                                                }}
+                                                variant="h6"
+                                                component="h3"
                                             >
-                                                {order.status.toUpperCase()}
+                                                {order.dishes.cookName}{' '}
+                                                {order.isMealReq ? '(Meal Request)' : ''}
                                             </Typography>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Box>
-            </div>
-        );
-    }
+                                        </Link>
+                                        <Typography>${order.totalCost.toFixed(2)}</Typography>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Typography component="h3">{order.status.toUpperCase()}</Typography>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                ) : (
+                    <Typography>No orders found in this category.</Typography>
+                )}
+            </Card>
+        </Box>
+    );
+
+    return (
+        <div>
+            <h2>Orders</h2>
+            {renderOrdersTable(inProgressOrders, 'In-progress Orders')}
+            {renderOrdersTable(completedOrders, 'Completed Orders')}
+        </div>
+    );
 }
 
 
