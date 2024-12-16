@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 
 import EditDish from './EditDish.jsx';
 import DeleteDish from './DeleteDish.jsx';
@@ -178,7 +178,7 @@ function DishDetail(props) {
                                 <strong>Cost:</strong> {dish.cost}
                             </Typography>
                             {currentUser.role==='user'&&(<Typography variant="body1" >
-                                <strong>Made by :</strong> {dish.cookName}
+                                <strong>Made by :</strong> <Link to={`/student/cook/${dish.cookId}`}>{dish.cookName}</Link>
                             </Typography>)}
                             {currentUser.role === 'cook' && (<FormControlLabel
                                 control={

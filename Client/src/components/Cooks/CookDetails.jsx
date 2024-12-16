@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams,Link } from 'react-router-dom';
 import { useApi } from "../../contexts/ApiContext";
 import { AuthContext } from "../../contexts/AccountContext";
 import {
@@ -9,7 +9,7 @@ import {
     List,
     ListItem,
     ListItemText,
-    Link,
+    
     Box,
     Grid,
     Avatar,
@@ -17,6 +17,7 @@ import {
     CardMedia,
     Button
 } from '@mui/material';
+import { CartContext } from '../../contexts/CartContext';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StarIcon from '@mui/icons-material/Star';
@@ -27,6 +28,7 @@ const CookDetails = () => {
     const { id } = useParams();
     const { apiCall, loading, error } = useApi();
     const { currentUser } = useContext(AuthContext);
+    const { cartItems, setCartItems, addToCart, removeFromCart, decFromCart } = useContext(CartContext);
     const [cook, setCookDetails] = useState(null)
     const [dishes, setDishes] = useState([])
     const [AddedtoCart, setCartMsg] = useState({})
@@ -62,12 +64,15 @@ const CookDetails = () => {
             alert(error);
         }
     }
-    const addToCart = async (dish) => {
+    const handleAddToCart = async (dishId) => {
         try {
-            const { data: { status } } = await axios.post(`http://localhost:3000/users/cart/add/${dish._id}/to/${currentUser._id}`);
-            alert(`${dish.name} added to cart successfully`)
+            await addToCart(dishId);
+            // const { data: { status } } = await axios.post(`http://localhost:3000/users/cart/add/${dish._id}/to/${currentUser._id}`);
+            // alert(`${dish.name} added to cart successfully`)
         } catch (err) {
-            alert(`Error while adding ${dish.name} to cart!`)
+            console.log(err);
+            alert(err.error);
+            // alert(`Error while adding ${dish.name} to cart!`)
         }
     };
     useEffect(() => {
@@ -170,7 +175,7 @@ const CookDetails = () => {
                                         />
                                         <CardContent>
                                             <Typography variant="h6" gutterBottom>
-                                                <Link href={`/student/dishes/${dish._id}`}>
+                                                <Link to={`/student/dishes/${dish._id}`}>
                                                     {dish.name}
                                                 </Link>
                                             </Typography>
@@ -194,7 +199,7 @@ const CookDetails = () => {
                                                                 variant="contained"
                                                                 color="primary"
                                                                 sx={{ marginTop: '8px', width: '180px' }}
-                                                                onClick={() => addToCart(dish)}
+                                                                onClick={() => handleAddToCart(dish._id)}
                                                             >
                                                                 {'Add To Cart'}
                                                             </Button>

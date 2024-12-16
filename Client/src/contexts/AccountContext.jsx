@@ -15,6 +15,7 @@ export const AuthProvider = ({children, navigate}) => {
     useEffect(() => {
         let myListener = onAuthStateChanged(auth, async (user) => {
           if(user && user.displayName){
+            setLoadingUser(true);
             try {
               const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/login`, {
                   method: 'POST',

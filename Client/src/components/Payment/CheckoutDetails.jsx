@@ -5,6 +5,7 @@ import { useApi } from '../../contexts/ApiContext.jsx';
 import AddCard from './AddCard.jsx';
 import { taxPercent } from '../../helpers/constants.js';
 import { AuthContext } from '../../contexts/AccountContext.jsx';
+import { CartContext } from '../../contexts/CartContext.jsx';
 
 
 function CheckoutDetails() {
@@ -12,7 +13,8 @@ function CheckoutDetails() {
     const { apiCall } = useApi();
     const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
-    const [cartItems, setCartItems] = useState(location.state?.cartItems || {});
+    const { cartItems, cook, total, setCartItems, setCook, setTotal } = useContext(CartContext);
+    const [mealReqCart, setMealReqCart] = useState(location.state?.cartItems || {});
     const [userId, setUserId] = useState(location.state?.studentId || '');
     const [isMealReq, setIsMealReq] = useState(location.state?.isMealReq || false);
     const [mealReqId, setMealReqId] = useState(location.state?.mealReqId || '');
@@ -27,17 +29,29 @@ function CheckoutDetails() {
 
     useEffect(() => {
         // Calculate the total cost
-        if (cartItems && cartItems.dishes && cartItems.dishes.length && cartItems.dishes.length > 0) {
-            setCookId(cartItems.cookId);
-            //const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
-            let totB4Tax = cartItems.totalCost.toFixed(2);
-            let calcTax = (totB4Tax * taxPercent).toFixed(2);
-            let finalTotal = (parseFloat(totB4Tax) + parseFloat(calcTax)).toFixed(2);
-            setTotalCostBeforeTax(totB4Tax);
-            setTax(calcTax);
-            setTotalCost(finalTotal);
+        if(!isMealReq){
+            if (cartItems && cartItems.length && cartItems.length > 0) {
+                setCookId(cook.cookId);
+                //const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+                let totB4Tax = total.toFixed(2);
+                let calcTax = (totB4Tax * taxPercent).toFixed(2);
+                let finalTotal = (parseFloat(totB4Tax) + parseFloat(calcTax)).toFixed(2);
+                setTotalCostBeforeTax(totB4Tax);
+                setTax(calcTax);
+                setTotalCost(finalTotal);
+            }
+        } else{
+            if (mealReqCart && mealReqCart.dishes && mealReqCart.dishes.length > 0) {
+                setCookId(mealReqCart.cookId);
+                let totB4Tax = mealReqCart.totalCost.toFixed(2);
+                let calcTax = (totB4Tax * taxPercent).toFixed(2);
+                let finalTotal = (parseFloat(totB4Tax) + parseFloat(calcTax)).toFixed(2);
+                setTotalCostBeforeTax(totB4Tax);
+                setTax(calcTax);
+                setTotalCost(finalTotal);
+            }
         }
-    }, [cartItems]);
+    }, [cartItems, cook, total, isMealReq, mealReqCart]);
 
     const getPaymentMethodsList = async () => {
         try {
@@ -72,6 +86,17 @@ function CheckoutDetails() {
         }
 
         try {
+            let obj = {}
+            if(isMealReq){
+                obj = mealReqCart;
+            } else{
+                obj = {
+                    dishes: cartItems,
+                    cookId: cookId,
+                    cookName: cook.cookName,
+                    totalCost: totalCost
+                }
+            }
 
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/payment/placeOrder`, {
                 method: 'POST',
@@ -82,7 +107,7 @@ function CheckoutDetails() {
                     cookId: cookId,//'6758d17e11319fce50ef3d88',
                     userId: userId,
                     username: username,
-                    items: cartItems,
+                    items: obj,
                     totalCostBeforeTax: totalCostBeforeTax,
                     tax: tax,
                     totalCost: totalCost,
@@ -96,6 +121,9 @@ function CheckoutDetails() {
                 throw new Error(response.error || 'Failed to place the order.');
             } else {
                 alert('Order placed successfully!');
+                setCartItems([]);
+                setCook({ cookId: '', cookName: '' });
+                setTotal(0);
                 //console.log('orderDetails: ' + JSON.stringify(response));
                 navigate('/student/orderConfirmation', { state: { orderDetails: response.orderDetails, isMealReq } });
             }
@@ -113,13 +141,13 @@ function CheckoutDetails() {
     };
 
     return (
-        <Box sx={{ mx: 'auto', width: '80%', mt: 5 }}>
+        <Box sx={{ mx: 'auto', width: '80%', mt: 5, mb: 5 }}>
             <Typography variant="h4" gutterBottom>
                 Order Summary
             </Typography>
             <Card sx={{ m: 3 }}>
                 <CardContent>
-                    <Typography variant="h6">Cook: {cartItems.cookName}</Typography>
+                    <Typography variant="h6">Cook:  {isMealReq ? mealReqCart.cookName : cook.cookName}</Typography>
                     {/* {cartItems && cartItems.dishes.map((item) => (
                         <Box key={item._id} sx={{
                             display: "flex",
@@ -145,13 +173,27 @@ function CheckoutDetails() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {cartItems?.dishes.map((item) => (
-                                    <TableRow key={item.dishId}>
-                                        <TableCell>{item.quantity}</TableCell>
-                                        <TableCell>{item.dishName}</TableCell>
-                                        <TableCell>${item.subTotal}</TableCell>
-                                    </TableRow>
-                                ))}
+                                {isMealReq ? (
+                                    <>
+                                        {mealReqCart && mealReqCart.dishes && mealReqCart.dishes.map((dish) => (
+                                            <TableRow key={dish.dishId}>
+                                                <TableCell>{dish.quantity}</TableCell>
+                                                <TableCell>{dish.dishName}</TableCell>
+                                                <TableCell>${dish.subTotal}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </>
+                                ) : (
+                                    <>
+                                        {cartItems.map((item) => (
+                                            <TableRow key={item.dishId}>
+                                                <TableCell>{item.quantity}</TableCell>
+                                                <TableCell>{item.dishName}</TableCell>
+                                                <TableCell>${item.subTotal}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </>
+                                )}
                             </TableBody>
                         </Table>
                     </TableContainer>

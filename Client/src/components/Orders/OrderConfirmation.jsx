@@ -36,7 +36,7 @@ function OrderConfirmation() {
     } = orderDetails;
 
     return (
-        <Box sx={{ mx: 'auto', width: '80%', mt: 5 }}>
+        <Box sx={{ mx: 'auto', width: '80%', mt: 5, mb: 5 }}>
             <Typography variant="h4" gutterBottom>
                 Order Confirmation
             </Typography>

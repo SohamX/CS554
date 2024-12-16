@@ -203,7 +203,7 @@ function CartDetails() {
                     }}
                 >
                     <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-                        Total: ${cartItems.totalCost}
+                        Total: ${total?.toFixed(2)}
                     </Typography>
                 </Box>
             </div>
