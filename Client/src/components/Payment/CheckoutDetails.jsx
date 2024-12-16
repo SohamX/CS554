@@ -14,7 +14,7 @@ function CheckoutDetails() {
     const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
     const { cartItems, cook, total, setCartItems, setCook, setTotal } = useContext(CartContext);
-    // const [cartItems, setCartItems] = useState(location.state?.cartItems || {});
+    const [mealReqCart, setMealReqCart] = useState(location.state?.cartItems || {});
     const [userId, setUserId] = useState(location.state?.studentId || '');
     const [isMealReq, setIsMealReq] = useState(location.state?.isMealReq || false);
     const [mealReqId, setMealReqId] = useState(location.state?.mealReqId || '');
@@ -74,11 +74,16 @@ function CheckoutDetails() {
         }
 
         try {
-            let obj = {
-                dishes: cartItems,
-                cookId: cookId,
-                cookName: cook.cookName,
-                totalCost: totalCost
+            let obj = {}
+            if(mealReqCart && mealReqCart.dishes && mealReqCart.dishes.length > 0){
+                obj = mealReqCart;
+            } else{
+                obj = {
+                    dishes: cartItems,
+                    cookId: cookId,
+                    cookName: cook.cookName,
+                    totalCost: totalCost
+                }
             }
 
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/payment/placeOrder`, {
