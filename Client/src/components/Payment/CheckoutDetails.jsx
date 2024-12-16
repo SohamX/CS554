@@ -29,17 +29,29 @@ function CheckoutDetails() {
 
     useEffect(() => {
         // Calculate the total cost
-        if (cartItems && cartItems.length && cartItems.length > 0) {
-            setCookId(cook.cookId);
-            //const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
-            let totB4Tax = total.toFixed(2);
-            let calcTax = (totB4Tax * taxPercent).toFixed(2);
-            let finalTotal = (parseFloat(totB4Tax) + parseFloat(calcTax)).toFixed(2);
-            setTotalCostBeforeTax(totB4Tax);
-            setTax(calcTax);
-            setTotalCost(finalTotal);
+        if(!isMealReq){
+            if (cartItems && cartItems.length && cartItems.length > 0) {
+                setCookId(cook.cookId);
+                //const total = cartItems.reduce((sum, item) => sum + item.subtotal, 0);
+                let totB4Tax = total.toFixed(2);
+                let calcTax = (totB4Tax * taxPercent).toFixed(2);
+                let finalTotal = (parseFloat(totB4Tax) + parseFloat(calcTax)).toFixed(2);
+                setTotalCostBeforeTax(totB4Tax);
+                setTax(calcTax);
+                setTotalCost(finalTotal);
+            }
+        } else{
+            if (mealReqCart && mealReqCart.dishes && mealReqCart.dishes.length > 0) {
+                setCookId(mealReqCart.cookId);
+                let totB4Tax = mealReqCart.totalCost.toFixed(2);
+                let calcTax = (totB4Tax * taxPercent).toFixed(2);
+                let finalTotal = (parseFloat(totB4Tax) + parseFloat(calcTax)).toFixed(2);
+                setTotalCostBeforeTax(totB4Tax);
+                setTax(calcTax);
+                setTotalCost(finalTotal);
+            }
         }
-    }, [cartItems, cook, total]);
+    }, [cartItems, cook, total, isMealReq, mealReqCart]);
 
     const getPaymentMethodsList = async () => {
         try {
@@ -75,7 +87,7 @@ function CheckoutDetails() {
 
         try {
             let obj = {}
-            if(mealReqCart && mealReqCart.dishes && mealReqCart.dishes.length > 0){
+            if(isMealReq){
                 obj = mealReqCart;
             } else{
                 obj = {
@@ -135,7 +147,7 @@ function CheckoutDetails() {
             </Typography>
             <Card sx={{ m: 3 }}>
                 <CardContent>
-                    <Typography variant="h6">Cook: {cook.cookName}</Typography>
+                    <Typography variant="h6">Cook:  {isMealReq ? mealReqCart.cookName : cook.cookName}</Typography>
                     {/* {cartItems && cartItems.dishes.map((item) => (
                         <Box key={item._id} sx={{
                             display: "flex",
@@ -161,13 +173,27 @@ function CheckoutDetails() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {cartItems.map((item) => (
-                                    <TableRow key={item.dishId}>
-                                        <TableCell>{item.quantity}</TableCell>
-                                        <TableCell>{item.dishName}</TableCell>
-                                        <TableCell>${item.subTotal}</TableCell>
-                                    </TableRow>
-                                ))}
+                                {isMealReq ? (
+                                    <>
+                                        {mealReqCart && mealReqCart.dishes && mealReqCart.dishes.map((dish) => (
+                                            <TableRow key={dish.dishId}>
+                                                <TableCell>{dish.quantity}</TableCell>
+                                                <TableCell>{dish.dishName}</TableCell>
+                                                <TableCell>${dish.subTotal}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </>
+                                ) : (
+                                    <>
+                                        {cartItems.map((item) => (
+                                            <TableRow key={item.dishId}>
+                                                <TableCell>{item.quantity}</TableCell>
+                                                <TableCell>{item.dishName}</TableCell>
+                                                <TableCell>${item.subTotal}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                    </>
+                                )}
                             </TableBody>
                         </Table>
                     </TableContainer>
