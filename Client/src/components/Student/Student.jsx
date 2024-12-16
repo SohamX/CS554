@@ -50,6 +50,7 @@ const student = () => {
   const [maxPrice, setMaxPrice] = useState(undefined);
   const [AddedtoCart, setAddedtoCart] = useState({});
   const [Errors,setErrors]= useState({});
+  const [wasItSearchQuery, setAnswer] = useState(false)
 
   const handleAdd = async (dishId) => {
     try {
@@ -119,10 +120,11 @@ const student = () => {
     else if (params === '' && maxPrice) params = params + `?max=${maxPrice}`
 
     try {
-      console.log(`http://localhost:3000/searchQuery${params}`)
+      // console.log(`http://localhost:3000/searchQuery${params}`)
       let resp = await axios.get(`http://localhost:3000/searchQuery${params}`);
       setDishes(resp.data.dishes);
       setLoading(false);
+      setAnswer(true)
       console.log(resp.data.dishes)
     } catch (e) {
       alert(e)
@@ -140,9 +142,11 @@ const student = () => {
         const { data: { dishes } } = await axios.get(`http://localhost:3000/dishes/`);
         setDishes(dishes);
         setLoading(false);
+        setAnswer(false)
       } catch (e) {
         console.log(e);
-        navigate('/404page');
+        alert(e)
+        // navigate('/404page');
       }
     }
     fetchData();
@@ -413,9 +417,11 @@ const student = () => {
         ))
       ) 
       } {
-        dishes && dishes.length == 0 && <div>
+        wasItSearchQuery && dishes && dishes.length == 0 && <div>
           Sorry, we can't find the dishes you are looking for!
         </div>
+      } {
+        !wasItSearchQuery && (!dishes || dishes.length == 0) && <></>
       }
     </>
   )

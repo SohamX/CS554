@@ -16,13 +16,27 @@ export const getDishById = async (id) => {
 
 export const getAvailableDishes = async (id) => {
     const dishCollection = await dishes();
-    const existingDishes = await dishCollection.find({ isAvailable: true }).toArray();
-    if (existingDishes.length === 0) throw `No dish available.`;
+
+    //get all available cooks
+    const availableCooks = await cookCollection.find().toArray();
+
+    //get all the dishes that are available
+    const existingDishes = await dishCollection.find({ isAvailable: true}).toArray();
+
+    let returnDishes = [];
+    
+    // filter dishes only whose cooks are available
     for(const dish of existingDishes){
-        const cook = await cookCollection.findOne({_id:dish.cookId});
-        dish.cookName = cook.username;
+        for(const cook of availableCooks){
+            if(dish.cookId.toString() === cook._id.toString() && cook.availability) {
+                dish.cookName = cook.username
+                returnDishes.push(dish)
+                console.log(dish.name)
+            }
+        }
     }
-    return existingDishes;
+
+    return returnDishes;
 };
 
 export const getAllDishesByCookId = async (cookId) => {
