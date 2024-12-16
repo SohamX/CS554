@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams,Link } from 'react-router-dom';
 import { useApi } from "../../contexts/ApiContext";
 import { AuthContext } from "../../contexts/AccountContext";
 import {
@@ -9,7 +9,7 @@ import {
     List,
     ListItem,
     ListItemText,
-    Link,
+    
     Box,
     Grid,
     Avatar,
@@ -170,7 +170,7 @@ const CookDetails = () => {
                                         />
                                         <CardContent>
                                             <Typography variant="h6" gutterBottom>
-                                                <Link href={`/student/dishes/${dish._id}`}>
+                                                <Link to={`/student/dishes/${dish._id}`}>
                                                     {dish.name}
                                                 </Link>
                                             </Typography>
