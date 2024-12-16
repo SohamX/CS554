@@ -134,19 +134,22 @@ export const getAcceptedMealReqsByUser = async (userId) => {
   if (!acceptedMealReqs) {
     throw `No accepted meal requests found for user with ID '${userId}'`;
   }
-
   
-  const enrichedMealReqs = acceptedMealReqs.map((mealReq) => {
-    const acceptedResponse = mealReq.responses.find(
-      (response) => response.selectedByUser === true
-    );
-    return {
-      ...mealReq,
-      acceptedCookusername: cookData.getCookByID(acceptedResponse.cookId).username
-    };
-  });
+  for (const mealReq of acceptedMealReqs) {
 
-  return enrichedMealReqs;
+    const selectedResponse = mealReq.responses.find(response => response.selectedByUser);
+    if (selectedResponse) {
+        
+        const cook = await cookData.getCookByID(selectedResponse.cookId.toString());
+        
+        mealReq.AcceptedcookName = cook.username;
+        mealReq.AcceptedcookId = cook._id;
+    }
+  }
+  
+  
+
+  return acceptedMealReqs;
 };
 
 export const getResponsesForMealReq = async (mealReqId) => {

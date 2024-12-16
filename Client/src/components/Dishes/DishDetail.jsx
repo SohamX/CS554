@@ -34,7 +34,7 @@ function DishDetail(props) {
                 throw response;
             }
 
-            console.log("Dish successfully added:", response.dish);
+            console.log("Dish successfully fetched:", response.dish);
             setDish(response.dish);
             if (currentUser.role === 'user') {
                 let cartItems = currentUser.cart
