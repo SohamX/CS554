@@ -55,15 +55,13 @@ const student = () => {
     try {
       // const  { data: { status } } = await axios.post(`http://localhost:3000/users/cart/add/${dishId}/to/${currentUser._id}`);
       // console.log(status);
-      addToCart(dishId);
-      alert('Successfully added to cart')
+      await addToCart(dishId);
     } catch (err) {
       console.log(err)
       setErrors((prevState) => ({
         ...prevState,
         [dishId]: true,
-      }));
-      
+      }));    
     }
   };
 

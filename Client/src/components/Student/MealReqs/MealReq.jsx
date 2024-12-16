@@ -16,7 +16,11 @@ function MealReq() {
   const [cartItems, setCartItems] = useState(null);
   const navigate = useNavigate();
 
-  const [studentId, setStudentId] = useState(currentUser._id);
+  const [studentId, setStudentId] = useState('');
+
+  useEffect(() => {
+    setStudentId(currentUser._id);
+  }, [currentUser]);
 
   useEffect(() => {
     console.log('on load useEffect');
@@ -57,10 +61,6 @@ function MealReq() {
       }
     }
     fetchData();
-
-
-
-
   }, [mealReqId]);
 
   const handleCheckout = async (mealReq) => {
