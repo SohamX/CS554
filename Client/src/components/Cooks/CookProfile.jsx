@@ -257,9 +257,9 @@ const CookProfile = () => {
 
     return (
         <Container maxWidth="sm" style={{ marginTop: "3%", marginBottom: "4%" }}>
-            <Typography variant="h4" component="h1" gutterBottom>
+            {/* <Typography variant="h4" component="h1" gutterBottom>
                 Cook Profile
-            </Typography>
+            </Typography> */}
             <Grid item>
                 <Avatar sx={{ width: 80, height: 80, fontSize: 32 }}>
                     {personalInfo.firstName[0]}{personalInfo.lastName[0]}
