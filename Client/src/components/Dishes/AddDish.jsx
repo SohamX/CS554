@@ -74,6 +74,9 @@ function AddDish(props) {
                     errors.push(err);
                 }
             }
+            if (!file) {
+                errors.push('Dish image is required.');
+            }
 
             if (errors.length > 0) {
                 setError(true);

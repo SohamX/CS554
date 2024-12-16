@@ -331,3 +331,17 @@ export const updateCooksAvailability = async (userId, availability) => {
   }
   return responseObj;
 }
+
+export const updateCooksEarnings = async (userId, totalCost) => {
+  if (!userId) throw `Cook ID not Provided`;
+
+  userId = helpers.checkId(userId, "userId");
+  const cook = await getCookByID(userId);
+  let earnings = (cook.earnings + totalCost).toFixed(2);
+  const updatedEarnings = await cookCollection.findOneAndUpdate({ _id: new ObjectId(userId) }, { $set: { earnings: earnings } }, { returnDocument: "after" });
+  if (!updatedEarnings) {
+    throw `Error occured while updating earnings`;
+  }
+  return updatedEarnings;
+
+}

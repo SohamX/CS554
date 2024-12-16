@@ -29,6 +29,7 @@ const CookProfile = () => {
     const [userId, setUserId] = useState(null);
     const [isAvailable, setAvailability] = useState(false);
     //Mohini add states and variables below here
+    const [earnings, setEarnings] = useState(currentUser.earnings || 0);
 
     const handlePersonalInfoChange = (e) => {
         const { name, value } = e.target;
@@ -252,6 +253,7 @@ const CookProfile = () => {
             longitude: currentUser.location.coordinates?.longitude || null,
         })
         setAvailability(currentUser.availability || false)
+        setEarnings(currentUser.earnings || 0);
     }, [currentUser]);
     //Mohini add functions below here
 
@@ -400,11 +402,7 @@ const CookProfile = () => {
                 </form>
             </Box>
             <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
-                <Typography variant="h5">Payment Info</Typography>
-                <p>Payment information will be displayed here.</p>
-                <Button variant="contained" color="primary" sx={{ mt: 2 }}>
-                    Edit
-                </Button>
+                <Typography variant="h5">My Net Earnings: ${earnings} </Typography>
             </Box>
             {/* <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
                 <Typography variant="h5">Favourites</Typography>
