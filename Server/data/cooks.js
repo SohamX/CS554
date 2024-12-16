@@ -325,7 +325,7 @@ export const updateCooksAvailability = async (userId, availability) => {
   const data = await getCookByID(userId);
   if (!data) throw `No cook found with ID: ${userId}`
     
-  const responseObj =  await cookCollection.findOneAndUpdate({_id: new ObjectId(userId)}, {$set: {availability: availability}});
+  const responseObj =  await cookCollection.findOneAndUpdate({_id: new ObjectId(userId)}, {$set: {availability: availability}}, {returnDocument: "after", upsert: true});
   if (!responseObj) {
     throw `Unable to update availability`
   }

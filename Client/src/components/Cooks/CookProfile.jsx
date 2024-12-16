@@ -206,9 +206,9 @@ const CookProfile = () => {
         }
     };
 
-    const handleToggleChange = async(event, id) => {
-        const isAvail = event.target.checked;
-        console.log('event.target.checked: ' + event.target.checked);
+    const handleToggleChange = async(id) => {
+        const isAvail = !isAvailable;
+        console.log('event.target.checked: ', isAvail);
         try {
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/cooks/availability/${id}`, {
                 method: 'PATCH',
@@ -268,7 +268,7 @@ const CookProfile = () => {
                     control={
                         <Switch
                             checked={isAvailable}
-                            onChange={(event) => handleToggleChange(event, currentUser._id)}
+                            onChange={() => handleToggleChange(currentUser._id)}
                             color="primary"
                         />
                     }
