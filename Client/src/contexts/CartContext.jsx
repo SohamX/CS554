@@ -10,7 +10,7 @@ export const CartProvider = ({children}) => {
     const [cartItems, setCartItems] = useState([]);
     const [cook, setCook] = useState({cookId: '', cookName: ''});
     const [total, setTotal] = useState(0);
-    const [loadingCart, setLoadingCart] = useState(true);
+    const [loadingCart, setLoadingCart] = useState(false);
     const { apiCall } = useApi();
     const { currentUser } = useContext(AuthContext);
 
