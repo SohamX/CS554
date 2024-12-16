@@ -2,7 +2,7 @@ import { Router } from 'express';
 
 const router = Router();
 import { errorMsg } from '../helpers/validationHelper.js';
-import { paymentData, orderData, userData, mealReqData } from '../data/index.js';
+import { paymentData, orderData, userData, mealReqData, cookData } from '../data/index.js';
 
 
 router
@@ -50,6 +50,9 @@ router
                 if (!orderAdded) {
                     res.status(400).json({ error: "Error creating an order." });
                 }
+
+                //Add to cooks earnings
+                await cookData.updateCooksEarnings(cookId, parseFloat(totalCost));
 
                 //remove from cart                
                 let emptyCart = await userData.emptyCart(userId);
