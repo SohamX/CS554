@@ -320,25 +320,27 @@ router.route("/:id")
 });
 
 // UPDATE COOK'S AVAILABILTY
-router.route("/availability/:id").put(async(req, res) => {
-  // let userId = req.params.id
-  // let {
-  //   days,
-  //   hours
-  // } = req.body
-  // try {
-  //   if (!userId) throw `Cook ID not Provided`;
-  //   userId = helpers.checkId(userId, "userId");
-  //   const data = await cookData.getCookByID(userId);
-  //   if (data) {
-  //     res.status(200).json({ status: "success", cook: data });
-  //   } else {
-  //     res.status(404).json({ error: "Cook Not Found" });
-  //   }
-  // } catch (e) {
-    res.status(400).json({ error: "Logic not implemented yet" });
+router.route("/availability/:id").patch(async(req, res) => {
+  let userId = req.params.id
+  let obj = req.body
+  // let availability = obj.availability;
+  try {
+    if (!userId) throw `Cook ID not Provided`;
+    userId = helpers.checkId(userId, "userId");
+    const data = await cookData.getCookByID(userId);
+    if (!data) {
+      res.status(404).json({ error: "Cook Not Found" });
+    }
+    const resp = await cookData.updateCooksAvailability(userId, obj.isAvailable);
+    if (resp) {
+      res.status(200).json({ status: "success", availability: resp });
+    } else {
+      res.status(500).json({ error: "INTERNAL SERVER ERROR" });
+    }
+  } catch (e) {
+    res.status(400).json({ error: e });
     return;
-  // }
+  }
 })
 
 // GET COOK'S AVAILABILITY BY ID

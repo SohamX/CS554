@@ -144,10 +144,7 @@ export const registerCook = async (
       country: country,
       coordinates: { longitude: longitude_float, latitude: latitude_float }, //Calculated and stored?
     },
-    availability: {
-      days: [], // E.g., ['Monday', 'Wednesday', 'Friday']
-      hours: { start: "", end: "" }, // E.g., {"start": "10:00", "end": "20:00"}
-    },
+    availability: true,
     earnings: 0,
     dishes: [],
     avgRating: 0,
@@ -318,4 +315,19 @@ export const getCookAvailability = async (userId) => {
     throw `No cook found with ID: ${userId}`;
   }
   return currUser.availability;
+}
+
+export const updateCooksAvailability = async (userId, availability) => {
+  if (!userId) throw `Cook ID not Provided`;
+
+  userId = helpers.checkId(userId, "userId");
+
+  const data = await getCookByID(userId);
+  if (!data) throw `No cook found with ID: ${userId}`
+    
+  const responseObj =  await cookCollection.findOneAndUpdate({_id: new ObjectId(userId)}, {$set: {availability: availability}});
+  if (!responseObj) {
+    throw `Unable to update availability`
+  }
+  return responseObj;
 }

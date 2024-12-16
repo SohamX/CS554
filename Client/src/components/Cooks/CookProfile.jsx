@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApi } from "../../contexts/ApiContext";
 import { AuthContext } from "../../contexts/AccountContext";
-import { Container, Typography, TextField, Button, Box } from "@mui/material";
+import { Container, Typography, TextField, Button, Box, Grid, Avatar, FormControlLabel, Switch } from "@mui/material";
 import { getLocation, getCoordinatesFromAddress, getDistance } from '../../helpers/constants.js';
 
 const CookProfile = () => {
@@ -27,7 +27,7 @@ const CookProfile = () => {
     });
     const [location, setLocation] = useState({ latitude: null, longitude: null });
     const [userId, setUserId] = useState(null);
-    
+    const [isAvailable, setAvailability] = useState(false);
     //Mohini add states and variables below here
 
     const handlePersonalInfoChange = (e) => {
@@ -206,6 +206,30 @@ const CookProfile = () => {
         }
     };
 
+    const handleToggleChange = async(event, id) => {
+        const isAvail = event.target.checked;
+        console.log('event.target.checked: ' + event.target.checked);
+        try {
+            const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/cooks/availability/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    isAvailable: isAvail
+                }),
+            });
+            if (response.error) {
+                throw response;
+            }
+            console.log("Dish successfully updated:", response.availability.availability);
+            setAvailability(response.availability.availability)
+        } catch (error) {
+            alert(error);
+        }
+        console.log(`Dish is now ${isAvail ? "Available" : "Unavailable"}`);
+    }
+
     useEffect(() => {
         setUserId(currentUser._id);
         setPersonalInfo({
@@ -227,6 +251,7 @@ const CookProfile = () => {
             latitude: currentUser.location.coordinates?.latitude || null,
             longitude: currentUser.location.coordinates?.longitude || null,
         })
+        setAvailability(currentUser.availability || false)
     }, [currentUser]);
     //Mohini add functions below here
 
@@ -235,6 +260,21 @@ const CookProfile = () => {
             <Typography variant="h4" component="h1" gutterBottom>
                 Cook Profile
             </Typography>
+            <Grid item>
+                <Avatar sx={{ width: 80, height: 80, fontSize: 32 }}>
+                    {personalInfo.firstName[0]}{personalInfo.lastName[0]}
+                </Avatar>
+                 <FormControlLabel
+                    control={
+                        <Switch
+                            checked={isAvailable}
+                            onChange={(event) => handleToggleChange(event, currentUser._id)}
+                            color="primary"
+                        />
+                    }
+                    label={isAvailable ? "Available" : "Unavailable"}
+                />
+            </Grid>
             <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
                 <Typography variant="h5">Personal Information</Typography>
                 <form>
