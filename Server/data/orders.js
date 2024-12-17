@@ -108,6 +108,34 @@ export const updateOrder = async (
     return existingOrder;
 };
 
+export const updateOrderReview = async (
+    id,
+    rating,
+    review
+) => {
+    id = validateId(id, 'id');
+    rating = parseFloat(rating);
+    if (review != "") {
+        review = checkDishDesc(review, 'review');
+    }
+
+    let existingOrder = await getOrderById(id);
+    existingOrder.rating = parseFloat(rating);
+    existingOrder.review = review;
+    const orderCollection = await orders();
+
+    let updateOrder = await orderCollection.findOneAndReplace(
+        { _id: ObjectId.createFromHexString(id) },
+        existingOrder,
+        { returnDocument: 'after' });
+
+    if (!updateOrder) {
+        throw 'could not update order successfully';
+    }
+    return updateOrder;
+
+};
+
 export const getAllIncompleteOrderByUserId = async (userId) => {
     userId = validateId(userId, 'userId');
     const orderCollection = await orders();

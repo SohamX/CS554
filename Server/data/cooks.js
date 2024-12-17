@@ -1,5 +1,5 @@
-import {users,cooks} from '../config/mongoCollections.js';
-import {ObjectId} from 'mongodb';
+import { users, cooks } from '../config/mongoCollections.js';
+import { ObjectId } from 'mongodb';
 import helpers from '../helpers/pranHelpers.js'
 import bcrypt from 'bcryptjs';
 const userCollection = await users();
@@ -31,7 +31,7 @@ export const registerCook = async (
     !country ||
     !gmail ||
     !mobileNumber ||
-    !bio || 
+    !bio ||
     !latitude ||
     !longitude
   ) {
@@ -50,7 +50,7 @@ export const registerCook = async (
   const sameUsername = await userCollection.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });
   const sameCookname = await cookCollection.findOne({ username: { $regex: new RegExp(`^${username}$`, 'i') } });
   if (sameUsername || sameCookname) {
-      throw `Error: User/Cook with ${username} already exists`;
+    throw `Error: User/Cook with ${username} already exists`;
   }
   // if (typeof password !== "string") {
   //   throw "Password should be of type string";
@@ -258,8 +258,8 @@ export const updateCook = async (
       throw 'Please enter a valid mobile number in 000-000-0000 format';
     }
     if (currUser.mobileNumber !== updatedCookData.mobileNumber) {
-      const matchedCount = await userCollection.countDocuments({ mobileNumber: mobileNumber,});
-      const cookMatched = await cookCollection.countDocuments({ mobileNumber: mobileNumber,});
+      const matchedCount = await userCollection.countDocuments({ mobileNumber: mobileNumber, });
+      const cookMatched = await cookCollection.countDocuments({ mobileNumber: mobileNumber, });
       if (matchedCount > 0 || cookMatched > 0) {
         throw 'Mobile number already exists';
       }
@@ -324,8 +324,8 @@ export const updateCooksAvailability = async (userId, availability) => {
 
   const data = await getCookByID(userId);
   if (!data) throw `No cook found with ID: ${userId}`
-    
-  const responseObj =  await cookCollection.findOneAndUpdate({_id: new ObjectId(userId)}, {$set: {availability: availability}}, {returnDocument: "after", upsert: true});
+
+  const responseObj = await cookCollection.findOneAndUpdate({ _id: new ObjectId(userId) }, { $set: { availability: availability } }, { returnDocument: "after", upsert: true });
   if (!responseObj) {
     throw `Unable to update availability`
   }
@@ -341,6 +341,58 @@ export const updateCooksEarnings = async (userId, totalCost) => {
   const updatedEarnings = await cookCollection.findOneAndUpdate({ _id: new ObjectId(userId) }, { $set: { earnings: earnings } }, { returnDocument: "after" });
   if (!updatedEarnings) {
     throw `Error occured while updating earnings`;
+  }
+  return updatedEarnings;
+
+}
+
+let oneDecimal = (num) => {
+  let decimal = num.toString().split('.')[1];
+  let deci = decimal.toString().slice(0, 1);
+  let res = num.toString().split('.')[0] + "." + deci;
+  return parseFloat(res);
+};
+
+let calcAvgRating = (reviewsArr) => {
+  let len = reviewsArr.length;
+  let avgRating = 0;
+  let sumRating = 0;
+  if (len > 0) {
+    for (let i = 0; i < len; i++) {
+      let currReview = reviewsArr[i];
+      sumRating += currReview.rating;
+    }
+    avgRating = sumRating / len;
+    if (!(Number.isInteger(avgRating)) && avgRating.toString().split('.')[1].length > 1) {
+      avgRating = oneDecimal(avgRating);
+    }
+    // // Round to nearest 0.5
+    // avgRating = Math.round(avgRating * 2) / 2;
+  }
+  return avgRating;
+};
+
+export const updateCooksRating = async (cookId, userId, rating, review) => {
+  if (!cookId) throw new Error("Cook ID not provided");
+  if (!userId) throw new Error("User ID not provided");
+  if (!rating || rating < 0 || rating > 5) throw new Error("Rating must be between 0 and 5");
+  if (typeof review !== "string" || review.length > 1000) {
+    throw new Error("Review must be a string and cannot exceed 1000 characters");
+  }
+
+  cookId = helpers.checkId(cookId, "userId");
+  const cook = await getCookByID(cookId);
+  let reviewsArr = cook.reviews;
+  let newReview = {
+    "userId": new ObjectId(userId),
+    "review": review.trim(),
+    "rating": parseFloat(rating)
+  };
+  reviewsArr.push(newReview);
+  let avgRating = calcAvgRating(reviewsArr);
+  const updatedEarnings = await cookCollection.findOneAndUpdate({ _id: new ObjectId(cookId) }, { $set: { avgRating: avgRating, reviews: reviewsArr } }, { returnDocument: "after" });
+  if (!updatedEarnings) {
+    throw `Error occured while updating avg rating and review`;
   }
   return updatedEarnings;
 

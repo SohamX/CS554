@@ -12,7 +12,7 @@ const constructorMethod = (app) => {
   app.use('/orders', orderRoutes);
   app.use('/dishes', dishRoutes);
   app.use('/cooks', cookRoutes);
-  app.use('/searchQuery', searchRoutes);
+  app.use('/search', searchRoutes);
   app.use('/payment', paymentRoutes);
 
   app.use('*', (req, res) => {

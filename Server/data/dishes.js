@@ -14,15 +14,33 @@ export const getDishById = async (id) => {
     return existingDish;
 };
 
-export const getAvailableDishes = async (id) => {
+export const getAvailableDishes = async (lat, long) => {
     const dishCollection = await dishes();
-    const existingDishes = await dishCollection.find({ isAvailable: true }).toArray();
-    if (existingDishes.length === 0) throw `No dish available.`;
+
+    //get all available cooks
+    const availableCooks = await cookCollection.find().toArray();
+
+    //get all the dishes that are available
+    const existingDishes = await dishCollection.find({ isAvailable: true}).toArray();
+
+    let returnDishes = [];
+    
+    // filter dishes only whose cooks are available
     for(const dish of existingDishes){
-        const cook = await cookCollection.findOne({_id:dish.cookId});
-        dish.cookName = cook.username;
+        for(const cook of availableCooks){
+            if(dish.cookId.toString() === cook._id.toString() && cook.availability) {
+                let dist = helpers.getDistanceFromLatLonInKm(lat, long, cook.location.coordinates.latitude, cook.location.coordinates.longitude)
+                console.log("user lat long", lat, long, "cook lat long", cook.location.coordinates.latitude, cook.location.coordinates.longitude, "dist in km", dist)
+                if (dist <= 10) {
+                    dish.cookName = cook.username
+                    returnDishes.push(dish)
+                    console.log(dish.name)
+                }
+            }
+        }
     }
-    return existingDishes;
+
+    return returnDishes;
 };
 
 export const getAllDishesByCookId = async (cookId) => {
@@ -172,45 +190,79 @@ export const deleteDish = async (
 }
 
 export const searchQuery = async (
-  dish,
-  cuisine,
-  location,
-  minPrice,
-  maxPrice
-) => {
-  const dishCollection = await dishes();
-  if (cuisine.trim() !== "") {
-    cuisine = helpers.checkString(cuisine, "cuisine");
-    cuisine = validateCuisineType(cuisine);
-  }
+    dish,
+    cuisine,
+    location,
+    minPrice,
+    maxPrice,
+    latitude,
+    longitude
+  ) => {
+    const dishCollection = await dishes();
+    if (cuisine.trim() !== "") {
+      cuisine = helpers.checkString(cuisine, "cuisine");
+      cuisine = validateCuisineType(cuisine);
+    }
+  
+    if (minPrice) {
+      if (typeof minPrice != "number") throw `Error: min price is not a number`;
+      if (Number.isNaN(minPrice)) throw `Error: min price is not a number`;
+    }
+  
+    if (maxPrice) {
+      if (typeof maxPrice != "number") throw `Error: max price is not a number`;
+      if (Number.isNaN(maxPrice)) throw `Error: max price is not a number`;
+    }
+  
+    if (minPrice && maxPrice && minPrice > maxPrice)
+      throw `Error: Min price cannot be greater than Max price`;
+  
+    let query = {};
+    if (cuisine.trim() !== "")
+      query["cuisineType"] = { $regex: cuisine, $options: "i" };
+    if (dish.trim() !== "") query["name"] = { $regex: dish, $options: "i" };
+    if (minPrice) {
+      query["cost"] = {};
+      query["cost"].$gte = minPrice;
+    }
+    if (maxPrice) {
+      query["cost"] = query["cost"] || {};
+      query["cost"].$lte = maxPrice;
+    }
 
-  if (minPrice) {
-    if (typeof minPrice != "number") throw `Error: min price is not a number`;
-    if (Number.isNaN(minPrice)) throw `Error: min price is not a number`;
-  }
+    let cookQuery = {};
 
-  if (maxPrice) {
-    if (typeof maxPrice != "number") throw `Error: max price is not a number`;
-    if (Number.isNaN(maxPrice)) throw `Error: max price is not a number`;
-  }
+    cookQuery["availability"] = true;
 
-  if (minPrice && maxPrice && minPrice > maxPrice) throw `Error: Min price cannot be greater than Max price`
+    if (location.trim() !== "") {
+        cookQuery["$or"] = [
+            { "location.state": { $regex: location, $options: "i" } },
+            { "location.city": { $regex: location, $options: "i" } }
+          ];
+    }
+  
+    let dishes_obj = await dishCollection.find(query).toArray();
+  
+    let cooks_obj = await cookCollection.find(cookQuery).toArray();
+  
+    let results = []
 
-  //location validation to be implemented
-
-  let query = {};
-  if (cuisine.trim() !== "")
-    query["cuisineType"] = { $regex: cuisine, $options: "i" };
-  if (dish.trim() !== "") query["name"] = { $regex: dish, $options: "i" };
-  if (minPrice) {
-    query["cost"] = {};
-    query["cost"].$gte = minPrice;
-  }
-  if (maxPrice) {
-    query["cost"] = query["cost"] || {}; 
-    query["cost"].$lte = maxPrice;
-  }
-  let results;
-  results = await dishCollection.find(query).toArray();
-  return results;
-};
+    for (const dish of dishes_obj) {
+        for (const cook of cooks_obj) {
+            if(dish.cookId.toString() === cook._id.toString()) {
+                if (location.trim() === "") {
+                    console.log("in non location filter")
+                    let dist = helpers.getDistanceFromLatLonInKm(latitude, longitude, cook.location.coordinates.latitude, cook.location.coordinates.longitude)
+                    if (dist < 10) {
+                        results.push(dish)
+                    }
+                } else {
+                    console.log("in location filter")
+                    results.push(dish)
+                }
+            }
+        }
+    }
+  
+    return results;
+  };

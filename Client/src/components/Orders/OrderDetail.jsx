@@ -1,21 +1,33 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 import { useApi } from '../../contexts/ApiContext.jsx';
-import { Card, CardContent, CardHeader, Typography, Button, Box, Grid, FormControlLabel, Switch, TableContainer, Table, TableHead, TableRow, TableCell, Paper, TableBody } from '@mui/material';
+import { Card, CardContent, Typography, Button, Box, TableContainer, Table, TableHead, TableRow, TableCell, Paper, TableBody, TextField, Rating } from '@mui/material';
 import { AuthContext } from '../../contexts/AccountContext.jsx';
-
+import { checkDishDesc } from '../../helpers/validationHelper.js';
 
 function OrderDetail(props) {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { apiCall } = useApi();
     const [order, setOrder] = useState(null);
     const { currentUser } = useContext(AuthContext);
+    const [userId, setUserId] = useState(currentUser._id || '');
     const [role, setRole] = useState(currentUser.role || '');
+    const [reviewText, setReviewText] = useState('');
+    const [ratingValue, setRatingValue] = useState(0);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(false);
+    const [errorMsg, setErrorMsg] = useState('');
 
-    const isById = true;
-    const attr = 'order';
-    //const [loading, setLoading] = useState(true);
+
+    const onReviewTextChange = (e) => {
+        let value = e.target.value;
+        value = checkDishDesc(value, 'Review');
+
+        setReviewText(value);
+    };
+
     const getOrder = async () => {
         try {
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/orders/${id}`, {
@@ -27,7 +39,6 @@ function OrderDetail(props) {
             if (response.error) {
                 throw response;
             }
-
             console.log("Order successfully fetched:", response.order);
             setOrder(response.order);
         } catch (error) {
@@ -35,9 +46,64 @@ function OrderDetail(props) {
         }
     };
 
+    const handleSubmitReview = async (e) => {
+        try {
+            e.preventDefault();
+            setError(false);
+            setIsSubmitting(true);
+
+            let reviewVal;
+
+            let errors = [];
+
+            if (reviewText && reviewText != "") {
+                try {
+                    reviewVal = checkDishDesc(reviewText, 'Review');
+                } catch (err) {
+                    errors.push(err);
+                }
+            }
+
+            if (errors.length > 0) {
+                setError(true);
+                setErrorMsg(errors.join('\n'));
+                return;
+            }
+
+            const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/orders/user/review/${id}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    rating: ratingValue,
+                    review: reviewVal,
+                }),
+            });
+            if (response.error) {
+                throw response;
+            }
+
+            alert('Review submitted successfully!');
+            setOrder(response.order);
+        } catch (error) {
+            alert('Failed to submit review. Please try again.');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    useEffect(() => {
+        setUserId(currentUser._id);
+        setRole(currentUser.role);
+    }, [currentUser,]);
+
     useEffect(() => {
         getOrder();
-    }, [id])
+    }, [id]);
+
+
+
     if (!order) {
         return (
             <Box sx={{ mx: 'auto', width: '80%', mt: 5, textAlign: 'center' }}>
@@ -65,6 +131,8 @@ function OrderDetail(props) {
         isMealReq,
         totalCost,
         createdAt,
+        rating,
+        review,
     } = order;
 
     if (order) {
@@ -75,7 +143,7 @@ function OrderDetail(props) {
                 <Box display="flex" flexDirection="column" alignItems="center" mt={5}>
                     <Card sx={{ width: '100%', maxWidth: 600, mb: 3 }}>
                         <Typography variant="h4" gutterBottom>
-                            {role === 'cook' ? 'User:' : 'Cook:'}  <strong>{role === 'cook' ? username : cookName}</strong>
+                            {role === 'cook' ? 'User:' : 'Cook:'} <strong>{role === 'cook' ? username : cookName}</strong>
                         </Typography>
                         <Card sx={{ m: 3, width: '90%' }}>
                             <CardContent>
@@ -135,6 +203,64 @@ function OrderDetail(props) {
                         <Typography variant="h5" sx={{ mt: 1 }}>
                             Total Cost: <strong>${totalCost.toFixed(2)}</strong>
                         </Typography>
+
+
+
+                        {status === 'completed' && rating === '-' && role !== 'cook' && (
+                            <Box sx={{ m: 4, width: '90%' }}>
+                                {error && <Typography
+                                    variant="body1"
+                                    align="center"
+                                    gutterBottom
+                                    className='errorMessage'
+                                    style={{ whiteSpace: 'pre-line' }}
+                                >
+                                    {errorMsg}
+                                </Typography>}
+                                <Typography variant="h5" gutterBottom>
+                                    Your feedback matters!
+                                </Typography>
+                                <Typography variant="body2" gutterBottom>
+                                    Rate your order and share your thoughts to help us make every meal even better. Your cook would appreciate it!
+                                </Typography>
+                                <Rating
+                                    value={ratingValue}
+                                    onChange={(event, newValue) => setRatingValue(newValue)}
+                                    precision={0.5}
+                                />
+                                <TextField
+                                    id="review"
+                                    label="Write your review"
+                                    multiline
+                                    rows={4}
+                                    variant="outlined"
+                                    fullWidth
+                                    sx={{ mt: 2 }}
+                                    value={reviewText}
+                                    onChange={(e) => onReviewTextChange(e.target.value)}
+                                    inputProps={{ maxLength: 1000 }}
+                                />
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{ mt: 2, width: '30%' }}
+                                    onClick={handleSubmitReview}
+                                    disabled={isSubmitting || !ratingValue}
+                                >
+                                    Submit
+                                </Button>
+                            </Box>
+                        )}
+
+                        {rating !== '-' && (
+                            <Card sx={{ m: 3, width: '90%' }}>
+                                <Typography variant="h5" gutterBottom>
+                                    Feedback
+                                </Typography>
+                                <Typography variant="body1">Rating: {rating}/5</Typography>
+                                <Typography variant="body1">Review: {review}</Typography>
+                            </Card>
+                        )}
                     </Card>
                 </Box>
             </div>

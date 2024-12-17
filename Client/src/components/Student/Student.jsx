@@ -50,10 +50,11 @@ const student = () => {
   const [maxPrice, setMaxPrice] = useState(undefined);
   const [AddedtoCart, setAddedtoCart] = useState({});
   const [Errors,setErrors]= useState({});
+  const [wasItSearchQuery, setAnswer] = useState(false)
 
   const handleAdd = async (dishId) => {
     try {
-      // const  { data: { status } } = await axios.post(`http://localhost:3000/users/cart/add/${dishId}/to/${currentUser._id}`);
+      // const  { data: { status } } = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/cart/add/${dishId}/to/${currentUser._id}`);
       // console.log(status);
       await addToCart(dishId);
     } catch (err) {
@@ -117,12 +118,14 @@ const student = () => {
     else if (params === '' && minPrice) params = params + `?min=${minPrice}`
     if (params !== '' && maxPrice) params = params + `&max=${maxPrice}`
     else if (params === '' && maxPrice) params = params + `?max=${maxPrice}`
+    if (params !== '' && !locationName) params = params + `&latitude=${currentUser.location.coordinates.latitude}&longitude=${currentUser.location.coordinates.longitude}`
+    else if (params === '' && !locationName) params = params + `?latitude=${currentUser.location.coordinates.latitude}&longitude=${currentUser.location.coordinates.longitude}`
 
     try {
-      console.log(`http://localhost:3000/searchQuery${params}`)
-      let resp = await axios.get(`http://localhost:3000/searchQuery${params}`);
+      let resp = await axios.get(`${import.meta.env.VITE_SERVER_URL}/search${params}`);
       setDishes(resp.data.dishes);
       setLoading(false);
+      setAnswer(true)
       console.log(resp.data.dishes)
     } catch (e) {
       alert(e)
@@ -137,12 +140,14 @@ const student = () => {
     }
     async function fetchData() {
       try {
-        const { data: { dishes } } = await axios.get(`http://localhost:3000/dishes/`);
+        const { data: { dishes } } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/search/home?latitude=${currentUser.location.coordinates.latitude}&longitude=${currentUser.location.coordinates.longitude}`);
         setDishes(dishes);
         setLoading(false);
+        setAnswer(false)
       } catch (e) {
         console.log(e);
-        navigate('/404page');
+        alert(e)
+        // navigate('/404page');
       }
     }
     fetchData();
@@ -413,9 +418,11 @@ const student = () => {
         ))
       ) 
       } {
-        dishes && dishes.length == 0 && <div>
+        wasItSearchQuery && dishes && dishes.length == 0 && <div>
           Sorry, we can't find the dishes you are looking for!
         </div>
+      } {
+        !wasItSearchQuery && (!dishes || dishes.length == 0) && <></>
       }
     </>
   )
