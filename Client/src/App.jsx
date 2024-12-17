@@ -38,6 +38,7 @@ import CookDetails from './components/Cooks/CookDetails.jsx';
 import StudentDetails from './components/Student/StudentDetails.jsx';
 import History from './components/Dishes/History.jsx';
 import ChatRoom from './components/Chat/ChatRoom.jsx';
+import CooksForYou from './components/Student/CooksForYou.jsx';
 
 
 
@@ -160,6 +161,9 @@ function App() {
                   </Route>
                   <Route path="/cook/orders/:id" element={<PrivateRoute requiredRole="cook" />} >
                     <Route path="/cook/orders/:id" element={<OrderDetail />} />
+                  </Route>
+                  <Route path="/student/cooksForYou" element={<PrivateRoute requiredRole="user" />} >
+                    <Route path="/student/cooksForYou" element={<CooksForYou />} />
                   </Route>
                   <Route path="/cook/dishes" element={<PrivateRoute requiredRole="cook" />} >
                     <Route path="/cook/dishes" element={<DishesList />} />

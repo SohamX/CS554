@@ -402,3 +402,26 @@ export const updateCooksRating = async (cookId, userId, rating, review) => {
   return updatedEarnings;
 
 }
+
+export const cooksForYou = async (lat, long) => {
+  try {
+    if (!lat || !long) throw `Latitude and Longitude should be provided`;
+    lat = helpers.latitudeAndLongitude(lat, 'Latitude')
+    long = helpers.latitudeAndLongitude(long, 'Longitude')
+    const cooks = await cookCollection.find({availability: true}).sort({avgRating: -1}).toArray()
+    let finalCooksArray = []
+    for (const cook of cooks) {
+      if (finalCooksArray.length < 5) {
+        let dist = helpers.getDistanceFromLatLonInKm(lat, long, cook.location.coordinates.latitude, cook.location.coordinates.longitude)
+        if (dist < 10) {
+          finalCooksArray.push(cook)
+        }
+      } else{
+        break
+      }
+    }
+    return finalCooksArray;
+  } catch(e) {
+    return e
+  }
+}
