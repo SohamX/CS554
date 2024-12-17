@@ -11,7 +11,7 @@ const validateCuisineType = (cuisineName) => {
 
 const validateOrderStatus = (status) => {
     if (orderStatus.get(status) === undefined)
-        throw new Error('Invalid cuisine type passed.');
+        throw new Error('Invalid status type passed.');
     return status;
 }
 
@@ -66,7 +66,11 @@ const checkDishDesc = (str, variable) => {
     checkUndefinedOrNull(str, variable);
     str = checkisValidString(str, variable);
     str = str.trim();
-    if (str.length < 2 || str.length > 150) throw `${variable} must be a non-empty string and length should be min 2 and max 150`;
+    if (variable === 'review') {
+        if (str.length < 2 || str.length > 1000) throw `${variable} must be a non-empty string and length should be min 2 and max 150`;
+    } else {
+        if (str.length < 2 || str.length > 150) throw `${variable} must be a non-empty string and length should be min 2 and max 150`;
+    }
     if (!isNaN(str))
         throw `Error: ${str} is not a valid value for ${variable} as it only contains digits`;
     return str;

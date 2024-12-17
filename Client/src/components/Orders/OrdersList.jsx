@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom';
 import { Button, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, FormControlLabel, Switch } from '@mui/material';
 import { useApi } from '../../contexts/ApiContext';
 import { AuthContext } from '../../contexts/AccountContext';
+import { SocketContext } from '../../contexts/SocketContext';
 
 
 function OrdersList() {
     const { apiCall } = useApi();
+    const { inOrders, updateOrderStatus } = useContext(SocketContext);
     const { currentUser } = useContext(AuthContext);
     const [userId, setUserId] = useState(currentUser._id || '');
     const [role, setRole] = useState(currentUser.role || '');
@@ -17,8 +19,6 @@ function OrdersList() {
     }, [currentUser]);
 
     const [orders, setOrders] = useState(null);
-    const isById = false;
-    const attr = 'order';
     const getOrdersList = async () => {
         try {
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/orders/${role}/${userId}`, {
@@ -44,15 +44,43 @@ function OrdersList() {
 
     if (!orders) return <Typography>Loading...</Typography>;
 
-    const inProgressOrders = orders.filter(order => order.status !== 'completed');
+    // const inProgressOrders = orders.filter(order => order.status !== 'completed');
     const completedOrders = orders.filter(order => order.status === 'completed');
 
 
-    //Note for Soham to implement chat feature
-    // This component is used for both completed and inprogress orders
-    //we can use order.status to conditionally implement functionality
-    //for inprogress use : order.status !== 'completed'
-    //Once you read this please remove these comments and commit along with your chat feature
+    const handleStatusChange = async (orderId, currentStatus) => {
+        let newStatus = '';
+        if (currentStatus === 'placed') {
+            newStatus = 'in_progress';
+        } else if (currentStatus === 'in_progress') {
+            newStatus = 'ready';
+        } else if (currentStatus === 'ready') {
+            newStatus = 'completed';
+        }
+
+        try{
+            const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/orders/${orderId}`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ status: newStatus }),
+            });
+            if(response.error){
+                throw response;
+            }
+            console.log("Order status updated successfully:", response);
+            if(newStatus === 'completed'){
+                getOrdersList();
+            }
+            updateOrderStatus(orderId, newStatus);
+        } catch (error) {
+            console.error('Error updating order status:', error);
+            alert(error.error);
+        }
+    };
+
+
     const renderOrdersTable = (ordersList, title) => (
         <Box
             sx={{
@@ -83,6 +111,7 @@ function OrdersList() {
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Order Details</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Order Status</TableCell>
+                                {currentUser.role === 'cook' && <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>}
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -105,7 +134,7 @@ function OrdersList() {
                                                 variant="h6"
                                                 component="h3"
                                             >
-                                                {order.dishes.cookName}{' '}
+                                                {currentUser.role==='user'? order.dishes.cookName: order.username}{' '}
                                                 {order.isMealReq ? '(Meal Request)' : ''}
                                             </Typography>
                                         </Link>
@@ -114,6 +143,21 @@ function OrdersList() {
                                     <TableCell>
                                         <Typography component="h3">{order.status.toUpperCase()}</Typography>
                                     </TableCell>
+                                    {currentUser.role === 'cook' && (
+                                        <TableCell>
+                                        {order.status !== 'completed' && (
+                                            <Button
+                                            variant="contained"
+                                            color="primary"
+                                            onClick={() => handleStatusChange(order._id, order.status)}
+                                            >
+                                            {order.status === 'placed' && 'Start Cooking'}
+                                            {order.status === 'in_progress' && 'Order Is Ready'}
+                                            {order.status === 'ready' && 'Completed'}
+                                            </Button>
+                                        )}
+                                        </TableCell>
+                                    )}
                                 </TableRow>
                             ))}
                         </TableBody>
@@ -128,7 +172,7 @@ function OrdersList() {
     return (
         <div>
             <h2>Orders</h2>
-            {renderOrdersTable(inProgressOrders, 'In-progress Orders')}
+            {renderOrdersTable(inOrders, 'In-progress Orders')}
             {renderOrdersTable(completedOrders, 'Completed Orders')}
         </div>
     );

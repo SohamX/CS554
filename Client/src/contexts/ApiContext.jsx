@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 
 const ApiContext = createContext();
 
@@ -7,7 +7,7 @@ export const ApiProvider = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const apiCall = async (url, options) => {
+  const apiCall = useCallback(async (url, options) => {
     setLoading(true);
     setError(null);
     try {
@@ -20,7 +20,7 @@ export const ApiProvider = ({ children }) => {
       setError(err.message);
       throw err;
     }
-  };
+  }, []);
 
   return (
     <ApiContext.Provider value={{ apiCall, loading, error }}>
