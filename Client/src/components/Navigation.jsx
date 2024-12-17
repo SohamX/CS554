@@ -45,7 +45,7 @@ const Navigation = () => {
                             </section> */}
                             <section style={{ display: "flex", alignItems: "center", width: "fit-content" }}>
                                 <Button color="inherit" style={{width: "auto"}}>
-                                    <Link to="/student/cooksaroundyou" style={{ color: "white", textDecoration: "none" }}>
+                                    <Link to="/student/cooksForYou" style={{ color: "white", textDecoration: "none" }}>
                                         Cooks Around You
                                     </Link>
                                 </Button>

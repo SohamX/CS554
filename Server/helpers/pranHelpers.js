@@ -137,8 +137,8 @@ const exportedMethods = {
         throw `Error: ${varName || 'Provided parameter'} is NaN`;
     let test = num.toString();
     let testArr = test.split('.');
-    if (!testArr.length === 2 || testArr[1].length < 6)
-        throw `Error: ${testArr.length} ${varName || 'Provided parameter'} must be upto 6 decimal places`;
+    if (!testArr.length === 2)
+        throw `Error: ${testArr.length} ${varName || 'Provided parameter'} must be a valid decimal`;
     if (varName === 'Latitude') {
       if (num > 90 || num < -90) throw `Error: ${varName || 'Provided parameter'} is out of range, the valid range is -90.000000 to 90.000000`
     } else if (varName === 'Longitude') {
@@ -174,6 +174,10 @@ const exportedMethods = {
       Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(radLat1) * Math.cos(radLat2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c/1000; // distance in KMs
+  },
+
+  beforeParseFloat(str) {
+    return  /^-?\d+(\.\d+)?$/.test(str);
   }
 };
 

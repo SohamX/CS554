@@ -5,6 +5,7 @@ const client = redis.createClient();
 client.connect().then(() => {});
 import helpers from "../helpers/pranHelpers.js";
 import { dishData } from "../data/index.js";
+import { cookData } from "../data/index.js";
 import { validateCuisineType } from "../helpers/validationHelper.js";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
@@ -108,9 +109,27 @@ router.route("/home/").get(userHome,async (req, res) => {
 
     res.status(200).json({ status: "success", dishes: dishes });
   } catch (e) {
-    res.status(404).json(errorMsg(e));
+    res.status(404).json({error : e});
     return;
   }
 });
 
+router.route("/cooks/").get(async (req, res) => {
+  try {
+    let latitude = req.query.latitude;
+    let longitude = req.query.longitude;
+    if (!latitude || !longitude) throw `Latitude and Longitude should be provided`
+    let isLat = helpers.beforeParseFloat(latitude)
+    if (!isLat) throw `Invalid latitude`
+    let isLong = helpers.beforeParseFloat(longitude)
+    if (!isLong) throw `Invalid longitude`
+    latitude = helpers.latitudeAndLongitude(parseFloat(latitude), 'Latitude')
+    longitude = helpers.latitudeAndLongitude(parseFloat(longitude), 'Longitude')
+    const cooks = await cookData.cooksForYou(latitude, longitude)
+    res.status(200).json({ status: "success", cooks: cooks });
+  } catch (e) {
+    res.status(404).json({error : e});
+    return;
+  }
+})
 export default router;
