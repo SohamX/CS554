@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate, useLocation, useParams,Link } from 'react-router-dom';
+import { useNavigate, useLocation, useParams, Link } from 'react-router-dom';
 import { useApi } from "../../contexts/ApiContext";
 import { AuthContext } from "../../contexts/AccountContext";
 import {
@@ -9,7 +9,7 @@ import {
     List,
     ListItem,
     ListItemText,
-    
+
     Box,
     Grid,
     Avatar,
@@ -22,6 +22,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import StarIcon from '@mui/icons-material/Star';
 import StarBorderIcon from '@mui/icons-material/StarBorder';
+import StarHalfIcon from '@mui/icons-material/StarHalf';
 import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import axios from 'axios';
 const CookDetails = () => {
@@ -132,23 +133,38 @@ const CookDetails = () => {
                         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <Box>
                                 <Typography variant="body1">Ratings:</Typography>
-                                {Array.from({ length: 5 }, (_, i) => (
-                                    i < cook.rating ? <StarIcon key={i} color="warning" /> : <StarBorderIcon key={i} color="warning" />
-                                ))}
+                                {Array.from({ length: 5 }, (_, i) => {
+                                    const ratingValue = cook.avgRating; // Example: 4.3
+
+                                    // Determine star type
+                                    if (i + 1 <= ratingValue) {
+                                        // Full star
+                                        return <StarIcon key={i} color="warning" />;
+                                    } else if (i < ratingValue && i + 1 > ratingValue) {
+                                        // Half star (ratingValue falls between i and i+1)
+                                        return <StarHalfIcon key={i} color="warning" />;
+                                    } else {
+                                        // Empty star
+                                        return <StarBorderIcon key={i} color="warning" />;
+                                    }
+                                })}
                             </Box>
                             <Box>
                                 <Typography variant="body1" sx={{ textAlign: 'center' }}>
                                     Reviews
                                 </Typography>
-                                {cook.reviews.length === 0 ? (
+                                {cook.reviews.length === 0 ||
+                                    cook.reviews.filter(review => typeof review.review === 'string' && review.review.trim() !== '').length === 0 ? (
                                     <Typography variant="body1">No reviews yet.</Typography>
                                 ) : (
                                     <List sx={{ textAlign: 'center' }}>
-                                        {cook.reviews.map((review, index) => (
-                                            <ListItem key={index} sx={{ justifyContent: 'center' }}>
-                                                <ListItemText primary={review} />
-                                            </ListItem>
-                                        ))}
+                                        {cook.reviews
+                                            .filter(review => typeof review.review === 'string' && review.review.trim() !== '')
+                                            .map((review) => (
+                                                <ListItem key={review.userId} sx={{ justifyContent: 'center' }}>
+                                                    <ListItemText primary={review.review} />
+                                                </ListItem>
+                                            ))}
                                     </List>
                                 )}
                             </Box>

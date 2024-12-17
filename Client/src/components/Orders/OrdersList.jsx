@@ -17,8 +17,6 @@ function OrdersList() {
     }, [currentUser]);
 
     const [orders, setOrders] = useState(null);
-    const isById = false;
-    const attr = 'order';
     const getOrdersList = async () => {
         try {
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/orders/${role}/${userId}`, {

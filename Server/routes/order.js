@@ -1,8 +1,8 @@
 import { Router } from 'express';
 const router = Router();
 import helpers from '../helpers/pranHelpers.js';
-import { validateDishesList, validateId, validateCost, validateCloudUrl, checkisValidBoolean, validateOrderStatus, errorMsg } from '../helpers/validationHelper.js';
-import { orderData } from '../data/index.js';
+import { validateDishesList, validateId, validateCost, checkDishDesc, checkisValidBoolean, validateOrderStatus, errorMsg, checkisValidString } from '../helpers/validationHelper.js';
+import { cookData, orderData } from '../data/index.js';
 
 router
     .route('/')
@@ -141,6 +141,55 @@ router
             res.status(200).json({ status: "success", orders: orders });
         } catch (e) {
             res.status(404).json(errorMsg(e));
+            return;
+        }
+    })
+
+
+router
+    .route('/user/review/:id')
+    .patch(async (req, res) => {
+        try {
+            req.params.id = validateId(req.params.id, 'id URL Param');
+        } catch (e) {
+            res.status(400).json(errorMsg(e));
+            return;
+        }
+        const orderFormData = req.body;
+        let {
+            rating,
+            review } = orderFormData;
+
+        try {
+            rating = parseFloat(rating);
+            if (review) {
+                review = checkDishDesc(review, 'review');
+            } else {
+                review = "";
+            }
+
+        } catch (e) {
+            return res.status(400).json(errorMsg(e))
+        }
+
+        try {
+            const orderUpdated = await orderData.updateOrderReview(req.params.id,
+                rating,
+                review);
+
+
+            if (orderUpdated) {
+                //update cook rating
+                await cookData.updateCooksRating(orderUpdated.cookId.toString(), orderUpdated.userId.toString(), orderUpdated.rating, orderUpdated.review);;
+
+                res.status(200).json({ status: "success", order: orderUpdated });
+            }
+            else {
+                res.status(500).json({ error: "Internal Server Error" });
+            }
+
+        } catch (e) {
+            res.status(400).json(errorMsg(e));
             return;
         }
     })
