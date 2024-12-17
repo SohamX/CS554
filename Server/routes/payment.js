@@ -2,7 +2,11 @@ import { Router } from 'express';
 
 const router = Router();
 import { errorMsg } from '../helpers/validationHelper.js';
-import { paymentData, orderData, userData, mealReqData, cookData } from '../data/index.js';
+import { paymentData, orderData, userData, mealReqData, cookData, dishData } from '../data/index.js';
+
+import redis from 'redis'
+const client = redis.createClient();
+client.connect().then(() => {});
 
 
 router
@@ -31,6 +35,14 @@ router
                 if (isMealReq) {
                     //TO DO update the mealReq obj - seletectedByUser true
                     let updateMealReqStatus = await mealReqData.acceptMealRequest(mealReqId, cookId);
+                }
+
+                if(!isMealReq){
+                    for(const dish of items.dishes){
+                        let dishId = dish.dishId;
+                        const dishDetails = await dishData.getDishById(dishId);
+                        await client.lPush(`historyList:${userId}`,JSON.stringify(dishDetails));
+                    }
                 }
 
                 let paymentDetails = await userData.getPaymentMethodByUserIdCardId(userId, paymentMethod);

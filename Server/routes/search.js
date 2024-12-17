@@ -1,10 +1,14 @@
 import { Router } from "express";
 const router = Router();
+import redis from 'redis';
+const client = redis.createClient();
+client.connect().then(() => {});
 import helpers from "../helpers/pranHelpers.js";
 import { dishData } from "../data/index.js";
 import { validateCuisineType } from "../helpers/validationHelper.js";
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { userHome } from "./middlewares.js";
 import dotenv from "dotenv";
 dotenv.config();
 const bucketName = process.env.BUCKET_NAME;
@@ -83,11 +87,15 @@ router.route("/").get(async (req, res) => {
   }
 });
 
-router.route("/home/").get(async (req, res) => {
+router.route("/home/").get(userHome,async (req, res) => {
   try {
     const latitude = req.query.latitude;
     const longitude = req.query.longitude;
+    const userId = req.query.userId;
+    console.log(userId);
     const dishes = await dishData.getAvailableDishes(latitude, longitude);
+    await client.json.set(`home:dishes:${userId}`, '.',dishes);
+    console.log("Setup in redis cache");
     for (const dish of dishes) {
       const getObjectParams = {
         Bucket: bucketName,

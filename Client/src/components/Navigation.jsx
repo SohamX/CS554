@@ -72,6 +72,11 @@ const Navigation = () => {
                                         My Account
                                     </Link>
                                 </Button>
+                                <Button color="inherit" style={{width: "auto"}}>
+                                    <Link to="/student/history" style={{ color: "white", textDecoration: "none" }}>
+                                        Recently Ordered
+                                    </Link>
+                                </Button>
                                 <Button color="inherit" style={{width: "auto"}} onClick={doSignOut}>
                                     Sign Out
                                 </Button>

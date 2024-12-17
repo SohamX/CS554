@@ -35,8 +35,7 @@ import OrdersList from './components/Orders/OrdersList.jsx';
 import OrderDetail from './components/Orders/OrderDetail.jsx';
 import CookDetails from './components/Cooks/CookDetails.jsx';
 import StudentDetails from './components/Student/StudentDetails.jsx';
-
-
+import History from './components/Dishes/History.jsx';
 
 const AuthProviderWithRouter = withRouter(AuthProvider);
 
@@ -63,6 +62,9 @@ function App() {
                   </Route>
                   <Route path="/student/cart" element={<PrivateRoute requiredRole="user" />} >
                     <Route path="/student/cart" element={<CartDetails />} />
+                  </Route>
+                  <Route path="/student/history" element={<PrivateRoute requiredRole="user" />} >
+                    <Route path="/student/history" element={<History />} />
                   </Route>
                   <Route path="/student/checkout" element={<PrivateRoute requiredRole="user" />} >
                     <Route path="/student/checkout" element={<CheckoutDetails />} />

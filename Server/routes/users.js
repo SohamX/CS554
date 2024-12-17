@@ -3,8 +3,12 @@ import { userData } from '../data/index.js';
 import helpers from '../helpers/pranHelpers.js'
 import { checkisValidString } from '../helpers/validationHelper.js';
 import { errorMsg, validateCardNumber, validateCvv, validateZipCode } from '../helpers/validationHelper.js';
-
+import { loginDetails } from "./middlewares.js";
 const router = Router();
+
+import redis from 'redis'
+const client = redis.createClient();
+client.connect().then(() => {});
 
 //REGISTER USER ROUTE
 
@@ -107,6 +111,7 @@ router
         latitude_float,
         longitude_float);
     if (succ.signupCompleted) {
+      await client.json.set(`user:${succ.user.gmail}`,'.',succ.user);
       res.status(200).json({ status: "success",user:succ.user });
     }
     else {
@@ -119,7 +124,7 @@ router
     }
   });
 
-router.route('/login').post(async (req, res) => {     // AFTER LOGIN 
+router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGIN 
     let { gmail } = req.body;
     try {
       if(!gmail){
@@ -134,6 +139,11 @@ router.route('/login').post(async (req, res) => {     // AFTER LOGIN
     }
     try {
       const data = await userData.loginUser(gmail);
+      if(data.role==="user"){
+        await client.json.set(`user:${gmail}`,'.',data);
+      }else{
+        await client.json.set(`cook:${gmail}`,'.',data);
+      }
       res.status(200).json({ status: "success", data:data});
     } catch (e) {
       res.status(404).json({error:e});
@@ -203,6 +213,9 @@ router.route('/login').post(async (req, res) => {     // AFTER LOGIN
         {
           throw "All fields cannot be empty"
         }
+        if(address||city||state||zipcode||country||latitude||longitude){
+          await client.del(`home:dishes:${req.params.id}`);
+        }
         if (firstName) {
           updateData.firstName = helpers.checkString(firstName, 'firstName');
           updateData.firstName = helpers.checkSpecialCharsAndNum(updateData.firstName, 'firstName');
@@ -269,6 +282,7 @@ router.route('/login').post(async (req, res) => {     // AFTER LOGIN
       try {
           const updateInfo = await userData.updateUser(req.params.id,updateData);
         if (updateInfo) {
+          await client.json.set(`user:${updateInfo.gmail}`,'.',updateInfo);
           res.status(200).json({ status: "success", user: updateInfo });
         }
         else {
@@ -339,6 +353,7 @@ router
     }
     try {
       const addedItem = await userData.addItemtoCart(req.params.userId, req.params.dishId);
+
       res.status(200).json({ status: "success", addedItem: addedItem });
     } catch (e) {
       res.status(404).json({error:e});
@@ -386,40 +401,40 @@ router
 
     })
   //UPDATE ITEM QUANT ROUTE
-router.route('/cart/update/:itemId').post(async (req, res) => {
-    try {
-      req.params.itemId = helpers.checkId(req.params.itemId, 'itemId URL Param');
-    } catch (e) {
-      res.status(400).json({error:e});
-      return;
-    }
-    try {
-      const updatedCartTotal = await userData.updateItembyQuant(req.params.itemId);
-      res.status(200).json({ status: "success", updatedCartTotal: updatedCartTotal });
-    } catch (e) {
-      res.status(404).json({error:e});
-      return;
-    }
-  })
+// router.route('/cart/update/:itemId').post(async (req, res) => {
+//     try {
+//       req.params.itemId = helpers.checkId(req.params.itemId, 'itemId URL Param');
+//     } catch (e) {
+//       res.status(400).json({error:e});
+//       return;
+//     }
+//     try {
+//       const updatedCartTotal = await userData.updateItembyQuant(req.params.itemId);
+//       res.status(200).json({ status: "success", updatedCartTotal: updatedCartTotal });
+//     } catch (e) {
+//       res.status(404).json({error:e});
+//       return;
+//     }
+//   })
 
-  //DELETE ITEM FROM CART ROUTE
-router
-  .route('/cart/delete/:itemId')
-  .post(async (req, res) => {
-    try {
-      req.params.itemId = helpers.checkId(req.params.itemId, 'itemId URL Param');
-    } catch (e) {
-      res.status(400).json({error:e});
-      return;
-    }
-    try {
-      const statObj = await userData.removeItemFromCart(req.params.itemId);
-      res.status(200).json({ status: "success", statObj: statObj });
-    } catch (e) {
-      res.status(404).json({error:e});
-      return;
-    }
-  })
+//   //DELETE ITEM FROM CART ROUTE
+// router
+//   .route('/cart/delete/:itemId')
+//   .post(async (req, res) => {
+//     try {
+//       req.params.itemId = helpers.checkId(req.params.itemId, 'itemId URL Param');
+//     } catch (e) {
+//       res.status(400).json({error:e});
+//       return;
+//     }
+//     try {
+//       const statObj = await userData.removeItemFromCart(req.params.itemId);
+//       res.status(200).json({ status: "success", statObj: statObj });
+//     } catch (e) {
+//       res.status(404).json({error:e});
+//       return;
+//     }
+//   })
 
 //ALL PAYMENT CARD ROUTES
 

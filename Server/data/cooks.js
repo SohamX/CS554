@@ -4,6 +4,9 @@ import helpers from '../helpers/pranHelpers.js'
 import bcrypt from 'bcryptjs';
 const userCollection = await users();
 const cookCollection = await cooks();
+import redis from 'redis'
+const client = redis.createClient();
+client.connect().then(() => {});
 
 export const registerCook = async (
   firstName,
@@ -329,6 +332,7 @@ export const updateCooksAvailability = async (userId, availability) => {
   if (!responseObj) {
     throw `Unable to update availability`
   }
+  
   return responseObj;
 }
 
@@ -337,11 +341,12 @@ export const updateCooksEarnings = async (userId, totalCost) => {
 
   userId = helpers.checkId(userId, "userId");
   const cook = await getCookByID(userId);
-  let earnings = (cook.earnings + totalCost).toFixed(2);
+  let earnings = (parseFloat(cook.earnings) + totalCost).toFixed(2);
   const updatedEarnings = await cookCollection.findOneAndUpdate({ _id: new ObjectId(userId) }, { $set: { earnings: earnings } }, { returnDocument: "after" });
   if (!updatedEarnings) {
     throw `Error occured while updating earnings`;
   }
+  await client.json.set(`cook:${updatedEarnings.gmail}`, '.',updatedEarnings);
   return updatedEarnings;
 
 }

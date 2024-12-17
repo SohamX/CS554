@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import multer from 'multer';
-import sharp from 'sharp'
+//import sharp from 'sharp'
 import crypto from 'crypto'
 const router = Router();
 import helpers from '../helpers/pranHelpers.js';
@@ -27,6 +27,10 @@ const s3Client = new S3Client({
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
+
+import redis from 'redis'
+const client = redis.createClient();
+client.connect().then(() => {});
 
 router
     .route('/')
@@ -114,7 +118,14 @@ router
                 // images
             );
             if (dishAdded) {
+                const keysToDelete = await client.keys(`home:dishes:*`);
+                if (keysToDelete.length > 0) {
+                    for (const key of keysToDelete) {
+                    await client.del(key);
+                    }
+                }
                 res.status(200).json({ status: "success", dish: dishAdded });
+                
             }
             else {
                 res.status(500).json({ error: "Internal Server Error" });
@@ -218,6 +229,18 @@ router
                 images,
                 isAvailable);
             if (dishUpdated) {
+                const keysToDelete = await client.keys(`home:dishes:*`);
+                if (keysToDelete.length > 0) {
+                    for (const key of keysToDelete) {
+                    await client.del(key);
+                    }
+                }
+                const keystoDel = await client.keys(`historyList:*`);
+                if (keystoDel.length > 0) {
+                    for (const key of keystoDel) {
+                    await client.del(key);
+                    }
+                }
                 res.status(200).json({ status: "success", dish: dishUpdated });
             }
             else {
@@ -247,6 +270,19 @@ router
               
             const command = new DeleteObjectCommand(getObjectParams);
             await s3Client.send(command);
+
+            const keysToDelete = await client.keys(`home:dishes:*`);
+            if (keysToDelete.length > 0) {
+                for (const key of keysToDelete) {
+                await client.del(key);
+                }
+            }
+            const keysToDel = await client.keys(`historyList*`);
+            if (keysToDel.length > 0) {
+                for (const key of keysToDel) {
+                await client.del(key);
+                }
+            }
 
             res.status(200).json({ status: "success", dish: dishDeleted });
         } catch (e) {
@@ -286,6 +322,51 @@ router
             res.status(404).json(errorMsg(e));
             return;
         }
+    })
+
+
+router
+    .route('/history/:userId')
+    .get(async(req,res)=>{ 
+      try{
+        const userId = req.params.userId;
+        const a = await client.lRange(`historyList:${userId}`,-5,-1);
+        const parsedArray = a.map(item => JSON.parse(item));
+        console.log(parsedArray.length);
+        console.log(parsedArray);
+        for (const dish of parsedArray) {
+            const getObjectParams = {
+                Bucket: bucketName,
+                Key: dish.imageName
+              }
+            
+              
+              const command = new GetObjectCommand(getObjectParams);
+              
+              const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
+              dish.imageUrl = url;
+        }
+
+        const filteredDishes = parsedArray.filter((dish => {
+            const uniqueIds = new Set();
+            return dish => {
+                if (uniqueIds.has(dish._id)) {
+                    return false; 
+                }
+                uniqueIds.add(dish._id);
+                return true; 
+            };
+        })());
+
+        res.status(200).json({ status: "success", dishes: filteredDishes });
+        }
+        catch(e){
+          console.log(e);
+        }
+   
+   
+   
+   
     })
 
 export default router;

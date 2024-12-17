@@ -140,7 +140,7 @@ const student = () => {
     }
     async function fetchData() {
       try {
-        const { data: { dishes } } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/search/home?latitude=${currentUser.location.coordinates.latitude}&longitude=${currentUser.location.coordinates.longitude}`);
+        const { data: { dishes } } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/search/home?latitude=${currentUser.location.coordinates.latitude}&longitude=${currentUser.location.coordinates.longitude}&userId=${currentUser._id}`);
         setDishes(dishes);
         setLoading(false);
         setAnswer(false)

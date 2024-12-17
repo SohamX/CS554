@@ -457,6 +457,7 @@ export const addItemtoCart = async (
   
   
     updatedUserData.cart.totalCost = totalCost;  
+    
 
     return updatedUserData.cart;
 }};
@@ -511,68 +512,68 @@ export const getItem = async(itemId)=>{
 }
 
 
-export const updateItembyQuant = async (itemId) => {
-  if(!itemId){
-    throw("itemId need to be supplied")
-  }
-  itemId = helpers.checkId(itemId,'itemId');
+// export const updateItembyQuant = async (itemId) => {
+//   if(!itemId){
+//     throw("itemId need to be supplied")
+//   }
+//   itemId = helpers.checkId(itemId,'itemId');
 
-  const item = await getItem(itemId);
-  let newQuant = item.quantity+1;
-  let newSubtotal = item.eachCost*newQuant;
+//   const item = await getItem(itemId);
+//   let newQuant = item.quantity+1;
+//   let newSubtotal = item.eachCost*newQuant;
   
-  var newObject = {
-    'cart.$.quantity': newQuant,
-    'cart.$.subtotal': newSubtotal
-  }
-  const updatedItem = await userCollection.findOneAndUpdate({'cart._id': new ObjectId(itemId)}, {$set:newObject},{returnDocument:'after'});
+//   var newObject = {
+//     'cart.$.quantity': newQuant,
+//     'cart.$.subtotal': newSubtotal
+//   }
+//   const updatedItem = await userCollection.findOneAndUpdate({'cart._id': new ObjectId(itemId)}, {$set:newObject},{returnDocument:'after'});
   
-  let sum = 0
-  updatedItem.cart.forEach((element) => {
-    sum += element.subtotal;    
-  });
+//   let sum = 0
+//   updatedItem.cart.forEach((element) => {
+//     sum += element.subtotal;    
+//   });
 
-  const updatedCartTotal = await userCollection.findOneAndUpdate({_id: new ObjectId(updatedItem._id)}, {$set:{cartTotal:sum}},{returnDocument:'after'});
+//   const updatedCartTotal = await userCollection.findOneAndUpdate({_id: new ObjectId(updatedItem._id)}, {$set:{cartTotal:sum}},{returnDocument:'after'});
   
   
-  return updatedCartTotal;
-};
+//   return updatedCartTotal;
+// };
 
-export const removeItemFromCart = async (itemId) => {
-  if(!itemId){
-    throw("itemId need to be supplied")
-  }
-  itemId = helpers.checkId(itemId,'itemId');
+// export const removeItemFromCart = async (itemId) => {
+//   if(!itemId){
+//     throw("itemId need to be supplied")
+//   }
+//   itemId = helpers.checkId(itemId,'itemId');
   
-  const user = await userCollection.findOne({'cart._id': new ObjectId(itemId)});
-  if(!user){
-    throw("No item with that ID")
-  }
-  if(user.cart.length===1){
-    await userCollection.findOneAndUpdate({'cart._id': new ObjectId(itemId)}, {$set:{cartTotal:0}});
-  }
-  else{
-    let deleteSubTotal = 0;
-    let sum = 0;
-    user.cart.forEach((element) => {
-      if(element._id.toString() === itemId){
-        deleteSubTotal = element.subtotal;
+//   const user = await userCollection.findOne({'cart._id': new ObjectId(itemId)});
+//   if(!user){
+//     throw("No item with that ID")
+//   }
+//   if(user.cart.length===1){
+//     await userCollection.findOneAndUpdate({'cart._id': new ObjectId(itemId)}, {$set:{cartTotal:0}});
+//   }
+//   else{
+//     let deleteSubTotal = 0;
+//     let sum = 0;
+//     user.cart.forEach((element) => {
+//       if(element._id.toString() === itemId){
+//         deleteSubTotal = element.subtotal;
         
-      }
-      sum+=element.subtotal; 
-    });
-    await userCollection.findOneAndUpdate({'cart._id': new ObjectId(itemId)}, {$set:{cartTotal:(sum-deleteSubTotal)}});
-  }
-  const removedreview=await userCollection.findOneAndUpdate(
-    {'cart._id': new ObjectId(itemId)},
-    {$pull: {cart: {_id: new ObjectId(itemId)}}},
-    { returnDocument: "after" }
-  );
-  if(!removedreview){
-    throw("Review is not deleted")
-  }
-  return {deleted:true};
-};
+//       }
+//       sum+=element.subtotal; 
+//     });
+//     await userCollection.findOneAndUpdate({'cart._id': new ObjectId(itemId)}, {$set:{cartTotal:(sum-deleteSubTotal)}});
+//   }
+//   const removedreview=await userCollection.findOneAndUpdate(
+//     {'cart._id': new ObjectId(itemId)},
+//     {$pull: {cart: {_id: new ObjectId(itemId)}}},
+//     { returnDocument: "after" }
+//   );
+//   if(!removedreview){
+//     throw("Review is not deleted")
+//   }
+//   return {deleted:true};
+// };
 
 export const emptyCart = async (userId) => {
   if (!userId) {
@@ -906,11 +907,11 @@ export const decreaseItemQuantity = async (userId, dishId) => {
     { $set: { cart: user.cart } },
     { returnDocument: "after" }
   );
-
+  
   if (!updatedUserData) {
     throw "Failed to update the cart";
   }
-
+  
   return updatedUserData.cart;
 };
 
