@@ -108,6 +108,20 @@ export const updateOrder = async (
     return existingOrder;
 };
 
+export const getAllIncompleteOrderByUserId = async (userId) => {
+    userId = validateId(userId, 'userId');
+    const orderCollection = await orders();
+    const allOrderByUserId = await orderCollection.find({ userId: ObjectId.createFromHexString(userId), status: { $ne: "completed" } }).toArray();
+    return allOrderByUserId;
+};
+
+export const getAllIncompleteOrderByCookId = async (cookId) => {
+    cookId = validateId(cookId, 'cookId');
+    const orderCollection = await orders();
+    const allOrderByCookId = await orderCollection.find({ cookId: ObjectId.createFromHexString(cookId), status: { $ne: "completed" } }).toArray();
+    return allOrderByCookId;
+}
+
 //Is this requried??
 // export const deleteOrder = async (
 //     id

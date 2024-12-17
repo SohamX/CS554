@@ -11,7 +11,7 @@ const validateCuisineType = (cuisineName) => {
 
 const validateOrderStatus = (status) => {
     if (orderStatus.get(status) === undefined)
-        throw new Error('Invalid cuisine type passed.');
+        throw new Error('Invalid status type passed.');
     return status;
 }
 

@@ -74,8 +74,8 @@ router
             return;
         }
     })
-    .put(async (req, res) => {
-    })
+    // .put(async (req, res) => {
+    // })
     .patch(async (req, res) => {
         try {
             req.params.id = validateId(req.params.id, 'id URL Param');
@@ -138,6 +138,42 @@ router
         }
         try {
             const orders = await orderData.getAllOrderByUserId(req.params.userId);
+            res.status(200).json({ status: "success", orders: orders });
+        } catch (e) {
+            res.status(404).json(errorMsg(e));
+            return;
+        }
+    })
+
+router
+    .route('/user/incomplete/:userId')
+    .get(async (req, res) => {
+        try {
+            req.params.cookId = validateId(req.params.userId, 'userId URL Param');
+        } catch (e) {
+            res.status(400).json(errorMsg(e));
+            return;
+        }
+        try {
+            const orders = await orderData.getAllIncompleteOrderByUserId(req.params.userId);
+            res.status(200).json({ status: "success", orders: orders });
+        } catch (e) {
+            res.status(404).json(errorMsg(e));
+            return;
+        }
+    })
+
+router
+    .route('/cook/incomplete/:cookId')
+    .get(async (req, res) => {
+        try {
+            req.params.cookId = validateId(req.params.cookId, 'cookId URL Param');
+        } catch (e) {
+            res.status(400).json(errorMsg(e));
+            return;
+        }
+        try {
+            const orders = await orderData.getAllIncompleteOrderByCookId(req.params.cookId);
             res.status(200).json({ status: "success", orders: orders });
         } catch (e) {
             res.status(404).json(errorMsg(e));
