@@ -6,6 +6,7 @@ import AddCard from './AddCard.jsx';
 import { taxPercent } from '../../helpers/constants.js';
 import { AuthContext } from '../../contexts/AccountContext.jsx';
 import { CartContext } from '../../contexts/CartContext.jsx';
+import { SocketContext } from '../../contexts/SocketContext.jsx';
 
 
 function CheckoutDetails() {
@@ -13,6 +14,7 @@ function CheckoutDetails() {
     const { apiCall } = useApi();
     const navigate = useNavigate();
     const { currentUser } = useContext(AuthContext);
+    const { newOrderPlaced } = useContext(SocketContext);
     const { cartItems, cook, total, setCartItems, setCook, setTotal } = useContext(CartContext);
     const [mealReqCart, setMealReqCart] = useState(location.state?.cartItems || {});
     const [userId, setUserId] = useState(location.state?.studentId || '');
@@ -124,6 +126,7 @@ function CheckoutDetails() {
                 setCartItems([]);
                 setCook({ cookId: '', cookName: '' });
                 setTotal(0);
+                newOrderPlaced(response.orderDetails);
                 //console.log('orderDetails: ' + JSON.stringify(response));
                 navigate('/student/orderConfirmation', { state: { orderDetails: response.orderDetails, isMealReq } });
             }

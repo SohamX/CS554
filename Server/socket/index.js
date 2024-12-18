@@ -13,6 +13,26 @@ const setUpSocket = (server) => {
 
     io.on('connection', (socket) => {
         console.log('a user connected', socket.id);
+        //-------------------------------------------------------------------------------------
+        // cooks join a room here to get notified when an order is placed
+        socket.on('join cook', ({ cookId }) => {
+            console.log('joining room', cookId);
+            socket.join(`cook:${cookId}`);
+        });
+        // notification from users to cooks
+        socket.on('new order', ({ order }) =>{
+            console.log('new order', order);
+            io.to(`cook:${order.cookId}`).emit('new order', order);
+        })
+        // cooks leave the room when they are done for the day
+        socket.on('leave cook', ({ cookId }) => {
+            console.log('leaving room', cookId);
+            socket.leave(`cook:${cookId}`);
+        });
+        //-------------------------------------------------------------------------------------
+
+        //-------------------------------------------------------------------------------------
+        // users and cooks join a room so that cook can notify users about the status of their order
         socket.on('join status', async ({ orderId, orderStatus }) => {
             console.log('joining room', orderId);
             socket.join(`status:${orderId}`);
@@ -31,7 +51,7 @@ const setUpSocket = (server) => {
             //     }
             // }
         });
-
+        // notification from cooks to users
         socket.on('order status update', async ({ orderId, status }) => {
             console.log('order status update', orderId, status);
             io.to(`status:${orderId}`).emit('order status update', { orderId, status });
@@ -53,12 +73,13 @@ const setUpSocket = (server) => {
             //     console.log(error);
             // }
         });
-
+        // users and cooks leave the room when the order is completed
         socket.on('leave status', async ({ orderId }) => {
             //await client.del(`status:${orderId}`);
             console.log('leaving room', orderId);
             socket.leave(`status:${orderId}`);
         });
+        //-------------------------------------------------------------------------------------
 
 
         socket.on('disconnect', () => {

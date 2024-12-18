@@ -40,7 +40,7 @@ function OrdersList() {
 
     useEffect(() => {
         getOrdersList();
-    }, [userId, role]);
+    }, [userId, role, inOrders]);
 
     if (!orders) return <Typography>Loading...</Typography>;
 
@@ -85,7 +85,7 @@ function OrdersList() {
         <Box
             sx={{
                 mx: 'auto',
-                width: '100%',
+                width: '-webkit-fill-available',
                 mt: 3,
                 p: 3,
                 display: 'flex',

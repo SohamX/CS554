@@ -12,6 +12,7 @@ export const SocketProvider = ({ children }) => {
     const { apiCall } = useApi();
     const [socket, setSocket] = useState(null);
     const [inOrders, setInOrders] = useState([]);
+    const [chatRooms, setChatRooms] = useState({});
     const joinedStatusRef = useRef(new Set());
     const socketRef = useRef();
 
@@ -32,9 +33,17 @@ export const SocketProvider = ({ children }) => {
 
             socketRef.current.on('order status update', (updatedOrder) => {
                 if (updatedOrder.status === 'completed') {
-                    socketRef.current.emit('leave status', updatedOrder.orderId);
+                    socketRef.current.emit('leave status', { orderId: updatedOrder.orderId});
                     joinedStatusRef.current.delete(updatedOrder.orderId);
                     setInOrders((prevOrders) => prevOrders.filter((order) => order._id !== updatedOrder.orderId));
+                    if(currentUser.role === 'user'){
+                        toast.success(`Your order was completed at ${new Date().toLocaleTimeString()}`);
+                    }
+                    // setChatRooms((prevChatRooms)=> {
+                    //     const newChatRooms = {...prevChatRooms};
+                    //     delete newChatRooms[updatedOrder.orderId];
+                    //     return newChatRooms;
+                    // })
                 } else{
                     let newOrder ={}
                     setInOrders((prevOrders) => prevOrders.map((order) => {
@@ -57,6 +66,14 @@ export const SocketProvider = ({ children }) => {
                     }
                 }
             });
+
+            socketRef.current.on('new order', (order) => {
+                if(currentUser.role === 'cook'){
+                    setInOrders((prevOrders) => [...prevOrders, order]);
+                    socketRef.current.emit('join status', {orderId: order._id, orderStatus: order.status});
+                    toast.success(`New order from ${order.username} at ${new Date().toLocaleTimeString()}`);
+                }
+            });
         }
 
         const joinIncompleteOrders = async () => {
@@ -70,6 +87,9 @@ export const SocketProvider = ({ children }) => {
                     }
                     });
                     setInOrders(response.orders);
+                    if(currentUser.role === 'cook'){
+                        socketRef.current.emit('join cook', {cookId: currentUser._id});
+                    }
                 }
             } catch (error) {
                 console.error('Error fetching incomplete orders:', error);
@@ -92,8 +112,16 @@ export const SocketProvider = ({ children }) => {
         }
     }
 
+    const newOrderPlaced = (order) => {
+        if(currentUser.role === 'user'){
+            setInOrders((prevOrders) => [...prevOrders, order]);
+            socketRef.current.emit('new order', {order: order});
+            socketRef.current.emit('join status', {orderId: order._id, orderStatus: order.status});
+        }
+    }
+
     return (
-        <SocketContext.Provider value={{socket, inOrders, updateOrderStatus}}>
+        <SocketContext.Provider value={{socket, inOrders, updateOrderStatus, newOrderPlaced}}>
             {children}
             <ToastContainer />
         </SocketContext.Provider>
