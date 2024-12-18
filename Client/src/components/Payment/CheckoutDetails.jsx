@@ -57,6 +57,8 @@ function CheckoutDetails() {
 
     const getPaymentMethodsList = async () => {
         try {
+            // const flag = await checkCooksAvailability()
+            // if (!flag) return 
             const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/paymentCard/${userId}`, {
                 method: 'GET',
                 headers: {
@@ -77,8 +79,38 @@ function CheckoutDetails() {
         }
     };
 
+    // const checkCooksAvailability = async () => {
+    //     try {
+    //         const cookDetails = await apiCall(`${import.meta.env.VITE_SERVER_URL}/cooks/${cook.cookId}`,{
+    //             method: 'GET',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //             }
+    //         });
+    //         if (cookDetails.error) {
+    //             console.log(cookDetails.error)
+    //             throw `Error while verifying cook of the dishes`
+    //         }
+    //         if (!cookDetails.cook.availability) {
+    //             // navigate('/student/cart')
+    //             throw `Sorry! Cannot proceed with checkout as the cook is currently unavailable, try after sometime or try dishes by other cooks!`
+    //             // return false 
+    //         }
+    //         return true
+    //     } catch (error) {
+    //         alert(error)
+    //         navigate('/student/cart')
+    //     }
+    // }
+
+    // useEffect(() => {
+    //     checkCooksAvailability()
+    // }, [cookId])
+ 
     useEffect(() => {
-        getPaymentMethodsList();
+        // if (cook.cookId.trim() !== "") {
+            getPaymentMethodsList();
+        // }
     }, [])
 
     const handlePlaceOrder = async () => {
@@ -120,6 +152,13 @@ function CheckoutDetails() {
             });
 
             if (response.error) {
+                if (response.error === "Cook Unavailable") {
+                    alert("Sorry! Cannot proceed with checkout as the cook is currently unavailable, try after sometime or try dishes by other cooks!")
+                    return
+                } else if (response.error === "Dish Unavailable") {
+                    alert("Sorry! Cannot proceed with checkout as some of the dishes are currently unavailable, try placing a new order!")
+                    return
+                }
                 throw new Error(response.error || 'Failed to place the order.');
             } else {
                 alert('Order placed successfully!');

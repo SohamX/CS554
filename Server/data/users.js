@@ -491,6 +491,9 @@ export const addItemToCart = async (
   if (user.cart.cookId !== "" && user.cart.cookId !== dish.cookId) {
     throw "You can't add items from different cooks";
   }
+
+  if (!cook.availability) throw `Could not add to cart as the cook is currently unavailable`
+
   let dist = helpers.getDistanceFromLatLonInKm(user.location.coordinates.latitude, user.location.coordinates.longitude, cook.location.coordinates.latitude, cook.location.coordinates.longitude)
   if (dist > 10) {
     throw "sorry, cook is very far away from your location";
