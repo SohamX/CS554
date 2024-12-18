@@ -858,6 +858,7 @@ export const updateCardDetails = async (userId, cardId, cardHolderName, expirati
     const hashcvv = encrypt(cvv);
     existCard.cvv = hashcvv;
   }
+  console.log("Inside db func");
   if (cvv || expirationDate) {
     let cvvVal = cvv ? cvv : decrypt(existCard.cvv);
     let cardNumberVal = decrypt(existCard.cardNumber);
@@ -896,13 +897,13 @@ export const updateCardDetails = async (userId, cardId, cardHolderName, expirati
   if (zipcode) updateFields['paymentCards.$.zipcode'] = existCard.zipcode;
   if (country) updateFields['paymentCards.$.country'] = existCard.country;
   //if (isDefault !== undefined) updateFields['paymentCards.$.isDefault'] = existCard.isDefault;
-
+  console.log("Inside db func before mongod upd");
   const updateResult = await userCollection.findOneAndUpdate(
     { _id: new ObjectId(userId), 'paymentCards._id': new ObjectId(cardId) },
     { $set: updateFields },
     { returnDocument: 'after' }
   );
-
+  console.log("Inside db func after mongod upd");
   if (!updateResult) {
     throw ("Payment card details not updated");
   }

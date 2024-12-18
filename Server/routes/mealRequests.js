@@ -3,6 +3,7 @@ const router = Router();
 import {mealReqData} from '../data/index.js';
 //import  { checkId, checkString, checkStringArray, checkEmail, checkRating, isValidDate, isTimeSlotValid } from '../helper.js';
 import helpers from '../helpers/pranHelpers.js'
+import xss from 'xss';
 // router.route('/new').get(async (req, res) => {
 // 
 // });
@@ -15,6 +16,11 @@ router.route('/').post(async (req, res) => {
   cuisineType,
   budget ,
   requiredBy} = mealReqFormData;
+  noOfPeople = xss(noOfPeople);
+  description = xss(description);
+  cuisineType = xss(cuisineType);
+  budget = xss(budget);
+  requiredBy = xss(requiredBy);
   
   try {
     description = helpers.checkString(description, 'description');

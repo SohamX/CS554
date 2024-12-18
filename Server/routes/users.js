@@ -4,6 +4,7 @@ import helpers from '../helpers/pranHelpers.js'
 import { checkisValidString } from '../helpers/validationHelper.js';
 import { errorMsg, validateCardNumber, validateCvv, validateZipCode } from '../helpers/validationHelper.js';
 import { loginDetails } from "./middlewares.js";
+import xss from 'xss';
 const router = Router();
 
 import redis from 'redis'
@@ -27,7 +28,19 @@ router
       country,
       latitude,
       longitude } = req.body;
-
+      firstName = xss(firstName)
+      lastName = xss(lastName)
+      username = xss(username)
+      gmail = xss(gmail)
+      mobileNumber = xss(mobileNumber)
+      address = xss(address)
+      city = xss(city)
+      state = xss(state)
+      zipcode = xss(zipcode)
+      country = xss(country)
+     // bio = xss(bio)
+      // latitude = xss(latitude)
+      // longitude = xss(longitude)
       let latitude_float
       let longitude_float
     try {
@@ -197,6 +210,18 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
         latitude,
         longitude } = req.body
 
+        firstName = xss(firstName)
+        lastName = xss(lastName)
+        username = xss(username)
+        mobileNumber = xss(mobileNumber)
+        address = xss(address)
+        city = xss(city)
+        state = xss(state)
+        zipcode = xss(zipcode)
+        country = xss(country)
+        // latitude = xss(latitude)
+        // longitude = xss(longitude)
+
       try {
         if(!firstName &&
           !lastName &&
@@ -213,6 +238,7 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
         {
           throw "All fields cannot be empty"
         }
+        console.log(latitude)
         if(address||city||state||zipcode||country||latitude||longitude){
           await client.del(`home:dishes:${req.params.id}`);
         }
@@ -256,6 +282,7 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
         }
         if (latitude) {
           updateData.latitude = latitude;
+          console.log(typeof updateData.latitude)
           updateData.latitude = helpers.latitudeAndLongitude(updateData.latitude, 'Latitude');
         }
         if (longitude) {
@@ -459,6 +486,15 @@ router
   })
   .post(async (req, res) => {
     let { type, provider, cardNumber, cardHolderName, expirationDate, cvv, zipcode, country, nickName } = req.body;
+    type = xss(type);
+    provider = xss(provider);
+    cardNumber = xss(cardNumber);
+    cardHolderName = xss(cardHolderName);
+    expirationDate = xss(expirationDate);
+    cvv = xss(cvv);
+    zipcode = xss(zipcode);
+    country = xss(country);
+    nickName = xss(nickName);
     try {
       if (!type || !provider || !cardNumber || !cardHolderName || !expirationDate || !cvv || !zipcode || !country) {
         throw ("All fields need to be supplied")
@@ -509,11 +545,19 @@ router
   .patch(async (req, res) => {
     //const { id, userId } = req.params;
     let { cardHolderName, expirationDate, cvv, zipcode, country, nickName } = req.body;
+    cardHolderName = xss(cardHolderName);
+    expirationDate = xss(expirationDate);
+    cvv = xss(cvv);
+    zipcode = xss(zipcode);
+    country = xss(country);
+    nickName = xss(nickName);
+
     console.log('HERE 1' + JSON.stringify(req.body));
     try {
       req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
       req.params.id = helpers.checkId(req.params.id, 'cardId URL Param');
-      let existCard = userData.getPayementMethodByUserIdCardId(req.params.userId, req.params.id);
+      console.log('HERE 2' + JSON.stringify(req.body));
+      let existCard = userData.getPaymentMethodByUserIdCardId(req.params.userId, req.params.id);
       if (!cardHolderName || !expirationDate || !cvv || !zipcode || !country || !nickName) {
         throw 'At least one field must be updated';
       }
@@ -544,7 +588,9 @@ router
       // if (isDefault !== undefined && typeof isDefault !== 'boolean') {
       //   throw 'isDefault must be a boolean';
       // }
+     console.log('HERE 3' + JSON.stringify(req.body));
       const updatedCard = await userData.updateCardDetails(req.params.userId, req.params.id, cardHolderName, expirationDate, cvv, nickName, zipcode, country);
+      console.log('After DB call' + JSON.stringify(req.body));
       return res.status(200).json({
         status: 'success',
         message: 'Card details updated successfully',
@@ -552,6 +598,7 @@ router
       });
 
     } catch (e) {
+      console.log('Inside Catch block' + JSON.stringify(req.body));
       return res.status(400).json(errorMsg(e));
     }
   })
