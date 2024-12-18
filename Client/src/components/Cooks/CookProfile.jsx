@@ -37,6 +37,22 @@ const CookProfile = () => {
             ...prevInfo,
             [name]: value,
         }));
+        if (name === 'mobileNumber') {
+            const formattedValue = formatMobileNumber(value);
+            setPersonalInfo((prevInfo) => ({
+                ...prevInfo,
+                [name]: formattedValue,
+            }));
+        }
+    };
+
+    const formatMobileNumber = (value) => {
+        const cleaned = ('' + value).replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+        if (match) {
+            return [match[1], match[2], match[3]].filter(Boolean).join('-');
+        }
+        return value;
     };
 
     const handleAddressChange = (e) => {
