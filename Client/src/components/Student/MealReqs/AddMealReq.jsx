@@ -124,7 +124,7 @@ function AddMealReq(props) {
         </div>
         <br />
         <div className={styles.formGroup}>
-          <label>
+          <label style={{ width: '100%' }}>
             Cuisine Type:
             <br />
             <input className={styles.input} id='cuisineType' required autoFocus={true} />

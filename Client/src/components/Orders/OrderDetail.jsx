@@ -5,6 +5,7 @@ import { useApi } from '../../contexts/ApiContext.jsx';
 import { Card, CardContent, Typography, Button, Box, TableContainer, Table, TableHead, TableRow, TableCell, Paper, TableBody, TextField, Rating } from '@mui/material';
 import { AuthContext } from '../../contexts/AccountContext.jsx';
 import { checkDishDesc } from '../../helpers/validationHelper.js';
+import { getCoordinatesFromAddress } from '../../helpers/constants.js';
 
 function OrderDetail(props) {
     const { id } = useParams();
@@ -19,6 +20,8 @@ function OrderDetail(props) {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(false);
     const [errorMsg, setErrorMsg] = useState('');
+    const [coordinates, setCoordinates] = useState({ latitude: 0, longitude: 0 });
+    const [cookAddress, setCookAddress] = useState('');
 
 
     const onReviewTextChange = (e) => {
@@ -45,6 +48,34 @@ function OrderDetail(props) {
             alert(error);
         }
     };
+    
+    const cookCord = async() => {
+        if(order && role){
+            if(order.status !== 'completed'){
+                if(role === 'user'){
+                    try{
+                        const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/cooks/coordinates/${order.cookId}`);
+                        if(response.error){
+                            throw response;
+                        }
+                        const location = response.location;
+                        const fullAddress = location.address + ', ' + location.city + ', ' + location.state + ', ' + location.zip + ', ' + location.country;
+                        if(response.location.coordinates.latitude ==="" && response.location.coordinates.longitude === ""){
+                            const coordinates = await getCoordinatesFromAddress(fullAddress);
+                            if(coordinates){
+                                setCoordinates(coordinates);
+                            }
+                        }else{
+                            setCoordinates(response.location.coordinates);
+                        }
+                        setCookAddress(fullAddress);
+                    } catch (error) {
+                        alert(error);
+                    }
+                }
+            }
+        }
+    }
 
     const handleSubmitReview = async (e) => {
         try {
@@ -96,13 +127,15 @@ function OrderDetail(props) {
     useEffect(() => {
         setUserId(currentUser._id);
         setRole(currentUser.role);
-    }, [currentUser,]);
+    }, [currentUser]);
 
     useEffect(() => {
         getOrder();
     }, [id]);
 
-
+    useEffect(()=>{
+        cookCord();
+    },[order])
 
     if (!order) {
         return (
@@ -141,7 +174,7 @@ function OrderDetail(props) {
             <div>
                 <h2>Order</h2>
                 <Box display="flex" flexDirection="column" alignItems="center" mt={5}>
-                    <Card sx={{ width: '100%', maxWidth: 600, mb: 3 }}>
+                    <Card sx={{ width: '100%', maxWidth: 600, mb: 5, padding: 4 }}>
                         <Typography variant="h4" gutterBottom>
                             {role === 'cook' ? 'User:' : 'Cook:'} <strong>{role === 'cook' ? username : cookName}</strong>
                         </Typography>
@@ -179,6 +212,30 @@ function OrderDetail(props) {
                                 </TableBody>
                             </Table>
                         </TableContainer>
+
+                        {role === 'user' && status !== 'completed' && cookAddress && (
+                            <Card sx={{ m: 3, width: '90%' }}>
+                                <CardContent>
+                                    <Typography variant="h6">
+                                        Cook's Address:
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {coordinates.latitude !== 0 && coordinates.longitude !== 0 && (
+                                            <iframe
+                                            width="80%"
+                                            height="200"
+                                            style={{ border: 0, borderRadius: '8px' }}
+                                            src={`https://www.google.com/maps/embed/v1/place?key=${import.meta.env.VITE_GMAP_API_KEY}&q=${coordinates.latitude},${coordinates.longitude}`}
+                                            allowFullScreen
+                                            ></iframe>
+                                        )}
+                                    </Typography>
+                                    <Typography variant="body1">
+                                        {cookAddress}
+                                    </Typography>            
+                                </CardContent>
+                            </Card>
+                        )}
 
                         <Typography variant="h5" gutterBottom>
                             Payment Details

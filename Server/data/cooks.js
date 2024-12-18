@@ -436,3 +436,12 @@ export const cooksForYou = async (lat, long) => {
     return e
   }
 }
+
+export const getCookCoordinates = async (cookId) => {
+  cookId = helpers.checkId(cookId, "cookId");
+  const coordinates = await cookCollection.findOne({ _id: new ObjectId(cookId) }, { projection: { "location": 1 } });
+  if (!coordinates) {
+    throw `No cook found with ID: ${cookId}`;
+  }
+  return coordinates;
+}

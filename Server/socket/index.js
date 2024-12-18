@@ -92,7 +92,7 @@ const setUpSocket = (server) => {
             console.log('message: ', msg);
             const { orderId } = msg;
             const chat = await client.rPush(`chat:${orderId}`, JSON.stringify(msg));
-            if(chat > 10){
+            if(chat > 50){
                 await client.lPop(`chat:${orderId}`);
             }
             await client.expire(`chat:${orderId}`, 3600);

@@ -3,9 +3,12 @@ import AddCard from './AddCard.jsx';
 import EditCard from './EditCard.jsx';
 import DeleteCard from './DeleteCard.jsx';
 import { Link } from 'react-router-dom';
-import { Button, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, FormControlLabel, Switch } from '@mui/material';
+import { Button, Card, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Box, FormControlLabel, Switch, Grid2, CardContent } from '@mui/material';
 import { useApi } from '../../contexts/ApiContext.jsx';
 import { AuthContext } from '../../contexts/AccountContext.jsx';
+import VisaLogo from '../../assets/Visa.png';
+import MasterCardLogo from '../../assets/MasterCard.svg';
+import AmericanExpressLogo from '../../assets/American_Express.png';
 
 
 function CardsList() {
@@ -107,37 +110,85 @@ function CardsList() {
         setShowDeleteModal(false);
     };
 
+    const getCardLogo = (provider) => {
+        switch (provider.toLowerCase()) {
+            case 'visa':
+                return VisaLogo;
+            case 'mastercard':
+                return MasterCardLogo;
+            case 'american express':
+                return AmericanExpressLogo;
+            default:
+                return '';
+        }
+    }
+
     if (Cards) {
 
         return (
             <div>
-                <h2>Cards</h2>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    sx={{ mt: 1, mr: 1, width: '150px' }}
-                    onClick={() => setShowAddForm(!showAddForm)}
-                >
-                    Add Card
-                </Button>
+                <h2>Your Card:</h2>
+                {Cards.length === 0 && (
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        sx={{ mt: 1, mr: 1, width: '150px' }}
+                        onClick={() => setShowAddForm(!showAddForm)}
+                    >
+                        Add Card
+                    </Button>
+                )}
                 {showAddForm && (
                     <AddCard userId={userId} paymentMethods={Cards} refreshPaymentMethods={getPaymentMethodsList} closeAddFormState={closeAddFormState} />
                 )}
-                <br />
-                <br />
                 <Box
                     sx={{
                         mx: 'auto',
-                        width: '80%',
+                        width: '50%',
                         mt: 3,
                         p: 3,
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        textAlign: 'center'
                     }}
                 >
-                    <TableContainer component={Card}
+                    <Grid2 container spacing={3}>
+                        {Cards.map((card) => (
+                            <Grid2 item xs={12} md={6} lg={4} key={card._id}>
+                                <Card sx={{ boxShadow: 3, p: 2, borderRadius: 2 }}>
+                                    <CardContent sx={{
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        alignItems: 'flex-start',
+                                        textAlign: 'center',
+                                        flexDirection: 'column',
+                                    }}>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+                                            <img src={getCardLogo(card.provider)} alt={card.provider} style={{ width: 50, marginRight: 10 }} />
+                                            <Typography variant='h6' component='h3'>
+                                                (**** **** **** {card.last4Digits})
+                                            </Typography>
+                                        </Box>
+                                        <Typography>{card.type.toUpperCase()}</Typography>
+                                        <Typography>Card Provider: {card.provider}</Typography>
+                                        <Typography>Card Holder Name: {card.cardHolderName}</Typography>
+                                        <Typography>Nickname: {card.nickName}</Typography>
+                                        <Typography>Expiration: {card.expirationDate}</Typography>
+                                        <Typography>Billing Zipcode: {card.zipcode}</Typography>
+                                        <Typography>Country: {card.country}</Typography>
+                                        <Box sx={{ mt: 2 }}>
+                                            <Button
+                                                variant="contained"
+                                                color="error"
+                                                sx={{ mt: 1, width: '100px' }}
+                                                onClick={() => handleOpenDeleteModal(card)}
+                                            >
+                                                Delete
+                                            </Button>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            </Grid2>
+                        ))}
+                    </Grid2>
+                    {/* <TableContainer component={Card}
                         sx={{
                             boxShadow: 3,
                             p: 2,
@@ -148,7 +199,7 @@ function CardsList() {
                             <TableHead>
                                 <TableRow>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Card Details</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Actions</TableCell>
+                                    <TableCell sx={{ fontWeight: 'bold' }}>Remove Card</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -169,15 +220,15 @@ function CardsList() {
 
                                         </TableCell>
                                         <TableCell>
-                                            <Button
+                                            {/* <Button
                                                 variant="contained"
                                                 color="secondary"
                                                 sx={{ mt: 1, width: '100px', mr: 2 }}
                                                 onClick={() => handleOpenEditModal(card)}
                                             >
                                                 Edit
-                                            </Button>
-                                            <Button
+                                            </Button> */}
+                                            {/*<Button
                                                 variant="contained"
                                                 color="error"
                                                 sx={{ mt: 1, width: '100px' }}
@@ -190,9 +241,9 @@ function CardsList() {
                                 ))}
                             </TableBody>
                         </Table>
-                    </TableContainer>
+                    </TableContainer> */}
                 </Box>
-                {showEditModal && (
+                {/* {showEditModal && (
                     <EditCard
                         isOpen={showEditModal}
                         userId={userId}
@@ -201,7 +252,7 @@ function CardsList() {
                         refreshCards={getPaymentMethodsList}
                         attr={attr}
                     />
-                )}
+                )} */}
 
                 {showDeleteModal && (
                     <DeleteCard
@@ -214,6 +265,31 @@ function CardsList() {
                         attr={attr}
                     />
                 )}
+                <Box
+                    sx={{
+                        mx: 'auto',
+                        width: '65%',
+                        mt: 3,
+                        p: 2,
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        textAlign: 'center',
+                        boxShadow: 2,
+                        borderRadius: 2,
+                        backgroundColor: '#f9f9f9',
+                    }}
+                >
+                    {Cards.length !== 0 ? (
+                        <Typography>
+                            Note: You can only have one card at a time. If you add a new card or edit the old card, please delete the old card.
+                        </Typography>
+                    ) : (
+                        <Typography>
+                            Note: You can only have one card at a time. Please add a card to make payments.
+                        </Typography>
+                    )}
+                </Box>
             </div>
         );
     }

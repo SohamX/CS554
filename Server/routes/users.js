@@ -513,7 +513,7 @@ router
     try {
       req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
       req.params.id = helpers.checkId(req.params.id, 'cardId URL Param');
-      let existCard = userData.getPayementMethodByUserIdCardId(req.params.userId, req.params.id);
+      let existCard = userData.getPaymentMethodByUserIdCardId(req.params.userId, req.params.id);
       if (!cardHolderName || !expirationDate || !cvv || !zipcode || !country || !nickName) {
         throw 'At least one field must be updated';
       }

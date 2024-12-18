@@ -144,7 +144,6 @@ const CookDetails = () => {
                             <iframe
                                 width="80%"
                                 height="200"
-                                frameBorder="0"
                                 style={{ border: 0, borderRadius: '8px' }}
                                 src={`https://www.google.com/maps?q=${cook.location.coordinates.latitude},${cook.location.coordinates.longitude}&hl=es;z=14&output=embed`}
                                 allowFullScreen
