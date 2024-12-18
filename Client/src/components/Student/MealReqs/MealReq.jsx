@@ -196,7 +196,7 @@ function MealReq() {
               <div style={styles.card} key={mealReq.cookId}>
                 <div style={styles.cardBody}>
                   <h3 style={styles.cardTitle}>
-                    <Link to={``}>
+                    <Link to={`/student/cook/${mealReq.cookId}`}>
                       {mealReq.cookName}
                     </Link> is interested
                   </h3>

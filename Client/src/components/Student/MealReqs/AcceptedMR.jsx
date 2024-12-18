@@ -78,7 +78,7 @@ function AcceptedMR() {
               </p>
               
               <p className={styles.cardText}> 
-                <span className={styles.cardSubtitle}>You selected :</span> {mealReq.AcceptedcookName}
+                <span className={styles.cardSubtitle}>You selected :</span> <Link to={`/student/cook/${mealReq.AcceptedcookId}`}>{mealReq.AcceptedcookName}</Link>
               </p>
               <br />
             </div>

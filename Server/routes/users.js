@@ -38,7 +38,7 @@ router
       state = xss(state)
       zipcode = xss(zipcode)
       country = xss(country)
-      bio = xss(bio)
+     // bio = xss(bio)
       // latitude = xss(latitude)
       // longitude = xss(longitude)
       let latitude_float
@@ -556,7 +556,8 @@ router
     try {
       req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
       req.params.id = helpers.checkId(req.params.id, 'cardId URL Param');
-      let existCard = userData.getPayementMethodByUserIdCardId(req.params.userId, req.params.id);
+      console.log('HERE 2' + JSON.stringify(req.body));
+      let existCard = userData.getPaymentMethodByUserIdCardId(req.params.userId, req.params.id);
       if (!cardHolderName || !expirationDate || !cvv || !zipcode || !country || !nickName) {
         throw 'At least one field must be updated';
       }
@@ -587,7 +588,9 @@ router
       // if (isDefault !== undefined && typeof isDefault !== 'boolean') {
       //   throw 'isDefault must be a boolean';
       // }
+     console.log('HERE 3' + JSON.stringify(req.body));
       const updatedCard = await userData.updateCardDetails(req.params.userId, req.params.id, cardHolderName, expirationDate, cvv, nickName, zipcode, country);
+      console.log('After DB call' + JSON.stringify(req.body));
       return res.status(200).json({
         status: 'success',
         message: 'Card details updated successfully',
@@ -595,6 +598,7 @@ router
       });
 
     } catch (e) {
+      console.log('Inside Catch block' + JSON.stringify(req.body));
       return res.status(400).json(errorMsg(e));
     }
   })

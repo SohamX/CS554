@@ -77,7 +77,7 @@ function AcceptedMRCook() {
                 <span className={styles.cardSubtitle}>No of People:</span> {mealReq.noOfPeople}
               </p>
                 <p className={styles.cardText}>
-                    <span className={styles.cardSubtitle}>Created By:</span> {mealReq.username}
+                    <span className={styles.cardSubtitle}>Created By:</span> <Link to={`/cook/student/${mealReq.userId}`}>{mealReq.username}</Link>
                 </p>
                 <p className={styles.cardText}>
                     <span className={styles.cardSubtitle} style={{ color: 'blue' }}>

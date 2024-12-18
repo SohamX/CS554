@@ -82,7 +82,7 @@ function PendingMR() {
                
               </h3>
               <p className={styles.cardText}>
-                <span className={styles.cardSubtitle}>Created By :</span> {mealReq.username}
+                <span className={styles.cardSubtitle}>Created By :</span> <Link to={`/cook/student/${mealReq.userId}`}>{mealReq.username}</Link>
               </p>
               <p className={styles.cardText}>
                 <span className={styles.cardSubtitle}>Cuisine Type:</span> {mealReq.cuisineType}
