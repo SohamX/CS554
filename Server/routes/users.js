@@ -39,8 +39,8 @@ router
       zipcode = xss(zipcode)
       country = xss(country)
       bio = xss(bio)
-      latitude = xss(latitude)
-      longitude = xss(longitude)
+      // latitude = xss(latitude)
+      // longitude = xss(longitude)
       let latitude_float
       let longitude_float
     try {
@@ -219,8 +219,8 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
         state = xss(state)
         zipcode = xss(zipcode)
         country = xss(country)
-        latitude = xss(latitude)
-        longitude = xss(longitude)
+        // latitude = xss(latitude)
+        // longitude = xss(longitude)
 
       try {
         if(!firstName &&
@@ -238,6 +238,7 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
         {
           throw "All fields cannot be empty"
         }
+        console.log(latitude)
         if(address||city||state||zipcode||country||latitude||longitude){
           await client.del(`home:dishes:${req.params.id}`);
         }
@@ -281,6 +282,7 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
         }
         if (latitude) {
           updateData.latitude = latitude;
+          console.log(typeof updateData.latitude)
           updateData.latitude = helpers.latitudeAndLongitude(updateData.latitude, 'Latitude');
         }
         if (longitude) {
@@ -549,7 +551,7 @@ router
     zipcode = xss(zipcode);
     country = xss(country);
     nickName = xss(nickName);
-    
+
     console.log('HERE 1' + JSON.stringify(req.body));
     try {
       req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');

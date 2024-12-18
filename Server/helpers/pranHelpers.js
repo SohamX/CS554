@@ -131,6 +131,7 @@ const exportedMethods = {
   latitudeAndLongitude(num, varName) {
     if (num === undefined || num === null)
         throw `Error: ${varName || 'Provided parameter'} is null or undefined`;
+      
     if (typeof num != 'number')
         throw `Error: ${varName || 'Provided parameter'} is not a number`;
     if (Number.isNaN(num))

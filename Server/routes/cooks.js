@@ -38,8 +38,8 @@ router.route("/register").post(async (req, res) => {
   zipcode = xss(zipcode)
   country = xss(country)
   bio = xss(bio)
-  latitude = xss(latitude)
-  longitude = xss(longitude)
+  // latitude = xss(latitude)
+  // longitude = xss(longitude)
 
   let latitude_float
   let longitude_float
@@ -215,9 +215,9 @@ router.route("/:id")
   zipcode = xss(zipcode)
   country = xss(country)
   bio = xss(bio)
-  latitude = xss(latitude)
-  longitude = xss(longitude)
-  
+  // latitude = xss(latitude)
+  // longitude = xss(longitude)
+
   let userId = req.params.id
 
   try {
