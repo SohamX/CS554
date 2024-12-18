@@ -119,7 +119,7 @@ const Cook = () => {
                                 </Typography>
                             </Grid>
                             {pendingMR.map((mealReq) => (
-                                <Grid item xs={6} key={mealReq._id} width='90%' justifyContent="center" margin={2} flex={1} p={2}>
+                                <Grid item xs={6} key={mealReq._id} width='90%' justifyContent="center" margin={2} flex={12} p={2}>
                                     <Card>
                                         <CardContent>
                                             <Typography variant="subtitle1" color="textSecondary">
