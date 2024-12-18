@@ -25,6 +25,7 @@ export const SocketProvider = ({ children }) => {
 
             socketRef.current.on('connect', () => {
                 console.log('Connected to socket server');
+                joinIncompleteOrders();
             });
 
             socketRef.current.on('disconnect', () => {
@@ -39,11 +40,11 @@ export const SocketProvider = ({ children }) => {
                     if(currentUser.role === 'user'){
                         toast.success(`Your order was completed at ${new Date().toLocaleTimeString()}`);
                     }
-                    // setChatRooms((prevChatRooms)=> {
-                    //     const newChatRooms = {...prevChatRooms};
-                    //     delete newChatRooms[updatedOrder.orderId];
-                    //     return newChatRooms;
-                    // })
+                    setChatRooms((prevChatRooms)=> {
+                        const newChatRooms = {...prevChatRooms};
+                        delete newChatRooms[updatedOrder.orderId];
+                        return newChatRooms;
+                    })
                 } else{
                     let newOrder ={}
                     setInOrders((prevOrders) => prevOrders.map((order) => {
@@ -71,8 +72,36 @@ export const SocketProvider = ({ children }) => {
                 if(currentUser.role === 'cook'){
                     setInOrders((prevOrders) => [...prevOrders, order]);
                     socketRef.current.emit('join status', {orderId: order._id, orderStatus: order.status});
+                    joinedStatusRef.current.add(order._id);
+                    setChatRooms((prevChatRooms) => {
+                        const newChatRooms = {...prevChatRooms};
+                        newChatRooms[order._id] = [];
+                        return newChatRooms;
+                    })
                     toast.success(`New order from ${order.username} at ${new Date().toLocaleTimeString()}`);
                 }
+            });
+
+            socketRef.current.on('chat message', (msg) => {
+                console.log('message: ', msg);
+                setChatRooms((prevChatRooms) => {
+                    const newChatRooms = {...prevChatRooms};
+                    if(newChatRooms[msg.orderId]){
+                        newChatRooms[msg.orderId].push(msg);
+                    } else{
+                        newChatRooms[msg.orderId] = [msg];
+                    }
+                    return newChatRooms;
+                });
+            });
+
+            socketRef.current.on('chat history', (chat) => {
+                console.log('chat history', chat);
+                setChatRooms((prevChatRooms) => {
+                    const newChatRooms = {...prevChatRooms};
+                    newChatRooms[chat[0].orderId] = chat;
+                    return newChatRooms;
+                });
             });
         }
 
@@ -81,10 +110,15 @@ export const SocketProvider = ({ children }) => {
                 const response = await apiCall(`http://localhost:3000/orders/${currentUser.role ==='user'? 'user':'cook'}/incomplete/${currentUser._id}`);
                 if (response.status === 'success') {
                     response.orders.forEach(order => {
-                    if (!joinedStatusRef.current.has(order._id)) {
-                        socketRef.current.emit('join status', {orderId: order._id, orderStatus: order.status});
-                        joinedStatusRef.current.add(order._id);
-                    }
+                        if (!joinedStatusRef.current.has(order._id)) {
+                            socketRef.current.emit('join status', {orderId: order._id, orderStatus: order.status});
+                            joinedStatusRef.current.add(order._id);
+                            setChatRooms((prevChatRooms) => {
+                                const newChatRooms = {...prevChatRooms};
+                                newChatRooms[order._id] = [];
+                                return newChatRooms;
+                            })
+                        }
                     });
                     setInOrders(response.orders);
                     if(currentUser.role === 'cook'){
@@ -96,10 +130,12 @@ export const SocketProvider = ({ children }) => {
             }
         };
 
-        joinIncompleteOrders();
-
         return () => {
             if (socketRef.current) {
+                socketRef.current.off('join status');
+                socketRef.current.off('order status update');
+                socketRef.current.off('new order');
+                socketRef.current.off('chat message');
                 socketRef.current.disconnect();
                 socketRef.current = null;
             }
@@ -117,11 +153,34 @@ export const SocketProvider = ({ children }) => {
             setInOrders((prevOrders) => [...prevOrders, order]);
             socketRef.current.emit('new order', {order: order});
             socketRef.current.emit('join status', {orderId: order._id, orderStatus: order.status});
+            joinedStatusRef.current.add(order._id);
+            setChatRooms((prevChatRooms) => {
+                const newChatRooms = {...prevChatRooms};
+                newChatRooms[order._id] = [];
+                return newChatRooms;
+            })
+        }
+    }
+
+    const sendMessage = (orderId, message) => {
+        if (socketRef.current && message.trim()) {
+            const msg = {
+                user: currentUser.username,
+                text: message,
+                timestamp: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                orderId: orderId
+            };
+            socketRef.current.emit('chat message', {msg: msg});
+            setChatRooms((prevChatRooms) => {
+                const newChatRooms = {...prevChatRooms};
+                newChatRooms[orderId].push(msg);
+                return newChatRooms;
+            });
         }
     }
 
     return (
-        <SocketContext.Provider value={{socket, inOrders, updateOrderStatus, newOrderPlaced}}>
+        <SocketContext.Provider value={{socket, inOrders, toast, updateOrderStatus, newOrderPlaced, chatRooms, sendMessage}}>
             {children}
             <ToastContainer />
         </SocketContext.Provider>

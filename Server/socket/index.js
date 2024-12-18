@@ -36,6 +36,14 @@ const setUpSocket = (server) => {
         socket.on('join status', async ({ orderId, orderStatus }) => {
             console.log('joining room', orderId);
             socket.join(`status:${orderId}`);
+            const chat = await client.lRange(`chat:${orderId}`, 0, -1);
+            if(chat.length > 0){
+                let chatMessages = [];
+                chat.forEach((msg) => {
+                    chatMessages.push(JSON.parse(msg));
+                });
+                socket.emit('chat history', chatMessages);
+            }
             // const status = await client.get(`status:${orderId}`);
             // const statusObj = JSON.parse(status);
             // console.log('status from redis', statusObj);
@@ -80,7 +88,16 @@ const setUpSocket = (server) => {
             socket.leave(`status:${orderId}`);
         });
         //-------------------------------------------------------------------------------------
-
+        socket.on('chat message', async ({msg}) => {
+            console.log('message: ', msg);
+            const { orderId } = msg;
+            const chat = await client.rPush(`chat:${orderId}`, JSON.stringify(msg));
+            if(chat > 10){
+                await client.lPop(`chat:${orderId}`);
+            }
+            await client.expire(`chat:${orderId}`, 3600);
+            socket.broadcast.to(`status:${orderId}`).emit('chat message', msg);
+        });
 
         socket.on('disconnect', () => {
             console.log('user disconnected');

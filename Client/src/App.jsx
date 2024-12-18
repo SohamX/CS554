@@ -37,7 +37,7 @@ import OrderDetail from './components/Orders/OrderDetail.jsx';
 import CookDetails from './components/Cooks/CookDetails.jsx';
 import StudentDetails from './components/Student/StudentDetails.jsx';
 import History from './components/Dishes/History.jsx';
-import ChatRoom from './components/Chat/ChatRoom.jsx';
+import FloatingChatWidget from './components/Chat/ChatRoom.jsx';
 import CooksForYou from './components/Student/CooksForYou.jsx';
 
 
@@ -208,6 +208,7 @@ function App() {
                 </Routes>
                 </div>
               </div>
+              <FloatingChatWidget />
             </SocketProvider>
           </CartProvider>
         </AuthProviderWithRouter>

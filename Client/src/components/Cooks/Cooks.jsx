@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useApi } from "../../contexts/ApiContext";
 import { AuthContext } from "../../contexts/AccountContext";
 import { SocketContext } from "../../contexts/SocketContext";
-import { Typography, Box, Card, CardContent, Grid } from "@mui/material";
+import { Typography, Box, Card, CardContent, Grid2 } from "@mui/material";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import axios from "axios";
 const Cook = () => {
@@ -58,13 +58,13 @@ const Cook = () => {
                     {
                         !loading && inOrders && inOrders.length > 0 &&
                         <>
-                            <Grid width='90%' flex={1} p={2} marginTop={2}>
+                            <Grid2 width='90%' flex={1} p={2} marginTop={2}>
                                 <Typography variant="h5" component="div">
                                     Upcoming orders
                                 </Typography>
-                            </Grid>
+                            </Grid2>
                             {inOrders.map((order) => (
-                                <Grid item xs={6} key={order._id} width='90%' justifyContent="center" margin={2} flex={12} p={2}>
+                                <Grid2 xs={6} key={order._id} width='90%' justifyContent="center" margin={2} flex={12} p={2}>
                                     <Card>
                                         <CardContent>
                                             <Typography variant="subtitle1" color="textSecondary">
@@ -76,26 +76,26 @@ const Cook = () => {
                                                 Placed On: <strong>{new Date(order.createdAt).toLocaleString()}</strong>
                                             </Typography>
                                             {
-                                                order.dishes.dishes.map((dish) => (
-                                                    <Typography>
+                                                order.dishes.dishes.map((dish, index) => (
+                                                    <Typography key={index}>
                                                         {dish.dishName} : {dish.quantity}
                                                     </Typography>
                                                 ))
                                             }
                                         </CardContent>
                                     </Card>
-                                </Grid>
+                                </Grid2>
                             )
                             )}
                         </>
                     } {
                         !loading && (!inOrders || inOrders.length === 0) &&
-                        <Grid width='90%' flex={1} p={2} marginTop={2}>
-                            <Grid width='90%'>
+                        <Grid2 width='90%' flex={1} p={2} marginTop={2}>
+                            <Grid2 width='90%'>
                                 <Typography variant="h5" component="div">
                                     Upcoming orders
                                 </Typography>
-                            </Grid>
+                            </Grid2>
                             <CheckCircleIcon
                                 color="success"
                                 sx={{ fontSize: 50, mb: 1, marginTop: 10 }}
@@ -103,7 +103,7 @@ const Cook = () => {
                             <Typography variant="h5" component="div">
                                 You are all caught up with the orders!
                             </Typography>
-                        </Grid>
+                        </Grid2>
                     }
                 </Box>
                 <Box display="flex" flexDirection="column" sx={{
@@ -113,13 +113,13 @@ const Cook = () => {
                 }}>
                     {!loading && pendingMR && pendingMR.length > 0 &&
                         <>
-                            <Grid width='90%' flex={1} p={2} marginTop={2}>
+                            <Grid2 width='90%' flex={1} p={2} marginTop={2}>
                                 <Typography variant="h5" component="div">
                                     Meal Requests
                                 </Typography>
-                            </Grid>
+                            </Grid2>
                             {pendingMR.map((mealReq) => (
-                                <Grid item xs={6} key={mealReq._id} width='90%' justifyContent="center" margin={2} flex={1} p={2}>
+                                <Grid2 xs={6} key={mealReq._id} width='90%' justifyContent="center" margin={2} flex={1} p={2}>
                                     <Card>
                                         <CardContent>
                                             <Typography variant="subtitle1" color="textSecondary">
@@ -142,18 +142,18 @@ const Cook = () => {
                                             </Typography>
                                         </CardContent>
                                     </Card>
-                                </Grid>
+                                </Grid2>
                             ))
                             }
                         </>
                     } {
                         !loading && (!pendingMR || pendingMR.length === 0) &&
-                        <Grid width='90%' flex={1} p={2} marginTop={2}>
-                            <Grid width='90%'>
+                        <Grid2 width='90%' flex={1} p={2} marginTop={2}>
+                            <Grid2 width='90%'>
                                 <Typography variant="h5" component="div">
                                     Meal Requests
                                 </Typography>
-                            </Grid>
+                            </Grid2>
                             <CheckCircleIcon
                                 color="success"
                                 sx={{ fontSize: 50, mb: 1, marginTop: 10 }}
@@ -161,7 +161,7 @@ const Cook = () => {
                             <Typography variant="h5" component="div">
                                 No more meal requests to explore!
                             </Typography>
-                        </Grid>
+                        </Grid2>
                     }
                 </Box>
             </Box>
