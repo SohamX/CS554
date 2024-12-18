@@ -29,8 +29,8 @@ export const createMealreq = async (
       cuisineType = helpers.checkString(cuisineType, 'cuisineType');
       cuisineType = helpers.checkSpecialCharsAndNum(cuisineType, 'cuisineType');
       noOfPeople = parseInt(noOfPeople, 10);
-    if (isNaN(noOfPeople) || noOfPeople <= 4 || !Number.isInteger(noOfPeople)) {
-    throw 'noOfPeople should be positive number and  minimum 5';
+    if (isNaN(noOfPeople) || noOfPeople <= 4 ||noOfPeople>30|| !Number.isInteger(noOfPeople)) {
+    throw 'noOfPeople should be positive number and  minimum 5 and maximum 30';
     }
     
     budget = parseInt(budget, 10);

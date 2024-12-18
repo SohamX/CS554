@@ -26,8 +26,8 @@ router.route('/').post(async (req, res) => {
 
   
     noOfPeople = parseInt(noOfPeople, 10);
-    if (isNaN(noOfPeople) || noOfPeople <= 4 || !Number.isInteger(noOfPeople)) {
-    throw 'noOfPeople should be positive number and  minimum 5';
+    if (isNaN(noOfPeople) || noOfPeople <= 4 || noOfPeople>30||!Number.isInteger(noOfPeople)) {
+    throw 'noOfPeople should be positive number and  minimum 5 and maximum 30';
     }
     
   
