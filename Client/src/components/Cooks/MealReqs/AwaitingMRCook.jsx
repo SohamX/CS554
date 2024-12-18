@@ -38,7 +38,7 @@ function AwaitingMRCook() {
       <div className={styles.container}>
         <Link to={`/mealReqs/cooks/pending`}>
           <button className={styles.button} style={{ width: '549px' }}>
-            Pending Meal Requests
+          Explore Meal Requests
           </button>
         </Link>
         <br />
@@ -50,7 +50,7 @@ function AwaitingMRCook() {
         <br />
       </div>
       <br />
-      <h2>Awaiting Meal Requests</h2>
+      <h2>Waiting for response</h2>
       {showsData && showsData.length > 0 ? (
         showsData.map((mealReq) => (
           <div className={styles.card} key={mealReq._id}>
@@ -90,8 +90,8 @@ function AwaitingMRCook() {
         ))
       ) : (
         <div className={styles.noMealRequests}>
-          <h3>Currently you dont have any awaiting</h3>
-          <p>Why don't you check and send one!</p>
+          <h3>Currently you dont have any for awaiting</h3>
+          <p>Why don't you explore and send one!</p>
         </div>
       )}
       <br />

@@ -4,6 +4,7 @@ import helpers from '../helpers/pranHelpers.js'
 import { checkisValidString } from '../helpers/validationHelper.js';
 import { errorMsg, validateCardNumber, validateCvv, validateZipCode } from '../helpers/validationHelper.js';
 import { loginDetails } from "./middlewares.js";
+import xss from 'xss';
 const router = Router();
 
 import redis from 'redis'
@@ -27,7 +28,19 @@ router
       country,
       latitude,
       longitude } = req.body;
-
+      firstName = xss(firstName)
+      lastName = xss(lastName)
+      username = xss(username)
+      gmail = xss(gmail)
+      mobileNumber = xss(mobileNumber)
+      address = xss(address)
+      city = xss(city)
+      state = xss(state)
+      zipcode = xss(zipcode)
+      country = xss(country)
+      bio = xss(bio)
+      latitude = xss(latitude)
+      longitude = xss(longitude)
       let latitude_float
       let longitude_float
     try {
@@ -196,6 +209,18 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
         country,
         latitude,
         longitude } = req.body
+
+        firstName = xss(firstName)
+        lastName = xss(lastName)
+        username = xss(username)
+        mobileNumber = xss(mobileNumber)
+        address = xss(address)
+        city = xss(city)
+        state = xss(state)
+        zipcode = xss(zipcode)
+        country = xss(country)
+        latitude = xss(latitude)
+        longitude = xss(longitude)
 
       try {
         if(!firstName &&
@@ -459,6 +484,15 @@ router
   })
   .post(async (req, res) => {
     let { type, provider, cardNumber, cardHolderName, expirationDate, cvv, zipcode, country, nickName } = req.body;
+    type = xss(type);
+    provider = xss(provider);
+    cardNumber = xss(cardNumber);
+    cardHolderName = xss(cardHolderName);
+    expirationDate = xss(expirationDate);
+    cvv = xss(cvv);
+    zipcode = xss(zipcode);
+    country = xss(country);
+    nickName = xss(nickName);
     try {
       if (!type || !provider || !cardNumber || !cardHolderName || !expirationDate || !cvv || !zipcode || !country) {
         throw ("All fields need to be supplied")
@@ -509,6 +543,13 @@ router
   .patch(async (req, res) => {
     //const { id, userId } = req.params;
     let { cardHolderName, expirationDate, cvv, zipcode, country, nickName } = req.body;
+    cardHolderName = xss(cardHolderName);
+    expirationDate = xss(expirationDate);
+    cvv = xss(cvv);
+    zipcode = xss(zipcode);
+    country = xss(country);
+    nickName = xss(nickName);
+    
     console.log('HERE 1' + JSON.stringify(req.body));
     try {
       req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');

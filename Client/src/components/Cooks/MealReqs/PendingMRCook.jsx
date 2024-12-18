@@ -59,7 +59,7 @@ function PendingMR() {
       <div className={styles.container}>
         <Link to={`/mealReqs/cooks/awaiting`}>
           <button className={styles.button} style={{ width: '549px' }}>
-            Awaiting Meal Requests
+            Waiting for Response
           </button>
         </Link>
         <br />
@@ -71,7 +71,7 @@ function PendingMR() {
         <br />
       </div>
       <br />
-      <h2>Pending Meal Requests</h2>
+      <h2>Explore Meal Requests</h2>
       {showsData && showsData.length > 0 ? (
         showsData.map((mealReq) => (
           <div className={styles.card} key={mealReq._id}>
@@ -112,7 +112,7 @@ function PendingMR() {
         ))
       ) : (
         <div className={styles.noMealRequests}>
-          <h3>No Pending Meal Requests Found Check back later</h3>
+          <h3>No Meal Requests Found to Explore Check back later</h3>
           
         </div>
       )}

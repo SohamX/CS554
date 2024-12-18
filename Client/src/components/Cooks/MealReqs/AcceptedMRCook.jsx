@@ -39,13 +39,13 @@ function AcceptedMRCook() {
       <div className={styles.container}>
         <Link to={`/mealReqs/cooks/pending`}>
           <button className={styles.button} style={{ width: '549px' }}>
-            Pending Meal Requests
+            Explore Meal Requests
           </button>
         </Link>
         <br />
         <Link to={`/mealReqs/cooks/awaiting`}>
           <button className={styles.button} style={{ width: '549px' }}>
-            Awaiting Meal Requests
+            Waiting for Response
           </button>
         </Link>
         <br />
@@ -92,7 +92,7 @@ function AcceptedMRCook() {
       ) : (
         <div className={styles.noMealRequests}>
           <h3>Currently you dont have any accepted </h3>
-          <p>Why don't you check and send one!</p>
+          <p>Why don't you explore and send request!</p>
         </div>
       )}
       <br />
