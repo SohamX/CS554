@@ -14,10 +14,12 @@ export const CartProvider = ({children}) => {
     const { apiCall } = useApi();
     const { currentUser } = useContext(AuthContext);
 
-    const addToCart = async (itemId) => {
+    const addToCart = async (itemId,quantity) => {
         try{
-            const response = await apiCall(`http://localhost:3000/users/cart/add/${itemId}/to/${currentUser._id}`, {
-                method: 'POST',
+            console.log(itemId);
+            console.log(quantity);
+            const response = await apiCall(`http://localhost:3000/users/cart/add/${itemId}/to/${currentUser._id}/by/${quantity}`, {
+                method: 'POST'
             });
             console.log(response);
             if (response.status !== 'success') {

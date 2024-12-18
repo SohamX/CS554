@@ -115,11 +115,11 @@ export const registerUser = async (
   
   
   gmail = gmail.trim();
-  if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+  if(!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail)) throw 'Please enter valid email'
   const sameGamil = await userCollection.findOne({gmail:gmail});
   const sameCookGmail = await cookCollection.findOne({gmail:gmail});
   if(sameGamil||sameCookGmail){
-    throw `Error : Already gmail exists with ${gmail}`
+    throw `Error : Already email exists with ${gmail}`
   }
 
   if(typeof mobileNumber!=="string"){
@@ -185,7 +185,7 @@ export const loginUser = async (gmail) => {
   }
 
   gmail = gmail.trim();
-  if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+  if(!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail)) throw 'Please enter valid email'
   
   const userFound = await userCollection.findOne({gmail:gmail});
   const cookFound = await cookCollection.findOne({gmail:gmail});
@@ -362,79 +362,203 @@ export const loginUser = async (gmail) => {
 
 
 
-export const addItemtoCart = async (
+// export const addItemtoCart = async (
+//   userId,
+//   dishId,
+  
+// ) => {
+//   if(!userId||!dishId){
+//     throw("All fields need to be supplied")
+//   }
+//   userId = helpers.checkId(userId, 'userId');
+//   dishId = helpers.checkId(dishId, 'dishId');
+//   //cookId = helpers.checkId(cookId, 'cookId');
+
+  
+//   const user = await userCollection.findOne({_id: new ObjectId(userId)});
+//   if (!user) throw 'No user with that userId';
+//   const dish = await dishCollection.findOne({_id: new ObjectId(dishId)});
+//   if (!dish) throw 'No dish with that dishId';
+//   // const cook = await cookCollection.findOne({_id: new ObjectId(cookId)});
+//   // if (!cook) throw 'No cook with that cookId';
+//   dish.cookId = dish.cookId.toString();
+//   const cook = await cookCollection.findOne({_id:new ObjectId(dish.cookId)});
+  
+//   if(user.cart.cookId!=="" && user.cart.cookId!==dish.cookId){
+//     throw("You can't add items from different cooks")
+//   }
+
+//   if(user.cart.cookId===""){
+//     const updatedCart = {
+//       cookId : dish.cookId,
+//       dishes : [{
+//         dishId : dishId,
+//         quantity : 1
+//       }]
+//     }
+//     const updatedUser = await userCollection.findOneAndUpdate({_id:new ObjectId(userId)},{$set:{cart:updatedCart}},{returnDocument:'after'});
+//     if(!updatedUser){
+//       throw("Item is not added")
+//     }
+    
+//     updatedUser.cart.cookName = cook.username;
+//     updatedUser.cart.dishes[0].dishName = dish.name;
+//     updatedUser.cart.dishes[0].subTotal = dish.cost;
+//     updatedUser.cart.totalCost = dish.cost;
+
+//     return updatedUser.cart;
+
+//   }
+
+//   else{
+//     let found = false;
+
+    
+//     user.cart.dishes.forEach((item) => {
+//         if (item.dishId === dishId) {
+//             found = true;
+//             item.quantity += 1; 
+//         }
+//     });
+    
+//     if (!found) {
+        
+//         user.cart.dishes.push({
+//             dishId: dishId,
+//             quantity: 1
+//         });
+//    }
+
+//    const updatedUserData = await userCollection.findOneAndUpdate({_id:new ObjectId(userId)},{$set:{cart:user.cart}},{returnDocument:'after'});
+
+//     if(!updatedUserData){
+//       throw("Item is not added")
+//     }
+    
+//     updatedUserData.cart.cookName = cook.username;
+
+//     for (const element of updatedUserData.cart.dishes) {
+//       let dish = await dishCollection.findOne({ _id: new ObjectId(element.dishId) });
+//       element.dishName = dish.name;
+//       element.subTotal = dish.cost * element.quantity;
+//     }
+
+//     // updatedUserData.cart.dishes.forEach(async(element)=>{
+//     //   let dish = await dishCollection.findOne({_id:new ObjectId(element.dishId)});
+//     //   console.log(dish);
+//     //   element.dishName = dish.name;
+//     //   element.subTotal = dish.cost*element.quantity;
+      
+//     // })
+
+//     const totalCost = updatedUserData.cart.dishes.reduce((sum, element) => {
+//       return sum + element.subTotal;
+//     }, 0);
+  
+  
+//     updatedUserData.cart.totalCost = totalCost;  
+    
+
+//     return updatedUserData.cart;
+// }};
+
+
+export const addItemToCart = async (
   userId,
   dishId,
-  
+  quantity
 ) => {
-  if(!userId||!dishId){
-    throw("All fields need to be supplied")
+  //console.log(quantity);
+  if (!userId || !dishId || !quantity || quantity <= 0) {
+    throw "All fields need to be supplied and quantity must be greater than zero";
   }
+  if(quantity>10){
+    throw "You can't add more than 10 items of same dish"
+  }
+
   userId = helpers.checkId(userId, 'userId');
   dishId = helpers.checkId(dishId, 'dishId');
-  //cookId = helpers.checkId(cookId, 'cookId');
 
-  
-  const user = await userCollection.findOne({_id: new ObjectId(userId)});
+  const user = await userCollection.findOne({ _id: new ObjectId(userId) });
   if (!user) throw 'No user with that userId';
-  const dish = await dishCollection.findOne({_id: new ObjectId(dishId)});
+
+  const dish = await dishCollection.findOne({ _id: new ObjectId(dishId) });
   if (!dish) throw 'No dish with that dishId';
-  // const cook = await cookCollection.findOne({_id: new ObjectId(cookId)});
-  // if (!cook) throw 'No cook with that cookId';
+
   dish.cookId = dish.cookId.toString();
-  const cook = await cookCollection.findOne({_id:new ObjectId(dish.cookId)});
-  
-  if(user.cart.cookId!=="" && user.cart.cookId!==dish.cookId){
-    throw("You can't add items from different cooks")
+  const cook = await cookCollection.findOne({ _id: new ObjectId(dish.cookId) });
+
+  if (user.cart.cookId !== "" && user.cart.cookId !== dish.cookId) {
+    throw "You can't add items from different cooks";
   }
 
-  if(user.cart.cookId===""){
+  let dist = helpers.getDistanceFromLatLonInKm(user.location.coordinates.latitude, user.location.coordinates.longitude, cook.location.coordinates.latitude, cook.location.coordinates.longitude)
+  if (dist > 10) {
+    throw "sorry, cook is very far away from your location";
+  }
+
+  if (!cook.availability) throw `Could not add to cart as the cook is currently unavailable`
+
+  if(user.cart.dishes.length===10){
+    throw "Your cart already contains 10 dishes,checkout first or remove some items"
+  }
+
+
+  if (user.cart.cookId === "") {
     const updatedCart = {
-      cookId : dish.cookId,
-      dishes : [{
-        dishId : dishId,
-        quantity : 1
+      cookId: dish.cookId,
+      dishes: [{
+        dishId: dishId,
+        quantity: quantity
       }]
+    };
+
+    const updatedUser = await userCollection.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      { $set: { cart: updatedCart } },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedUser) {
+      throw "Item is not added";
     }
-    const updatedUser = await userCollection.findOneAndUpdate({_id:new ObjectId(userId)},{$set:{cart:updatedCart}},{returnDocument:'after'});
-    if(!updatedUser){
-      throw("Item is not added")
-    }
-    
+
     updatedUser.cart.cookName = cook.username;
     updatedUser.cart.dishes[0].dishName = dish.name;
-    updatedUser.cart.dishes[0].subTotal = dish.cost;
-    updatedUser.cart.totalCost = dish.cost;
+    updatedUser.cart.dishes[0].subTotal = dish.cost * quantity;
+    updatedUser.cart.totalCost = dish.cost * quantity;
 
     return updatedUser.cart;
-
-  }
-
-  else{
+  } else {
     let found = false;
 
-    
     user.cart.dishes.forEach((item) => {
-        if (item.dishId === dishId) {
-            found = true;
-            item.quantity += 1; 
+      if (item.dishId === dishId) {
+        found = true;
+        if (item.quantity + quantity > 10) {
+          throw "You can't add more than 10 items of same dish";
         }
+        item.quantity += quantity; // Add the specified quantity
+      }
     });
-    
+
     if (!found) {
-        
-        user.cart.dishes.push({
-            dishId: dishId,
-            quantity: 1
-        });
-   }
-
-   const updatedUserData = await userCollection.findOneAndUpdate({_id:new ObjectId(userId)},{$set:{cart:user.cart}},{returnDocument:'after'});
-
-    if(!updatedUserData){
-      throw("Item is not added")
+      user.cart.dishes.push({
+        dishId: dishId,
+        quantity: quantity
+      });
     }
-    
+
+    const updatedUserData = await userCollection.findOneAndUpdate(
+      { _id: new ObjectId(userId) },
+      { $set: { cart: user.cart } },
+      { returnDocument: 'after' }
+    );
+
+    if (!updatedUserData) {
+      throw "Item is not added";
+    }
+
     updatedUserData.cart.cookName = cook.username;
 
     for (const element of updatedUserData.cart.dishes) {
@@ -443,24 +567,16 @@ export const addItemtoCart = async (
       element.subTotal = dish.cost * element.quantity;
     }
 
-    // updatedUserData.cart.dishes.forEach(async(element)=>{
-    //   let dish = await dishCollection.findOne({_id:new ObjectId(element.dishId)});
-    //   console.log(dish);
-    //   element.dishName = dish.name;
-    //   element.subTotal = dish.cost*element.quantity;
-      
-    // })
-
     const totalCost = updatedUserData.cart.dishes.reduce((sum, element) => {
       return sum + element.subTotal;
     }, 0);
-  
-  
-    updatedUserData.cart.totalCost = totalCost;  
-    
+
+    updatedUserData.cart.totalCost = totalCost;
 
     return updatedUserData.cart;
-}};
+  }
+};
+
 
 export const getCartItems = async (userId) => {
   if(!userId){

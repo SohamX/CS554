@@ -42,10 +42,36 @@ function CartDetails() {
     //     getCartItemList();
     // }, [studentId])
 
-    const handleCheckout = () => {
+    const checkCooksAvailability = async () => {
+        try {
+            const cookDetails = await apiCall(`${import.meta.env.VITE_SERVER_URL}/cooks/${cook.cookId}`,{
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            if (cookDetails.error) {
+                console.log(cookDetails.error)
+                throw `Error while verifying cook of the dishes`
+            }
+            if (!cookDetails.cook.availability) {
+                throw `Sorry! Cannot proceed with checkout as the cook is currently unavailable, try after sometime or try dishes by other cooks!`
+            }
+            return true
+        } catch (error) {
+            alert(error)
+            // navigate('/student/cart')
+        }
+    }
+
+    const handleCheckout = async() => {
         if (!cartItems || !cartItems.length || !(cartItems.length > 0)) {
             alert('Your cart is empty. Please add items to proceed.');
             return;
+        }
+        if (cook.cookId.trim() !== "") {
+            const check = await checkCooksAvailability()
+            if (!check) return
         }
         const cart = {
             cookId: cook.cookId,
@@ -58,13 +84,13 @@ function CartDetails() {
 
     const handleAdd=async(dishId)=>{
         try {
-            addToCart(dishId)
+           await addToCart(dishId,1)
             // const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/add/${dishId}/to/${studentId}`, {
             //     method: 'POST',
             // });
             // setCartItems(response.addedItem);
         } catch (error) {
-            console.error("API call failed:", error);
+            alert(error.error);
         }
     }
 

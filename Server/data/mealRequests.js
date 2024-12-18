@@ -294,12 +294,20 @@ export const getPendingMealReqsWithoutCook = async (cookId) => {
   // if (pendingMealReqs.length === 0) {
   //   throw `No pending meal requests found where cookId ${cookId} is not present.`;
   // }
+  // get cooks location
+  const cook = await cookCollection.findOne({ _id: new ObjectId(cookId) });
+  let dist = 0.0;
+  let PMRFinal = []
   for (const mealReq of pendingMealReqs) {
     const user = await userCollection.findOne({ _id: new ObjectId(mealReq.userId) });
-    mealReq.username = user.username;
+    dist = helpers.getDistanceFromLatLonInKm(cook.location.coordinates.latitude, cook.location.coordinates.longitude, user.location.coordinates.latitude, user.location.coordinates.longitude)
+    if (dist < 10) {
+      mealReq.username = user.username;
+      PMRFinal.push(mealReq)
+    }
   }
 
-  return pendingMealReqs;
+  return PMRFinal;
 };
 
 export const getNoResponseMealReqsByCook = async (cookId) => {

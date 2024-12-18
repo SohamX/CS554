@@ -82,7 +82,7 @@ router
         longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
 
         gmail = gmail.trim();
-        if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+        if(!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail)) throw 'Please enter valid gmail'
 
         if(typeof mobileNumber!=="string"){
           throw 'mobileNumber should be of type string'
@@ -132,7 +132,7 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
       }
     
       gmail = gmail.trim();
-      if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+      if(!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail)) throw 'Please enter valid gmail'
     } catch (e) {
       res.status(400).json({error:e});
       return;
@@ -341,7 +341,7 @@ router
   }) 
   //ADD ITEM TO CART ROUTE
 router
-  .route('/cart/add/:dishId/to/:userId')
+  .route('/cart/add/:dishId/to/:userId/by/:quantity')
   .post(async (req, res) => {
     try {
       req.params.dishId = helpers.checkId(req.params.dishId, 'dishId URL Param');
@@ -352,7 +352,8 @@ router
       return;
     }
     try {
-      const addedItem = await userData.addItemtoCart(req.params.userId, req.params.dishId);
+      
+      const addedItem = await userData.addItemToCart(req.params.userId, req.params.dishId,parseInt(req.params.quantity));
 
       res.status(200).json({ status: "success", addedItem: addedItem });
     } catch (e) {

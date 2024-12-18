@@ -103,7 +103,7 @@ function DishesList() {
                 <Button
                     variant="contained"
                     color="primary"
-                    sx={{ mt: 1, mr: 1 }}
+                    sx={{ mt: 1, mr: 1, width: '30%' }}
                     onClick={() => setShowAddForm(!showAddForm)}
                 >
                     Add Dish
@@ -132,7 +132,7 @@ function DishesList() {
                             borderRadius: 2,
                         }}
                     >
-                        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                        <Table sx={{width: '90%'}} aria-label="simple table">
                             <TableHead>
                                 <TableRow>
                                     <TableCell sx={{ fontWeight: 'bold' }}>Name</TableCell>
@@ -185,18 +185,20 @@ function DishesList() {
                                                 }
                                                 label={dish.isAvailable ? "Available" : "Unavailable"}
                                             />
+                                            <br/>
                                             <Button
                                                 variant="contained"
                                                 color="secondary"
-                                                sx={{ mt: 1 }}
+                                                sx={{ mt: 1, width: '50%' }}
                                                 onClick={() => handleOpenEditModal(dish)}
                                             >
                                                 Edit
                                             </Button>
+                                            {/* <br/> */}
                                             <Button
                                                 variant="contained"
                                                 color="error"
-                                                sx={{ mt: 1 }}
+                                                sx={{ mt: 1, width: '50%' }}
                                                 onClick={() => handleOpenDeleteModal(dish)}
                                             >
                                                 Delete

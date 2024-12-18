@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../../contexts/AccountContext.jsx';
+import { CartContext } from '../../contexts/CartContext.jsx';
 //import { Typography, Button, Box, Card, CardContent, TextField, Container, Grid2, Avatar, Select, Popper, Paper, IconButton } from '@mui/material';
 import styles from '../Student/MealReq.module.css'
 
@@ -9,6 +10,42 @@ function History() {
   const { currentUser } = useContext(AuthContext);
   const [dishes, setDishes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { cartItems, addToCart, removeFromCart } = useContext(CartContext);
+  const [quantities, setQuantities] = useState({});
+
+  const handleIncrement = (dishId) => {
+    setQuantities((prev) => ({
+      ...prev,
+      [dishId]: (prev[dishId] || 1) + 1, // Default to 1 if no value exists
+    }));
+  };
+
+  const handleDecrement = (dishId) => {
+    setQuantities((prev) => {
+      const currentQuantity = prev[dishId] || 1;
+      if (currentQuantity <= 1) return prev; // Prevent decrement below 1
+      return {
+        ...prev,
+        [dishId]: currentQuantity - 1,
+      };
+    });
+  };
+
+  const handleAdd = async (dishId,quantity) => {
+    try {
+      // const  { data: { status } } = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/cart/add/${dishId}/to/${currentUser._id}`);
+      // console.log(status);
+      await addToCart(dishId,quantity);
+      alert(`${quantity} Servings added  to your cart`)
+    } catch (err) {
+      alert(err.error);
+   //   alert("You cannot add items from different cooks to the cart at the same time");
+      // setErrors((prevState) => ({
+      //   ...prevState,
+      //   [dishId]: true,
+      // }));    
+    }
+  };
   useEffect(() => {
     if (!currentUser) {
       navigate("/");
@@ -66,13 +103,40 @@ function History() {
               <p className={styles.cardText}>
                 <span className={styles.cardSubtitle}>Cost :</span> {'$'+ mealReq.cost}
               </p>
+              <p className={styles.cardText}>
+          <span className={styles.cardSubtitle}>Made By :</span> <Link to={`/student/cook/${mealReq.cookId}`}>{mealReq.cookName}</Link>
+             </p>
               
-              
-              <div className={styles.buttonContainer}>
-          <button className={styles.buttonPrimary} >Add to Cart</button>
-          
-          <button className={styles.buttonSecondary}>Checkout</button>
-             </div>
+              <div className={styles.buttonContainer} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              className={styles.buttonSecondary}
+              onClick={() => handleDecrement(mealReq._id)}
+              style={{ padding: '4px 8px' }}
+            >
+              -
+            </button>
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
+              {quantities[mealReq._id] || 1}
+            </span>
+            <button
+              className={styles.buttonSecondary}
+              onClick={() => handleIncrement(mealReq._id)}
+              style={{ padding: '4px 8px' }}
+            >
+              +
+            </button>
+          </div>
+
+          {/* Add to Cart Button Below Quantity */}
+          <button
+            className={styles.buttonPrimary}
+            onClick={() => handleAdd(mealReq._id, quantities[mealReq._id] || 1)}
+            style={{ padding: '8px 16px', fontSize: '1rem' }}
+          >
+            Add to Cart
+          </button>
+        </div>
              {/* {cartItems[mealReq._id] && (
                 <p style={{ color: 'green' }}>Successfully Added to your cart</p>
               )}

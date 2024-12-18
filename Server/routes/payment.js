@@ -22,6 +22,27 @@ router
             if (isMealReq && !mealReqId) {
                 return res.status(400).json({ error: 'Invalid request data.' });
             }
+            try {
+                const cookDetails = await cookData.getCookByID(cookId)
+                if (!cookDetails.availability) {
+                        return res.status(400).json({error: "Cook Unavailable"});
+                }
+            } catch (e) {
+                return res.status(400).json({error: (e)});
+            }
+            // try {
+            const dishes = await dishData.getAllDishesByCookId(cookId)
+            for (let dish of dishes) {
+                for (let item of items.dishes) {
+                    if(dish._id.toString() == item.dishId && !dish.isAvailable) {
+                        return res.status(400).json({error: "Dish Unavailable"});
+                    }
+                }
+            }
+            // } catch (e) {
+            //     res.status(400).json({error: (e)});
+            //     return;
+            // }
             console.log('mealReqId: ' + mealReqId);
             try {
                 // Process payment

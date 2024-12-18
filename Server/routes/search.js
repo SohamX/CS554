@@ -105,6 +105,8 @@ router.route("/home/").get(userHome,async (req, res) => {
       const command = new GetObjectCommand(getObjectParams);
       const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
       dish.imageUrl = url;
+      const cook = await cookData.getCookByID(dish.cookId.toString());
+      dish.cookName = cook.username;
     }
 
     res.status(200).json({ status: "success", dishes: dishes });

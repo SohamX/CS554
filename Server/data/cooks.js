@@ -94,12 +94,12 @@ export const registerCook = async (
   let longitude_float = helpers.latitudeAndLongitude(longitude, 'Longitude')
 
   gmail = gmail.trim();
-  if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail))
-    throw "Please enter valid gmail";
+  if (!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail))
+    throw "Please enter valid email";
   const sameGamil = await userCollection.findOne({ gmail: gmail });
   const sameCookGamil = await cookCollection.findOne({ gmail: gmail });
   if (sameGamil || sameCookGamil) {
-    throw `Error : Already gmail exists with ${gmail}`;
+    throw `Error : Already email exists with ${gmail}`;
   }
 
   if (typeof mobileNumber !== "string") {
@@ -332,7 +332,18 @@ export const updateCooksAvailability = async (userId, availability) => {
   if (!responseObj) {
     throw `Unable to update availability`
   }
-  
+  const keysToDelete = await client.keys(`home:dishes:*`);
+  if (keysToDelete.length > 0) {
+      for (const key of keysToDelete) {
+      await client.del(key);
+      }
+  }
+  const keystoDel = await client.keys(`historyList:*`);
+  if (keystoDel.length > 0) {
+      for (const key of keystoDel) {
+      await client.del(key);
+      }
+  }
   return responseObj;
 }
 

@@ -34,6 +34,25 @@ const CookDetails = () => {
     const [dishes, setDishes] = useState([])
     const [AddedtoCart, setCartMsg] = useState({})
     const [Errors, setErrors] = useState({});
+    const [quantities, setQuantities] = useState({});
+
+  const handleIncrement = (dishId) => {
+    setQuantities((prev) => ({
+      ...prev,
+      [dishId]: (prev[dishId] || 1) + 1, // Default to 1 if no value exists
+    }));
+  };
+
+  const handleDecrement = (dishId) => {
+    setQuantities((prev) => {
+      const currentQuantity = prev[dishId] || 1;
+      if (currentQuantity <= 1) return prev; // Prevent decrement below 1
+      return {
+        ...prev,
+        [dishId]: currentQuantity - 1,
+      };
+    });
+  };
 
     const getCookDetails = async () => {
         try {
@@ -65,9 +84,10 @@ const CookDetails = () => {
             alert(error);
         }
     }
-    const handleAddToCart = async (dishId) => {
+    const handleAddToCart = async (dishId,quantity) => {
         try {
-            await addToCart(dishId);
+            await addToCart(dishId,quantity);
+            alert(`${quantity} servings added  to your cart`)
             // const { data: { status } } = await axios.post(`http://localhost:3000/users/cart/add/${dish._id}/to/${currentUser._id}`);
             // alert(`${dish.name} added to cart successfully`)
         } catch (err) {
@@ -210,24 +230,36 @@ const CookDetails = () => {
                                             <Box sx={{ justifyContent: "center" }}>
                                                 {dish.isAvailable &&
                                                     <>
-                                                        <Box>
+                                                        <Box >
                                                             <Button
                                                                 variant="contained"
                                                                 color="primary"
-                                                                sx={{ marginTop: '8px', width: '180px' }}
-                                                                onClick={() => handleAddToCart(dish._id)}
+                                                                sx={{ marginTop: '8px', width: '50px' }}
+                                                                onClick={() => handleIncrement(dish._id)}
                                                             >
-                                                                {'Add To Cart'}
+                                                                {"+"}
                                                             </Button>
+                                                            
+                                                            <span style={{ fontSize: '1.2rem', fontWeight: 'bold', margin: '0 10px' }}>
+                                                                {quantities[dish._id] || 1}
+                                                            </span>
+                                                            
                                                             <Button
                                                                 variant="contained"
                                                                 color="primary"
-                                                                sx={{ marginTop: '8px', width: '180px', marginLeft: '10px' }}
-                                                            // onClick={checkOut(dish._id)}
+                                                                sx={{ marginTop: '8px', width: '50px' }}
+                                                                onClick={() => handleDecrement(dish._id)}
                                                             >
-                                                                {'Add To Cart'}
+                                                                {'-'}
                                                             </Button>
                                                         </Box>
+                                                        <Button
+                                                            color="success"
+                                                            variant="contained"
+                                                            
+                                                            sx={{ marginTop: '8px', width: '350px' }}
+                                                            onClick={() => handleAddToCart(dish._id, quantities[dish._id] || 1)} >
+                                                              {'Add to Cart'}  </Button>   
                                                     </>
                                                 }
                                                 {
