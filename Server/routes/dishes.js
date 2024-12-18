@@ -6,7 +6,7 @@ const router = Router();
 import helpers from '../helpers/pranHelpers.js';
 import resizeImage from '../data/resizeImage.js';
 import { validateCuisineType, validateCost, checkisValidImageArray, validateId, validateUniqueDishesPerCook, checkDishDesc, checkisValidBoolean, errorMsg } from '../helpers/validationHelper.js';
-import { dishData } from '../data/index.js';
+import { dishData,cookData } from '../data/index.js';
 import { S3Client,PutObjectCommand,GetObjectCommand, DeleteObjectCommand} from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import dotenv from 'dotenv';
@@ -345,6 +345,8 @@ router
               
               const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
               dish.imageUrl = url;
+              const cook = await cookData.getCookByID(dish.cookId.toString());
+              dish.cookName = cook.username;
         }
 
         const filteredDishes = parsedArray.filter((dish => {

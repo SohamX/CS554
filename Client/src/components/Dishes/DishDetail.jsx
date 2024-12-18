@@ -6,6 +6,7 @@ import DeleteDish from './DeleteDish.jsx';
 import { useApi } from '../../contexts/ApiContext';
 import { Card, CardContent, CardHeader, Typography, Button, Box, Grid, FormControlLabel, Switch } from '@mui/material';
 import { AuthContext } from '../../contexts/AccountContext.jsx';
+import { CartContext } from '../../contexts/CartContext.jsx';
 
 
 function DishDetail(props) {
@@ -19,6 +20,7 @@ function DishDetail(props) {
     const { currentUser } = useContext(AuthContext);
     const [count, setCount] = useState(0)
     const [itemId, setItemId] = useState(null)
+    const { cartItems, addToCart, removeFromCart } = useContext(CartContext);
     const isById = true;
     const attr = 'dish';
     //const [loading, setLoading] = useState(true);
@@ -98,29 +100,21 @@ function DishDetail(props) {
         setShowDeleteModal(false);
     };
 
-    const addToCart = async (dish) => {
+    const handleAdd = async (dishId) => {
         try {
-           
-                const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/add/${id}/to/${currentUser._id}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                
-                });
-               if(response.status==="success"){
-                alert("Dish successfully added to your cart")
-
-               }
-               else{
-                alert(response.error)
-               }
-               
-                
-        } catch (error) {
-            alert("You cannot dishes from different cooks in your cart");
+          // const  { data: { status } } = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/cart/add/${dishId}/to/${currentUser._id}`);
+          // console.log(status);
+          await addToCart(dishId,1);
+          alert(`Successfully added  to your cart`)
+        } catch (err) {
+          alert(err.error);
+       //   alert("You cannot add items from different cooks to the cart at the same time");
+          // setErrors((prevState) => ({
+          //   ...prevState,
+          //   [dishId]: true,
+          // }));    
         }
-    }
+      };
 
     // const removeFromCart = async (dish) => {
     //     try {
@@ -216,7 +210,7 @@ function DishDetail(props) {
                             <Button
                                 variant="contained"
                                 color="secondary"
-                                onClick={() => addToCart(dish)}
+                                onClick={() => handleAdd(dish._id)}
                             >
                                 Add To Cart
                             </Button>

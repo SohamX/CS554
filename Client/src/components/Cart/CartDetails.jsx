@@ -58,13 +58,13 @@ function CartDetails() {
 
     const handleAdd=async(dishId)=>{
         try {
-            addToCart(dishId)
+           await addToCart(dishId,1)
             // const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/add/${dishId}/to/${studentId}`, {
             //     method: 'POST',
             // });
             // setCartItems(response.addedItem);
         } catch (error) {
-            console.error("API call failed:", error);
+            alert(error.error);
         }
     }
 

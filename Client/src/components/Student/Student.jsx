@@ -52,17 +52,34 @@ const student = () => {
   const [Errors,setErrors]= useState({});
   const [wasItSearchQuery, setAnswer] = useState(false)
 
-  const handleAdd = async (dishId) => {
+  const [quantities, setQuantities] = useState({});
+
+  const handleIncrement = (dishId) => {
+    setQuantities((prev) => ({
+      ...prev,
+      [dishId]: (prev[dishId] || 1) + 1, // Default to 1 if no value exists
+    }));
+  };
+
+  const handleDecrement = (dishId) => {
+    setQuantities((prev) => {
+      const currentQuantity = prev[dishId] || 1;
+      if (currentQuantity <= 1) return prev; // Prevent decrement below 1
+      return {
+        ...prev,
+        [dishId]: currentQuantity - 1,
+      };
+    });
+  };
+
+  const handleAdd = async (dishId,quantity) => {
     try {
       // const  { data: { status } } = await axios.post(`${import.meta.env.VITE_SERVER_URL}/users/cart/add/${dishId}/to/${currentUser._id}`);
       // console.log(status);
-      await addToCart(dishId);
+      await addToCart(dishId,quantity);
+      alert(`${quantity} Servings added  to your cart`)
     } catch (err) {
-      console.log(err)
-      setErrors((prevState) => ({
-        ...prevState,
-        [dishId]: true,
-      }));    
+      alert(err.error);  
     }
   };
 
@@ -374,50 +391,73 @@ const student = () => {
       </Box>
       </Container>
       {dishes && dishes.length > 0 && (
-        dishes.map((mealReq) => (
-          <div className={styles.card} key={mealReq._id}>
-            <div className={styles.cardBody}>
-            <img style={{
-                            width: '100%',
-                            height: 'auto',
-                            maxHeight: '400px',
-                            objectFit: 'cover',
-                            borderTopLeftRadius: '4px',
-                            borderTopRightRadius: '4px'
-                        }}
-              src={mealReq.imageUrl} 
-              alt={mealReq.name} 
-              // className={styles.cardImage} // Add styles for the image
-            />
-              <h3 className={styles.cardTitle}>
-                <Link to={`/student/dishes/${mealReq._id}`}>
-                  {mealReq.name}
-                </Link>
-              </h3>
-              <p className={styles.cardText}>
-                <span className={styles.cardSubtitle}>Cuisine Type:</span> {mealReq.cuisineType}
-              </p>
-              <p className={styles.cardText}>
-                <span className={styles.cardSubtitle}>Cost :</span> {'$'+ mealReq.cost}
-              </p>
-              
-              
-              <div className={styles.buttonContainer}>
-          <button className={styles.buttonPrimary} onClick={()=>handleAdd(mealReq._id)}>Add to Cart</button>
-          
-          <button className={styles.buttonSecondary}>Checkout</button>
-             </div>
-             {cartItems[mealReq._id] && (
-                <p style={{ color: 'green' }}>Successfully Added to your cart</p>
-              )}
-              {Errors[mealReq._id] && (
-                <p style={{ color: 'red' }}>You can't add dishes from different cooks</p>
-              )}
-            </div>
+  dishes.map((mealReq) => (
+    <div className={styles.card} key={mealReq._id}>
+      <div className={styles.cardBody}>
+        <img 
+          style={{
+            width: '100%',
+            height: 'auto',
+            maxHeight: '400px',
+            objectFit: 'cover',
+            borderTopLeftRadius: '4px',
+            borderTopRightRadius: '4px'
+          }}
+          src={mealReq.imageUrl} 
+          alt={mealReq.name}
+        />
+        <h3 className={styles.cardTitle}>
+          <Link to={`/student/dishes/${mealReq._id}`}>
+            {mealReq.name}
+          </Link>
+        </h3>
+        <p className={styles.cardText}>
+          <span className={styles.cardSubtitle}>Cuisine Type:</span> {mealReq.cuisineType}
+        </p>
+        <p className={styles.cardText}>
+          <span className={styles.cardSubtitle}>Cost:</span> {'$' + mealReq.cost}
+        </p>
+        <p className={styles.cardText}>
+          <span className={styles.cardSubtitle}>Made By :</span> <Link to={`/student/cook/${mealReq.cookId}`}>{mealReq.cookName}</Link>
+        </p>
+
+        {/* Quantity Adjustment Buttons */}
+        <div className={styles.buttonContainer} style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <button
+              className={styles.buttonSecondary}
+              onClick={() => handleDecrement(mealReq._id)}
+              style={{ padding: '4px 8px' }}
+            >
+              -
+            </button>
+            <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>
+              {quantities[mealReq._id] || 1}
+            </span>
+            <button
+              className={styles.buttonSecondary}
+              onClick={() => handleIncrement(mealReq._id)}
+              style={{ padding: '4px 8px' }}
+            >
+              +
+            </button>
           </div>
-        ))
-      ) 
-      } {
+
+          {/* Add to Cart Button Below Quantity */}
+          <button
+            className={styles.buttonPrimary}
+            onClick={() => handleAdd(mealReq._id, quantities[mealReq._id] || 1)}
+            style={{ padding: '8px 16px', fontSize: '1rem' }}
+          >
+            Add to Cart
+          </button>
+        </div>
+      </div>
+    </div>
+  ))
+)}
+
+ {
         wasItSearchQuery && dishes && dishes.length == 0 && <div>
           Sorry, we can't find the dishes you are looking for!
         </div>

@@ -341,7 +341,7 @@ router
   }) 
   //ADD ITEM TO CART ROUTE
 router
-  .route('/cart/add/:dishId/to/:userId')
+  .route('/cart/add/:dishId/to/:userId/by/:quantity')
   .post(async (req, res) => {
     try {
       req.params.dishId = helpers.checkId(req.params.dishId, 'dishId URL Param');
@@ -352,7 +352,8 @@ router
       return;
     }
     try {
-      const addedItem = await userData.addItemtoCart(req.params.userId, req.params.dishId);
+      
+      const addedItem = await userData.addItemToCart(req.params.userId, req.params.dishId,parseInt(req.params.quantity));
 
       res.status(200).json({ status: "success", addedItem: addedItem });
     } catch (e) {
