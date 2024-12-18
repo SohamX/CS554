@@ -30,8 +30,8 @@ function AddMealReq(props) {
 
     try {
         noOfPeople = parseInt(noOfPeople, 10);
-        if (isNaN(noOfPeople) || noOfPeople <= 4 || !Number.isInteger(noOfPeople)) {
-        throw 'noOfPeople should be positive number and  minimum 5';
+        if (isNaN(noOfPeople) || noOfPeople <= 4 || noOfPeople > 30 || !Number.isInteger(noOfPeople)) {
+        throw 'noOfPeople should be positive number and  minimum 5 and maximum 30';
         }
     } catch (e) {
       console.log(e);
@@ -124,12 +124,32 @@ function AddMealReq(props) {
         </div>
         <br />
         <div className={styles.formGroup}>
-          <label style={{ width: '100%' }}>
-            Cuisine Type:
-            <br />
-            <input className={styles.input} id='cuisineType' required autoFocus={true} />
-          </label>
-        </div>
+      <label style={{ width: '100%' }}>
+        Cuisine Type:
+        <br />
+        <select className={styles.input} id='cuisineType' required>
+          <option value='' disabled selected>
+            Select Cuisine
+          </option>
+          <option value='AMERICAN'>AMERICAN</option>
+          <option value='MEXICAN'>MEXICAN</option>
+          <option value='ITALIAN'>ITALIAN</option>
+          <option value='INDIAN'>INDIAN</option>
+          <option value='THAI'>THAI</option>
+          <option value='CHINESE'>CHINESE</option>
+          <option value='FRENCH'>FRENCH</option>
+          <option value='POLISH'>POLISH</option>
+          <option value='HUNGARIAN'>HUNGARIAN</option>
+          <option value='JAPANESE'>JAPANESE</option>
+          <option value='KOREAN'>KOREAN</option>
+          <option value='MONGOLIAN'>MONGOLIAN</option>
+          <option value='DUTCH'>DUTCH</option>
+          <option value='GREEK'>GREEK</option>
+          <option value='VIETNAMESE'>VIETNAMESE</option>
+          <option value='OTHER'>OTHER</option>
+        </select>
+      </label>
+    </div>
         <br />
         <div className={styles.formGroup}>
           <label>

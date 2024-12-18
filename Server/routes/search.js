@@ -70,6 +70,7 @@ router.route("/").get(async (req, res) => {
     );
     if (!dishes) {
       res.status(404).json({ error: "No Data Found" });
+      return
     }
     for (const dish of dishes) {
       const getObjectParams = {

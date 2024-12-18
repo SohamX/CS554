@@ -9,6 +9,7 @@ const cookCollection = await cooks();
 import redis from 'redis'
 const client = redis.createClient();
 client.connect().then(() => {});
+import xss from 'xss'
 // ADD COOK ROUTE
 router.route("/register").post(async (req, res) => {
   let {
@@ -26,6 +27,20 @@ router.route("/register").post(async (req, res) => {
     latitude,
     longitude
   } = req.body;
+  firstName = xss(firstName)
+  lastName = xss(lastName)
+  username = xss(username)
+  gmail = xss(gmail)
+  mobileNumber = xss(mobileNumber)
+  address = xss(address)
+  city = xss(city)
+  state = xss(state)
+  zipcode = xss(zipcode)
+  country = xss(country)
+  bio = xss(bio)
+  // latitude = xss(latitude)
+  // longitude = xss(longitude)
+
   let latitude_float
   let longitude_float
   try {
@@ -190,6 +205,19 @@ router.route("/:id")
     latitude,
     longitude
   } = req.body;
+  firstName = xss(firstName)
+  lastName = xss(lastName)
+  username = xss(username)
+  mobileNumber = xss(mobileNumber)
+  address = xss(address)
+  city = xss(city)
+  state = xss(state)
+  zipcode = xss(zipcode)
+  country = xss(country)
+  bio = xss(bio)
+  // latitude = xss(latitude)
+  // longitude = xss(longitude)
+
   let userId = req.params.id
 
   try {

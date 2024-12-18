@@ -7,7 +7,7 @@ import {
     CardContent,
     Typography,
     Box,
-    Grid,
+    Grid2,
     Avatar,
     Chip,
     CardMedia,
@@ -49,21 +49,21 @@ const StudentDetails = () => {
         return (
             <Card sx={{ maxWidth: 1000, margin: '20px auto', padding: '24px', boxShadow: 3 }}>
                 <CardContent>
-                    <Grid container spacing={2} alignItems="center">
-                        <Grid item>
+                    <Grid2 container spacing={2} alignItems="center">
+                        <Grid2 item>
                             <Avatar sx={{ width: 80, height: 80, fontSize: 32 }}>
                                 {student.firstName[0]}{student.lastName[0]}
                             </Avatar>
-                        </Grid>
-                        <Grid item>
+                        </Grid2>
+                        <Grid2 item>
                             <Typography variant="h4" gutterBottom>
                                 {student.firstName} {student.lastName}
                             </Typography>
                             <Typography variant="subtitle1" color="textSecondary">
                                 @{student.username}
                             </Typography>
-                        </Grid>
-                    </Grid>
+                        </Grid2>
+                    </Grid2>
 
                     <Box sx={{ marginTop: '16px', display: 'flex', justifyContent: 'center', gap: 2 }}>
                         <Chip label={`Email: ${student.gmail}`} />

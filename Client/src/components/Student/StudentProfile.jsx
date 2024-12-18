@@ -2,10 +2,23 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApi } from '../../contexts/ApiContext';
 import { AuthContext } from "../../contexts/AccountContext";
-import { Container, Typography, TextField, Button, Box, Grid, Avatar } from "@mui/material";
+import { Container, Typography, TextField, Button, Box, Grid2, Avatar, FormControl, Select, MenuItem } from "@mui/material";
 import { getLocation, getCoordinatesFromAddress, getDistance } from '../../helpers/constants.js';
 
 const StudentProfile = () => {
+    const statesFF = [
+        "Alabama - AL", "Alaska - AK", "Arizona - AZ", "Arkansas - AR", "California - CA",
+        "Colorado - CO", "Connecticut - CT", "Delaware - DE", "Florida - FL", "Georgia - GA",
+        "Hawaii - HI", "Idaho - ID", "Illinois - IL", "Indiana - IN", "Iowa - IA",
+        "Kansas - KS", "Kentucky - KY", "Louisiana - LA", "Maine - ME", "Maryland - MD",
+        "Massachusetts - MA", "Michigan - MI", "Minnesota - MN", "Mississippi - MS",
+        "Missouri - MO", "Montana - MT", "Nebraska - NE", "Nevada - NV", "New Hampshire - NH",
+        "New Jersey - NJ", "New Mexico - NM", "New York - NY", "North Carolina - NC",
+        "North Dakota - ND", "Ohio - OH", "Oklahoma - OK", "Oregon - OR", "Pennsylvania - PA",
+        "Rhode Island - RI", "South Carolina - SC", "South Dakota - SD", "Tennessee - TN",
+        "Texas - TX", "Utah - UT", "Vermont - VT", "Virginia - VA", "Washington - WA",
+        "West Virginia - WV", "Wisconsin - WI", "Wyoming - WY"
+    ]
     const { apiCall, loading, error } = useApi();
     const { currentUser, setCurrentUser } = useContext(AuthContext);
     const [editPersonalInfo, setEditPersonalInfo] = useState(false);
@@ -57,6 +70,22 @@ const StudentProfile = () => {
             ...prevInfo,
             [name]: value,
         }));
+        if (name === 'mobileNumber') {
+            const formattedValue = formatMobileNumber(value);
+            setPersonalInfo((prevInfo) => ({
+                ...prevInfo,
+                [name]: formattedValue,
+            }));
+        }
+    };
+
+    const formatMobileNumber = (value) => {
+        const cleaned = ('' + value).replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{0,3})(\d{0,3})(\d{0,4})$/);
+        if (match) {
+            return [match[1], match[2], match[3]].filter(Boolean).join('-');
+        }
+        return value;
     };
 
     const handleAddressChange = (e) => {
@@ -228,11 +257,11 @@ const StudentProfile = () => {
             {/* <Typography variant="h4" component="h1" gutterBottom>
                 Student Profile
             </Typography> */}
-            <Grid item>
+            <Grid2 item>
                 <Avatar sx={{ width: 80, height: 80, fontSize: 32 }}>
                     {personalInfo.firstName[0]}{personalInfo.lastName[0]}
                 </Avatar>
-            </Grid>
+            </Grid2>
             <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
                 <Typography variant="h5">Personal Information</Typography>
                 <form>
@@ -310,7 +339,7 @@ const StudentProfile = () => {
                         onChange={handleAddressChange}
                         disabled={!editAddress}
                     />
-                    <TextField
+                    {/* <TextField
                         fullWidth
                         margin="normal"
                         label="State"
@@ -318,7 +347,26 @@ const StudentProfile = () => {
                         value={address.state}
                         onChange={handleAddressChange}
                         disabled={!editAddress}
-                    />
+                    /> */}
+                    <FormControl fullWidth margin="normal" required>
+                        <Select
+                            // label="State"
+                            name="state"
+                            value={address.state}
+                            onChange={handleAddressChange}
+                            displayEmpty
+                            disabled={!editAddress}
+                        >
+                            <MenuItem value="" disabled>
+                                Select State
+                            </MenuItem>
+                            {statesFF.map((state) => (
+                                <MenuItem key={state} value={state}>
+                                    {state}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
                     <TextField
                         fullWidth
                         margin="normal"

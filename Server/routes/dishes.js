@@ -2,6 +2,7 @@ import { Router } from 'express';
 import multer from 'multer';
 //import sharp from 'sharp'
 import crypto from 'crypto'
+import xss from 'xss';
 const router = Router();
 import helpers from '../helpers/pranHelpers.js';
 import resizeImage from '../data/resizeImage.js';
@@ -59,6 +60,13 @@ router
     .post(upload.single('image'),async (req, res) => {
         // console.log(req.body);
         // console.log(req.file);
+        try {
+            if (!req.file) {
+                throw "Please provide dish image";
+            }
+        } catch (error) {
+            res.status(400).json(errorMsg(error));
+        }
 
         const imageName = generateFileName()
 
@@ -85,6 +93,10 @@ router
             cost
             // ,images
         } = dishFormData;
+        name = xss(name);
+        description = xss(description);
+        cuisineType = xss(cuisineType);
+        cost = xss(cost);
 
         try {
             if (!cookId || !name || !description || !cuisineType || !cost) {//|| !images
@@ -182,6 +194,11 @@ router
             cost,
             images,
             isAvailable } = dishFormData;
+        name = xss(name);
+        description = xss(description);
+        cuisineType = xss(cuisineType);
+        cost = xss(cost);
+        
 
         try {
             cookId = validateId(cookId, 'cookId');

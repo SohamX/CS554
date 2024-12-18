@@ -261,8 +261,8 @@ export const updateCook = async (
       throw 'Please enter a valid mobile number in 000-000-0000 format';
     }
     if (currUser.mobileNumber !== updatedCookData.mobileNumber) {
-      const matchedCount = await userCollection.countDocuments({ mobileNumber: mobileNumber, });
-      const cookMatched = await cookCollection.countDocuments({ mobileNumber: mobileNumber, });
+      const matchedCount = await userCollection.countDocuments({ mobileNumber: updatedCookData.mobileNumber, });
+      const cookMatched = await cookCollection.countDocuments({ mobileNumber: updatedCookData.mobileNumber, });
       if (matchedCount > 0 || cookMatched > 0) {
         throw 'Mobile number already exists';
       }

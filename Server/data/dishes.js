@@ -250,6 +250,7 @@ export const searchQuery = async (
     for (const dish of dishes_obj) {
         for (const cook of cooks_obj) {
             if(dish.cookId.toString() === cook._id.toString()) {
+                dish.cookName = cook.username
                 if (location.trim() === "") {
                     console.log("in non location filter")
                     let dist = helpers.getDistanceFromLatLonInKm(latitude, longitude, cook.location.coordinates.latitude, cook.location.coordinates.longitude)
