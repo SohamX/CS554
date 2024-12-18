@@ -115,11 +115,11 @@ export const registerUser = async (
   
   
   gmail = gmail.trim();
-  if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+  if(!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail)) throw 'Please enter valid email'
   const sameGamil = await userCollection.findOne({gmail:gmail});
   const sameCookGmail = await cookCollection.findOne({gmail:gmail});
   if(sameGamil||sameCookGmail){
-    throw `Error : Already gmail exists with ${gmail}`
+    throw `Error : Already email exists with ${gmail}`
   }
 
   if(typeof mobileNumber!=="string"){
@@ -185,7 +185,7 @@ export const loginUser = async (gmail) => {
   }
 
   gmail = gmail.trim();
-  if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+  if(!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail)) throw 'Please enter valid email'
   
   const userFound = await userCollection.findOne({gmail:gmail});
   const cookFound = await cookCollection.findOne({gmail:gmail});

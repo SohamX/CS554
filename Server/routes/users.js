@@ -82,7 +82,7 @@ router
         longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
 
         gmail = gmail.trim();
-        if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+        if(!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail)) throw 'Please enter valid gmail'
 
         if(typeof mobileNumber!=="string"){
           throw 'mobileNumber should be of type string'
@@ -132,7 +132,7 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
       }
     
       gmail = gmail.trim();
-      if(!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail)) throw 'Please enter valid gmail'
+      if(!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail)) throw 'Please enter valid gmail'
     } catch (e) {
       res.status(400).json({error:e});
       return;

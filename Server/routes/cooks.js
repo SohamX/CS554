@@ -99,7 +99,7 @@ router.route("/register").post(async (req, res) => {
     longitude_float = helpers.latitudeAndLongitude(longitude_float, 'Longitude')
 
     gmail = gmail.trim();
-    if (!/^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(gmail))
+    if (!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail))
       throw "Please enter valid gmail";
     // const sameGamil = await userCollection.findOne({ gmail: gmail });
     // const sameCookGamil = await cookCollection.findOne({ gmail: gmail });
