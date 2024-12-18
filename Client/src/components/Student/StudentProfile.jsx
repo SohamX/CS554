@@ -2,7 +2,7 @@ import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useApi } from '../../contexts/ApiContext';
 import { AuthContext } from "../../contexts/AccountContext";
-import { Container, Typography, TextField, Button, Box, Grid, Avatar } from "@mui/material";
+import { Container, Typography, TextField, Button, Box, Grid2, Avatar } from "@mui/material";
 import { getLocation, getCoordinatesFromAddress, getDistance } from '../../helpers/constants.js';
 
 const StudentProfile = () => {
@@ -228,11 +228,11 @@ const StudentProfile = () => {
             {/* <Typography variant="h4" component="h1" gutterBottom>
                 Student Profile
             </Typography> */}
-            <Grid item>
+            <Grid2 item>
                 <Avatar sx={{ width: 80, height: 80, fontSize: 32 }}>
                     {personalInfo.firstName[0]}{personalInfo.lastName[0]}
                 </Avatar>
-            </Grid>
+            </Grid2>
             <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
                 <Typography variant="h5">Personal Information</Typography>
                 <form>

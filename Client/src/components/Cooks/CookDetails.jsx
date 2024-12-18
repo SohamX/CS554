@@ -11,11 +11,11 @@ import {
     ListItemText,
 
     Box,
-    Grid,
     Avatar,
     Chip,
     CardMedia,
-    Button
+    Button,
+    Grid2
 } from '@mui/material';
 import { CartContext } from '../../contexts/CartContext';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
@@ -104,21 +104,21 @@ const CookDetails = () => {
         return (
             <Card sx={{ maxWidth: 1000, margin: '20px auto', padding: '24px', boxShadow: 3 }}>
                 <CardContent>
-                    <Grid container spacing={2} alignItems="center">
-                        <Grid item>
+                    <Grid2 container spacing={2} alignItems="center">
+                        <Grid2 item>
                             <Avatar sx={{ width: 80, height: 80, fontSize: 32 }}>
                                 {cook.firstName[0]}{cook.lastName[0]}
                             </Avatar>
-                        </Grid>
-                        <Grid item>
+                        </Grid2>
+                        <Grid2 item>
                             <Typography variant="h4" gutterBottom>
                                 {cook.firstName} {cook.lastName}
                             </Typography>
                             <Typography variant="subtitle1" color="textSecondary">
                                 @{cook.username}
                             </Typography>
-                        </Grid>
-                    </Grid>
+                        </Grid2>
+                    </Grid2>
 
                     <Typography variant="body1" sx={{ marginTop: '16px', textAlign: 'center' }}>
                         "{cook.bio}"
@@ -198,9 +198,9 @@ const CookDetails = () => {
                     {dishes.length === 0 ? (
                         <Typography variant="body1" textAlign="center">No dishes yet.</Typography>
                     ) : (
-                        <Grid container spacing={2} sx={{ marginTop: '16px', justifyContent: "center" }} key="dish_array">
+                        <Grid2 container spacing={2} sx={{ marginTop: '16px', justifyContent: "center" }} key="dish_array">
                             {dishes.map((dish) => (
-                                <Grid item xs={12} sm={6} md={5} key={dish._id}>
+                                <Grid2 item xs={12} sm={6} md={5} key={dish._id}>
                                     <Card>
                                         <CardMedia
                                             component="img"
@@ -271,9 +271,9 @@ const CookDetails = () => {
                                             </Box>
                                         </CardContent>
                                     </Card>
-                                </Grid>
+                                </Grid2>
                             ))}
-                        </Grid>
+                        </Grid2>
                     )}
                 </CardContent>
             </Card>

@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Typography, Button, Card, CardContent, Grid, Avatar } from "@mui/material";
+import { Typography, Button, Card, CardContent, Grid2, Avatar } from "@mui/material";
 import { AuthContext } from "../../contexts/AccountContext";
 
 const CooksForYou = () => {
@@ -40,16 +40,16 @@ const CooksForYou = () => {
             )}
 
             {cooks && cooks.length > 0 && (
-                <Grid container spacing={3}>
+                <Grid2 container spacing={3}>
                     {cooks.slice(0, 2).map((cook) => (
-                        <Grid item xs={6} key={cook._id} display="flex" justifyContent="center" marginBottom={1} marginTop={2}>
+                        <Grid2 item xs={6} key={cook._id} display="flex" justifyContent="center" marginBottom={1} marginTop={2}>
                             <Card sx={{ width: '70%', height: '100%' }}>
                                 <CardContent>
-                                    {/* <Grid item> */}
+                                    {/* <Grid2 item> */}
                                     <Avatar sx={{ width: 50, height: 50, fontSize: 20 }}>
                                         {cook.firstName[0]}{cook.lastName[0]}
                                     </Avatar>
-                                    {/* </Grid> */}
+                                    {/* </Grid2> */}
                                     <Typography variant="h5" component="div" marginRight={4}>
                                         <Link to={`/student/cook/${cook._id}`}>
                                             {cook.firstName} {cook.lastName}
@@ -72,11 +72,11 @@ const CooksForYou = () => {
                                     </Typography>
                                 </CardContent>
                             </Card>
-                        </Grid>
+                        </Grid2>
                     ))}
 
                     {cooks.slice(2, 3).map((cook) => (
-                        <Grid item xs={12} key={cook._id} display="flex" justifyContent="center" marginBottom={1}>
+                        <Grid2 item xs={12} key={cook._id} display="flex" justifyContent="center" marginBottom={1}>
                             <Card sx={{ width: '50%', height: '100%' }}>
                                 <CardContent>
                                     <Avatar sx={{ width: 50, height: 50, fontSize: 20 }}>
@@ -104,11 +104,11 @@ const CooksForYou = () => {
                                     </Typography>
                                 </CardContent>
                             </Card>
-                        </Grid>
+                        </Grid2>
                     ))}
 
                     {cooks.slice(3, 5).map((cook) => (
-                        <Grid item xs={6} key={cook._id} display="flex" justifyContent="center" marginBottom={1}>
+                        <Grid2 item xs={6} key={cook._id} display="flex" justifyContent="center" marginBottom={1}>
                             <Card sx={{ width: '70%', height: '100%' }}>
                                 <CardContent>
                                     <Avatar sx={{ width: 50, height: 50, fontSize: 20 }}>
@@ -136,9 +136,9 @@ const CooksForYou = () => {
                                     </Typography>
                                 </CardContent>
                             </Card>
-                        </Grid>
+                        </Grid2>
                     ))}
-                </Grid>
+                </Grid2>
             )}
 
             {(!cooks || cooks.length === 0) && !loading && (
