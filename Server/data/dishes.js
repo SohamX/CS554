@@ -62,7 +62,7 @@ export const addDish = async (
     // images
 ) => {
     const dishCollection = await dishes();
-    if (!cookId || !name || !description || !cuisineType || !cost) {// || !images
+    if (!cookId || !name || !description || !cuisineType || !cost || !imageName) {// || !images
         throw "All fields need to be supplied";
     }
     cookId = validateId(cookId, 'cookId');

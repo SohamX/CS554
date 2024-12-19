@@ -58,6 +58,7 @@ router
         !latitude ||
         !longitude
         ){
+            console.log(req.body)
             throw "All fields need to be supplied"
           }
         firstName = helpers.checkString(firstName,'firstName');

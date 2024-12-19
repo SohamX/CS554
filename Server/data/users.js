@@ -157,7 +157,7 @@ export const registerUser = async (
         country: country,
         coordinates: { longitude: longitude_float, latitude: latitude_float} //Calculated and stored?
     },
-    favourites : [],
+   
     cart : {
       cookId : "",
       dishes : []

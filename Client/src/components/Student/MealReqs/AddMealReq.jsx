@@ -39,8 +39,8 @@ function AddMealReq(props) {
     }
 
     try {
-        description = helpers.checkString(description, 'description');
-        description = helpers.checkSpecialCharsAndNum(description, 'description');
+        description = helpers.checkString(description, 'mealDescription');
+        //description = helpers.checkSpecialCharsAndNum(description, 'description');
     } catch (e) {
       newErrors.push(e);
     }

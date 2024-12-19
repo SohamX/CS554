@@ -24,8 +24,8 @@ export const createMealreq = async (
         throw "All fields need to be supplied";
       }
       userId = helpers.checkId(userId, 'userId');
-      description = helpers.checkString(description, 'description');
-      description = helpers.checkSpecialCharsAndNum(description, 'description');
+      description = helpers.checkString(description, 'mealDescription');
+      //description = helpers.checkSpecialCharsAndNum(description, 'description');
       cuisineType = helpers.checkString(cuisineType, 'cuisineType');
       cuisineType = helpers.checkSpecialCharsAndNum(cuisineType, 'cuisineType');
       noOfPeople = parseInt(noOfPeople, 10);
