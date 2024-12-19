@@ -21,10 +21,10 @@ router.route('/').post(async (req, res) => {
   cuisineType = xss(cuisineType);
   budget = xss(budget);
   requiredBy = xss(requiredBy);
-  
+
   try {
-    description = helpers.checkString(description, 'description');
-    description = helpers.checkSpecialCharsAndNum(description, 'description');
+    description = helpers.checkString(description, 'mealDescription');
+   // description = helpers.checkSpecialCharsAndNum(description, 'description');
   
   
     cuisineType = helpers.checkString(cuisineType, 'cuisineType');
