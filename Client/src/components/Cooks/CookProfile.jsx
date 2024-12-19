@@ -46,15 +46,18 @@ const CookProfile = () => {
 
     const handlePersonalInfoChange = (e) => {
         const { name, value } = e.target;
-        setPersonalInfo((prevInfo) => ({
-            ...prevInfo,
-            [name]: value,
-        }));
         if (name === 'mobileNumber') {
-            const formattedValue = formatMobileNumber(value);
+            if(value.length < 13){
+                const formattedValue = formatMobileNumber(value);
+                setPersonalInfo((prevInfo) => ({
+                    ...prevInfo,
+                    [name]: formattedValue,
+                }));
+            }
+        } else {
             setPersonalInfo((prevInfo) => ({
                 ...prevInfo,
-                [name]: formattedValue,
+                [name]: value,
             }));
         }
     };
@@ -436,7 +439,7 @@ const CookProfile = () => {
                         name="country"
                         value={address.country}
                         onChange={handleAddressChange}
-                        disabled={!editAddress}
+                        disabled
                     />
                     <Button
                         fullWidth
@@ -459,13 +462,13 @@ const CookProfile = () => {
                     Edit
                 </Button>
             </Box> */}
-            <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
+            {/* <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
                 <Typography variant="h5">Past Orders</Typography>
                 <p>Past orders will be displayed here.</p>
                 <Button variant="contained" color="primary" sx={{ mt: 2 }}>
                     Edit
                 </Button>
-            </Box>
+            </Box> */}
         </Container>
     );
 };

@@ -32,7 +32,7 @@ const AdditionalInfo = () => {
         city: '',
         state: '',
         zipcode: '',
-        country: '',
+        country: 'United States',
         bio: '',
     });
     const navigate = useNavigate();
@@ -66,11 +66,13 @@ const AdditionalInfo = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         if (name === 'mobileNumber') {
-            const formattedValue = formatMobileNumber(value);
-            setFormData((prevData) => ({
-                ...prevData,
-                [name]: formattedValue,
-            }));
+            if(value.length < 13){
+                const formattedValue = formatMobileNumber(value);
+                setFormData((prevData) => ({
+                    ...prevData,
+                    [name]: formattedValue,
+                }));
+            }
         } else {
             setFormData((prevData) => ({
                 ...prevData,
@@ -94,6 +96,34 @@ const AdditionalInfo = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if(!formData.username || !formData.mobileNumber || !formData.address || !formData.city || !formData.state || !formData.zipcode){
+            alert('Please fill out all fields');
+            return;
+        }
+        if(formData.username.length < 3){
+            alert('Username must be at least 3 characters long');
+            return;
+        }
+        if(formData.mobileNumber.length !== 12){
+            alert('Please enter a valid mobile number');
+            return;
+        }
+        if(formData.address.length < 5){
+            alert('Please enter a valid address');
+            return;
+        }
+        if(formData.city.length < 2){
+            alert('Please enter a valid city');
+            return;
+        }
+        if(formData.zipcode.length !== 5){
+            alert('Please enter a valid zipcode');
+            return;
+        }
+        if(formData.state === ''){
+            alert('Please select a state');
+            return;
+        }
         const url = role === 'student' ? `${import.meta.env.VITE_SERVER_URL}/users/register` : `${import.meta.env.VITE_SERVER_URL}/cooks/register`;
         try {
             if(!location.latitude || !location.longitude){
@@ -238,9 +268,9 @@ const AdditionalInfo = () => {
                         margin="normal"
                         label="Country"
                         name="country"
-                        value={formData.country}
-                        onChange={handleChange}
+                        value={"United States"}
                         required
+                        disabled
                     />
                     {role === 'cook' && (
                         <TextField

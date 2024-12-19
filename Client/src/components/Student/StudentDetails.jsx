@@ -76,14 +76,16 @@ const StudentDetails = () => {
                             <Typography variant="body1" align="center">
                                 {student.location.address}, {student.location.city}, {student.location.state}, {student.location.zipcode}, {student.location.country}
                             </Typography>
-                            <iframe
-                                width="80%"
-                                height="200"
-                                frameBorder="0"
-                                style={{ border: 0, borderRadius: '8px' }}
-                                src={`https://www.google.com/maps?q=${student.location.coordinates.latitude},${student.location.coordinates.longitude}&hl=es;z=14&output=embed`}
-                                allowFullScreen
-                            ></iframe>
+                            {student.location.coordinates.latitude !== 0.0 && student.location.coordinates.longitude !== 0.0 &&
+                                <iframe
+                                    width="80%"
+                                    height="200"
+                                    frameBorder="0"
+                                    style={{ border: 0, borderRadius: '8px' }}
+                                    src={`https://www.google.com/maps?q=${student.location.coordinates.latitude},${student.location.coordinates.longitude}&hl=es;z=14&output=embed`}
+                                    allowFullScreen
+                                ></iframe>
+                            }
                         </Box>
                     </Box>
                 </CardContent>

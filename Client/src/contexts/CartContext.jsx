@@ -82,8 +82,11 @@ export const CartProvider = ({children}) => {
             if(response.status !== 'success'){
                 throw response;
             }
+            console.log(response);
             setCartItems(response.decItem.dishes);
-            setCook({cookId: response.decItem.cookId, cookName: response.decItem.cookName});
+            if(response.decItem.cookId === ''){
+                setCook({cookId: response.decItem.cookId, cookName: response.decItem.cookName});
+            }
             setTotal(response.decItem.totalCost);
         } catch (error) {
             console.error('Error:', error);
@@ -126,7 +129,9 @@ export const CartProvider = ({children}) => {
                 throw response;
             }
             setCartItems(response.remItem.dishes);
-            setCook({cookId: response.remItem.cookId, cookName: response.remItem.cookName});
+            if(response.remItem.cookId === '') {
+                setCook({cookId: response.remItem.cookId, cookName: response.remItem.cookName});
+            }
             setTotal(response.remItem.totalCost);
         } catch (error) {
             console.error('Error:', error);

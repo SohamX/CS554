@@ -308,6 +308,8 @@ export const getCookByID = async (userId) => {
   if (!currUser) {
     throw `No cook found with ID: ${userId}`;
   }
+  if (typeof(currUser.location.coordinates.longitude) == 'string') currUser.location.coordinates.longitude = 0.0
+  if (typeof(currUser.location.coordinates.latitude) == 'string') currUser.location.coordinates.latitude = 0.0
   return currUser;
 }
 
@@ -424,6 +426,7 @@ export const cooksForYou = async (lat, long) => {
     for (const cook of cooks) {
       if (finalCooksArray.length < 5) {
         let dist = helpers.getDistanceFromLatLonInKm(lat, long, cook.location.coordinates.latitude, cook.location.coordinates.longitude)
+        console.log("cook for you dist:", dist)
         if (dist < 10) {
           finalCooksArray.push(cook)
         }
@@ -435,4 +438,13 @@ export const cooksForYou = async (lat, long) => {
   } catch(e) {
     return e
   }
+}
+
+export const getCookCoordinates = async (cookId) => {
+  cookId = helpers.checkId(cookId, "cookId");
+  const coordinates = await cookCollection.findOne({ _id: new ObjectId(cookId) }, { projection: { "location": 1 } });
+  if (!coordinates) {
+    throw `No cook found with ID: ${cookId}`;
+  }
+  return coordinates;
 }

@@ -351,6 +351,8 @@ export const loginUser = async (gmail) => {
     if (!user) {
       throw `Error: User does not exist`;
     }
+    if (typeof(user.location.coordinates.longitude) == 'string') user.location.coordinates.longitude = 0.0
+    if (typeof(user.location.coordinates.latitude) == 'string') user.location.coordinates.latitude = 0.0
     return user;
   }
 

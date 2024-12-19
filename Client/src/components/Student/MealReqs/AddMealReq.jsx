@@ -124,7 +124,7 @@ function AddMealReq(props) {
         </div>
         <br />
         <div className={styles.formGroup}>
-      <label>
+      <label style={{ width: '100%' }}>
         Cuisine Type:
         <br />
         <select className={styles.input} id='cuisineType' required>
@@ -133,10 +133,16 @@ function AddMealReq(props) {
           </option>
           <option value='AMERICAN'>AMERICAN</option>
           <option value='MEXICAN'>MEXICAN</option>
+          <option value='ITALIAN'>ITALIAN</option>
           <option value='INDIAN'>INDIAN</option>
+          <option value='THAI'>THAI</option>
           <option value='CHINESE'>CHINESE</option>
           <option value='FRENCH'>FRENCH</option>
           <option value='POLISH'>POLISH</option>
+          <option value='HUNGARIAN'>HUNGARIAN</option>
+          <option value='JAPANESE'>JAPANESE</option>
+          <option value='KOREAN'>KOREAN</option>
+          <option value='MONGOLIAN'>MONGOLIAN</option>
           <option value='DUTCH'>DUTCH</option>
           <option value='GREEK'>GREEK</option>
           <option value='VIETNAMESE'>VIETNAMESE</option>

@@ -328,6 +328,10 @@ router.route("/:id")
       res.status(500).json({ error: "Internal Server Error" });
     }
   } catch (e) {
+    if(e === `No cook with that ID`){
+      res.status(404).json({ error: e });
+      return;
+    }
     res.status(500).json({ error: e, message: e.message });
     return;
   }
@@ -362,6 +366,7 @@ router.route("/availability/:id").patch(async(req, res) => {
     const data = await cookData.getCookByID(userId);
     if (!data) {
       res.status(404).json({ error: "Cook Not Found" });
+      return;
     }
     const resp = await cookData.updateCooksAvailability(userId, obj.isAvailable);
     if (resp) {
@@ -394,6 +399,31 @@ router.route("/availability/:id").patch(async(req, res) => {
     }
   } catch (e) {
     res.status(400).json({ error: e });
+    return;
+  }
+})
+
+router.route('/coordinates/:id').get(async(req,res)=>{
+  let cookId = req.params.id;
+  try {
+    cookId = helpers.checkId(cookId, 'cookId');
+  } catch (e) {
+    res.status(400).json({ error: e });
+    return;
+  }
+  try {
+    const data = await cookData.getCookCoordinates(cookId);
+    if (data) {
+      res.status(200).json({ status: "success", location: data.location });
+    } else {
+      res.status(404).json({ error: "Cook Not Found" });
+    }
+  } catch (e) {
+    if(e === `No cook found with ID: ${cookId}`){
+      res.status(404).json({ error: e });
+      return;
+    }
+    res.status(500).json({ error: e });
     return;
   }
 })

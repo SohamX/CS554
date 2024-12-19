@@ -58,6 +58,7 @@ router
         !latitude ||
         !longitude
         ){
+            console.log(req.body)
             throw "All fields need to be supplied"
           }
         firstName = helpers.checkString(firstName,'firstName');
@@ -556,7 +557,6 @@ router
     try {
       req.params.userId = helpers.checkId(req.params.userId, 'userId URL Param');
       req.params.id = helpers.checkId(req.params.id, 'cardId URL Param');
-      console.log('HERE 2' + JSON.stringify(req.body));
       let existCard = userData.getPaymentMethodByUserIdCardId(req.params.userId, req.params.id);
       if (!cardHolderName || !expirationDate || !cvv || !zipcode || !country || !nickName) {
         throw 'At least one field must be updated';

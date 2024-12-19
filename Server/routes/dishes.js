@@ -247,6 +247,7 @@ router
                 isAvailable);
             if (dishUpdated) {
                 const keysToDelete = await client.keys(`home:dishes:*`);
+                console.log("visited", keysToDelete)
                 if (keysToDelete.length > 0) {
                     for (const key of keysToDelete) {
                     await client.del(key);
