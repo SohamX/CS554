@@ -308,6 +308,8 @@ export const getCookByID = async (userId) => {
   if (!currUser) {
     throw `No cook found with ID: ${userId}`;
   }
+  if (typeof(currUser.location.coordinates.longitude) == 'string') currUser.location.coordinates.longitude = 0.0
+  if (typeof(currUser.location.coordinates.latitude) == 'string') currUser.location.coordinates.latitude = 0.0
   return currUser;
 }
 

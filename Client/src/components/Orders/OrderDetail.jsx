@@ -1,5 +1,5 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 
 import { useApi } from '../../contexts/ApiContext.jsx';
 import { Card, CardContent, Typography, Button, Box, TableContainer, Table, TableHead, TableRow, TableCell, Paper, TableBody, TextField, Rating } from '@mui/material';
@@ -176,7 +176,13 @@ function OrderDetail(props) {
                 <Box display="flex" flexDirection="column" alignItems="center" mt={5}>
                     <Card sx={{ width: '100%', maxWidth: 600, mb: 5, padding: 4 }}>
                         <Typography variant="h4" gutterBottom>
-                            {role === 'cook' ? 'User:' : 'Cook:'} <strong>{role === 'cook' ? username : cookName}</strong>
+                            {/* {role === 'cook' ? 'User:' : 'Cook:'} <strong>{role === 'cook' ? username : cookName}</strong> */}
+                            <Link to={`/cook/student/${order.userId}`}>
+                                {role === 'cook' && <>User : <strong>{username}</strong></>}
+                            </Link>
+                            <Link to={`/student/cook/${order.cookId}`}>
+                                {role !== 'cook' && <>Cook : <strong>{cookName}</strong></>}
+                            </Link>
                         </Typography>
                         <Card sx={{ m: 3, width: '90%' }}>
                             <CardContent>
