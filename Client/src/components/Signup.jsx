@@ -12,6 +12,32 @@ function SignUp() {
     const handleSignUp = async (e) => {
         e.preventDefault();
         const { firstName, lastName, email, passwordOne, passwordTwo } = e.target.elements;
+        firstName.value = firstName.value.trim();
+        lastName.value = lastName.value.trim();
+        email.value = email.value.trim();
+        passwordOne.value = passwordOne.value.trim();
+        passwordTwo.value = passwordTwo.value.trim();
+        if(firstName.value === '' || lastName.value === '' || email.value === '' || passwordOne.value === '' || passwordTwo.value === '') {
+            alert('Please fill out all fields');
+            return false;
+        }
+        if(firstName.value.length < 2){
+            alert('First name must be at least 2 characters long');
+            return false;
+        }
+        if(lastName.value.length < 2){
+            alert('Last name must be at least 2 characters long');
+            return false;
+        }
+        if(!email.value.includes('@') || !email.value.includes('.')){
+            alert('Please enter a valid email address');
+            return false;
+        }
+        email.value = email.value.toLowerCase();
+        if(passwordOne.value.length < 6){
+            alert('Password must be at least 6 characters long');
+            return false;
+        }
         if (passwordOne.value !== passwordTwo.value) {
             setPwMatch('Passwords do not match');
             return false;

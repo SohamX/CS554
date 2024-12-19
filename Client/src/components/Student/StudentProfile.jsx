@@ -66,15 +66,18 @@ const StudentProfile = () => {
 
     const handlePersonalInfoChange = (e) => {
         const { name, value } = e.target;
-        setPersonalInfo((prevInfo) => ({
-            ...prevInfo,
-            [name]: value,
-        }));
         if (name === 'mobileNumber') {
-            const formattedValue = formatMobileNumber(value);
+            if(value.length < 13){
+                const formattedValue = formatMobileNumber(value);
+                setPersonalInfo((prevInfo) => ({
+                    ...prevInfo,
+                    [name]: formattedValue,
+                }));
+            }
+        } else {
             setPersonalInfo((prevInfo) => ({
                 ...prevInfo,
-                [name]: formattedValue,
+                [name]: value,
             }));
         }
     };
@@ -383,7 +386,7 @@ const StudentProfile = () => {
                         name="country"
                         value={address.country}
                         onChange={handleAddressChange}
-                        disabled={!editAddress}
+                        disabled
                     />
                     <Button
                         fullWidth

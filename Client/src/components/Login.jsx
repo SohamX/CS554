@@ -20,13 +20,29 @@ const Login = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-    let {email, password} = event.target.elements;
+    setError('');
+    if (!email || !password) {
+      setError('Please enter email and password');
+      return;
+    }
+    if(email===''){
+      setError('Please enter an email address');
+      return;
+    }
+    if(password===''){
+      setError('Please enter a password');
+      return;
+    }
+    if(!email.includes('@') || !email.includes('.')){
+      setError('Please enter a valid email address');
+      return;
+    }
 
     try {
       await doSignInWithEmailAndPassword(email.value, password.value);
     } catch (error) {
-      if(error.message.trim() === "Firebase: Error (auth/invalid-credential)."){
-        setError('No user found with that email');
+      if(error.message.trim() === "Firebase: Error (auth/invalid-credential)."|| error.message.trim() === "Firebase: Error (auth/missing-email)."){
+        setError('No user found with that email or password');
       }
       else{
         setError(error.message);
@@ -80,13 +96,21 @@ const Login = () => {
   //   }
   // };
 
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  }
+
   return (
     <Container maxWidth="sm" style={{marginTop: "5%", marginBottom: "5%"}}>
       <Box sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
         <Typography variant="h4" component="h1" gutterBottom>
           Login
         </Typography>
-        {error && <Alert severity="error">{error}</Alert>}
+        {error && <Alert severity="error" sx={{ width: "93%"}}>{error}</Alert>}
         <form onSubmit={handleLogin}>
           <TextField
             fullWidth
@@ -95,7 +119,7 @@ const Login = () => {
             name="email"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={handleEmailChange}
             required
             autoFocus
           />
@@ -106,7 +130,7 @@ const Login = () => {
             name="password"
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
             required
           />
           <Button
