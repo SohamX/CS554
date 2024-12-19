@@ -1,7 +1,7 @@
 import { orders } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import helpers from '../helpers/pranHelpers.js';
-import { validateDishesList, validateId, validateCost, validateCloudUrl, checkisValidBoolean, validateOrderStatus } from '../helpers/validationHelper.js';
+import { validateDishesList, validateId, validateCost, validateCloudUrl, checkisValidBoolean, validateOrderStatus, checkDishDesc } from '../helpers/validationHelper.js';
 import { getDishById } from './dishes.js';
 import { userData } from '../data/index.js';
 

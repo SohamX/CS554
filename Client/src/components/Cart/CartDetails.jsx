@@ -256,6 +256,7 @@ function CartDetails() {
                             boxShadow: 2,
                             borderRadius: 2,
                             backgroundColor: '#f9f9f9',
+                            mb: 3,
                         }}
                     >
                         <Typography variant="h6" sx={{ fontWeight: 'bold' }}>

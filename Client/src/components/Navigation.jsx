@@ -11,6 +11,8 @@ import ListAltIcon from '@mui/icons-material/ListAlt';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import HistoryIcon from '@mui/icons-material/History';
 import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import {doSignOut} from '../firebase/FirebaseFunctions';
 import { CartContext } from '../contexts/CartContext';
 
@@ -83,35 +85,41 @@ const Navigation = () => {
                         ) : (
                             <div style={{ display: "flex", justifyContent: "space-between" }}>
                                 <section style={{ display: "flex", alignItems: "center" }}>
-                                    <Button color="inherit">
-                                        <Link to="/cook" style={{ color: "white", textDecoration: "none" }}>
-                                            Home
+                                    <Button color="inherit" style={{ width: "auto" }}>
+                                        <Link to="/cook" style={{ color: "white", textDecoration: "none", display: "flex", alignItems: "center" }}>
+                                            <HomeIcon />
+                                            <Typography variant="body2" sx={{ ml: 1 }}>Home</Typography>
                                         </Link>
                                     </Button>
                                 </section>
-                                <section style={{ display: "flex", alignItems: "center" }}>
-                                        <Button color="inherit" style={{ width: "auto" }}>
-                                            <Link to="/cook/dishes" style={{ color: "white", textDecoration: "none" }}>
-                                            My Dishes
+                                <section style={{ display: "flex", alignItems: "center", width: "fit-content" }}>
+                                    <Button color="inherit" style={{ width: "auto" }}>
+                                        <Link to="/cook/dishes" style={{ color: "white", textDecoration: "none", display: "flex", alignItems: "center" }}>
+                                            <DinnerDiningIcon />
+                                            <Typography variant="body2" sx={{ ml: 1 }}>My Dishes</Typography>
                                         </Link>
                                     </Button>
-                                        <Button color="inherit" style={{ width: "auto" }}>
-                                            <Link to="/cook/orders" style={{ color: "white", textDecoration: "none" }}>
-                                            Orders
+                                    <Button color="inherit" style={{ width: "auto" }}>
+                                        <Link to="/cook/orders" style={{ color: "white", textDecoration: "none", display: "flex", alignItems: "center" }}>
+                                            <ReceiptIcon />
+                                            <Typography variant="body2" sx={{ ml: 1 }}>Orders</Typography>
                                         </Link>
                                     </Button>
-                                    <Button color="inherit" style={{width: "auto"}}>
-                                        <Link to="/mealReqs/cooks/pending" style={{ color: "white", textDecoration: "none" }}>
-                                            Meal Requests
+                                    <Button color="inherit" style={{ width: "auto" }}>
+                                        <Link to="/mealReqs/cooks/pending" style={{ color: "white", textDecoration: "none", display: "flex", alignItems: "center" }}>
+                                            <ListAltIcon />
+                                            <Typography variant="body2" sx={{ ml: 1 }}>Meal Requests</Typography>
                                         </Link>
                                     </Button>
-                                    <Button color="inherit" style={{width: "auto"}}>
-                                        <Link to="/cook/account" style={{ color: "white", textDecoration: "none" }}>
-                                            My Account
+                                    <Button color="inherit" style={{ width: "auto" }}>
+                                        <Link to="/cook/account" style={{ color: "white", textDecoration: "none", display: "flex", alignItems: "center" }}>
+                                            <AccountCircleIcon />
+                                            <Typography variant="body2" sx={{ ml: 1 }}>My Account</Typography>
                                         </Link>
                                     </Button>
-                                    <Button color="inherit" style={{width: "auto"}} onClick={doSignOut}>
-                                        Sign Out
+                                    <Button color="inherit" style={{ width: "auto" }} onClick={doSignOut}>
+                                        <LogoutIcon />
+                                        <Typography variant="body2" sx={{ ml: 1 }}>Sign Out</Typography>
                                     </Button>
                                 </section>
                             </div>
@@ -119,14 +127,20 @@ const Navigation = () => {
                     ) : (
                         <div style={{ display: "flex", justifyContent: "flex-end" }}>
                             {location.pathname!=='/additional/info' && (
-                                <>
-                                    <Button color="inherit" component={Link} to="/">
-                                        Sign In
+                                <section style={{ display: "flex", alignItems: "center" }}>
+                                    <Button color="inherit" style={{ width: "auto" }}>
+                                        <Link to='/' style={{ color: "white", textDecoration: "none", display: "flex", alignItems: "center" }}>
+                                            <LoginIcon sx={{ mr: 1 }} />
+                                            <Typography variant="body2" sx={{ ml: 1 }}>Sign In</Typography>
+                                        </Link>
                                     </Button>
-                                    <Button color="inherit" component={Link} to="/signup">
-                                        Sign Up
+                                    <Button color="inherit" style={{ width: "auto" }}>
+                                        <Link to='/signup' style={{ color: "white", textDecoration: "none", display: "flex", alignItems: "center" }}>
+                                            <PersonAddIcon sx={{ mr: 1 }} />
+                                            <Typography variant='body2' sx={{ ml: 1 }}>Sign Up</Typography>
+                                        </Link>
                                     </Button>
-                                </>
+                                </section>
                             )}
                         </div>
                     )}

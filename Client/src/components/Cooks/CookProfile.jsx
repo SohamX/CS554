@@ -459,13 +459,13 @@ const CookProfile = () => {
                     Edit
                 </Button>
             </Box> */}
-            <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
+            {/* <Box mb={6} sx={{ mt: 4, p: 3, boxShadow: 3, borderRadius: 2 }}>
                 <Typography variant="h5">Past Orders</Typography>
                 <p>Past orders will be displayed here.</p>
                 <Button variant="contained" color="primary" sx={{ mt: 2 }}>
                     Edit
                 </Button>
-            </Box>
+            </Box> */}
         </Container>
     );
 };

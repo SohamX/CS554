@@ -26,8 +26,7 @@ function OrderDetail(props) {
 
     const onReviewTextChange = (e) => {
         let value = e.target.value;
-        value = checkDishDesc(value, 'Review');
-
+        // value = checkDishDesc(value, 'Review');
         setReviewText(value);
     };
 
@@ -60,7 +59,7 @@ function OrderDetail(props) {
                         }
                         const location = response.location;
                         const fullAddress = location.address + ', ' + location.city + ', ' + location.state + ', ' + location.zip + ', ' + location.country;
-                        if(response.location.coordinates.latitude ==="" && response.location.coordinates.longitude === ""){
+                        if((response.location.coordinates.latitude ===0 && response.location.coordinates.longitude === 0)|| (response.location.coordinates.latitude === '' && response.location.coordinates.longitude === '')){
                             const coordinates = await getCoordinatesFromAddress(fullAddress);
                             if(coordinates){
                                 setCoordinates(coordinates);
@@ -118,6 +117,7 @@ function OrderDetail(props) {
             alert('Review submitted successfully!');
             setOrder(response.order);
         } catch (error) {
+            console.error('Error:', error);
             alert('Failed to submit review. Please try again.');
         } finally {
             setIsSubmitting(false);
@@ -294,7 +294,7 @@ function OrderDetail(props) {
                                     fullWidth
                                     sx={{ mt: 2 }}
                                     value={reviewText}
-                                    onChange={(e) => onReviewTextChange(e.target.value)}
+                                    onChange={onReviewTextChange}
                                     inputProps={{ maxLength: 1000 }}
                                 />
                                 <Button
@@ -311,11 +311,13 @@ function OrderDetail(props) {
 
                         {rating !== '-' && (
                             <Card sx={{ m: 3, width: '90%' }}>
-                                <Typography variant="h5" gutterBottom>
-                                    Feedback
-                                </Typography>
-                                <Typography variant="body1">Rating: {rating}/5</Typography>
-                                <Typography variant="body1">Review: {review}</Typography>
+                                <CardContent>
+                                    <Typography variant="h5" gutterBottom>
+                                        Feedback
+                                    </Typography>
+                                    <Typography variant="body1">Rating: {rating}/5</Typography>
+                                    <Typography variant="body1">Review: {review}</Typography>
+                                </CardContent>
                             </Card>
                         )}
                     </Card>
