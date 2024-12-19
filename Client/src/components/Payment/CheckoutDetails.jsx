@@ -268,14 +268,15 @@ function CheckoutDetails() {
                 ))}
             </RadioGroup>
 
-            <Button
+            {paymentMethods && paymentMethods.length === 0 && <Button
                 variant="contained"
                 color="primary"
                 sx={{ mt: 1, mr: 1 }}
                 onClick={handleOnClickAddPayment}
             >
                 Add Payment Method
-            </Button>
+            </Button>}
+
             {showAddForm && (
                 <AddCard userId={userId} paymentMethods={paymentMethods} refreshPaymentMethods={getPaymentMethodsList} closeAddFormState={closeAddFormState} />
             )}
