@@ -199,7 +199,11 @@ function EditDish(props) {
                                             console.log('error: ' + response.error);
                                             throw response.error;
                                         }
+                                        setShowEditModal(false);
 
+                                        alert('Dish Updated');
+                                        props.refreshDishes();
+                                        props.handleClose();
                                         console.log("Dish successfully updated:", response.dish);
                                     } catch (error) {
                                         alert(error);
@@ -208,11 +212,11 @@ function EditDish(props) {
 
                                 await updateDish();
 
-                                setShowEditModal(false);
+                                // setShowEditModal(false);
 
-                                alert('Dish Updated');
-                                props.refreshDishes();
-                                props.handleClose();
+                                // alert('Dish Updated');
+                                // props.refreshDishes();
+                                // props.handleClose();
                             } catch (e) {
                                 setError(true);
                                 const errorMessage = e.message ? e.message : e;
