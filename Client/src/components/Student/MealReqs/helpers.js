@@ -75,7 +75,7 @@ const exportedMethods = {
     if (!strVal) throw `Error: You must supply a ${varName}!`;
     if (typeof strVal !== 'string') throw `Error: ${varName} must be a string!`;
     strVal = strVal.trim();
-    if (strVal.length < 2 || strVal.length > 25) throw `${varName} must be a non-empty string and length should be min 2 and max 25`;
+    if (varName !== 'mealDescription' && (strVal.length < 2 || strVal.length > 25)) throw `${varName} must be a non-empty string and length should be min 2 and max 25`;
     if (varName === 'mealDescription' && (strVal.length < 2 || strVal.length > 200)) throw `${varName} must be a non-empty string and length should be min 2 and max 200`;
     if (!isNaN(strVal))
       throw `Error: ${strVal} is not a valid value for ${varName} as it only contains digits`;

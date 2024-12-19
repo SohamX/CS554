@@ -7,7 +7,7 @@ import { Button, Card, Typography, Table, TableBody, TableCell, TableContainer, 
 import { useApi } from '../../contexts/ApiContext.jsx';
 import { AuthContext } from '../../contexts/AccountContext.jsx';
 import VisaLogo from '../../assets/Visa.png';
-import MasterCardLogo from '../../assets/MasterCard.svg';
+import MasterCardLogo from '../../assets/Mastercard.svg';
 import AmericanExpressLogo from '../../assets/American_Express.png';
 
 
