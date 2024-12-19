@@ -141,13 +141,14 @@ const CookDetails = () => {
                         </Typography>
                     </Box> */}
 
-                            <iframe
-                                width="80%"
-                                height="200"
-                                style={{ border: 0, borderRadius: '8px' }}
-                                src={`https://www.google.com/maps?q=${cook.location.coordinates.latitude},${cook.location.coordinates.longitude}&hl=es;z=14&output=embed`}
-                                allowFullScreen
-                            ></iframe>
+                            { cook.location.coordinates.latitude !== 0.0 && cook.location.coordinates.longitude !==0.0 &&
+                                <iframe
+                                    width="80%"
+                                    height="200"
+                                    style={{ border: 0, borderRadius: '8px' }}
+                                    src={`https://www.google.com/maps?q=${cook.location.coordinates.latitude},${cook.location.coordinates.longitude}&hl=es;z=14&output=embed`}
+                                    allowFullScreen
+                                ></iframe>}
                         </Box>
                         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <Box>
