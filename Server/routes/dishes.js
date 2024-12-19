@@ -70,12 +70,12 @@ router
 
         const imageName = generateFileName()
 
-        const fileBuffer = await resizeImage(req.file.buffer);
+        // const fileBuffer = await resizeImage(req.file.buffer);
 
         const params = {
             Bucket: bucketName,
             Key: imageName,
-            Body: fileBuffer,
+            Body: req.file.buffer,
             ContentType: req.file.mimetype,
         }
 
@@ -247,6 +247,7 @@ router
                 isAvailable);
             if (dishUpdated) {
                 const keysToDelete = await client.keys(`home:dishes:*`);
+                console.log("visited", keysToDelete)
                 if (keysToDelete.length > 0) {
                     for (const key of keysToDelete) {
                     await client.del(key);

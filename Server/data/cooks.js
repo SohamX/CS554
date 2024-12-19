@@ -426,6 +426,7 @@ export const cooksForYou = async (lat, long) => {
     for (const cook of cooks) {
       if (finalCooksArray.length < 5) {
         let dist = helpers.getDistanceFromLatLonInKm(lat, long, cook.location.coordinates.latitude, cook.location.coordinates.longitude)
+        console.log("cook for you dist:", dist)
         if (dist < 10) {
           finalCooksArray.push(cook)
         }
