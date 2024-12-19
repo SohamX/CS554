@@ -70,12 +70,12 @@ router
 
         const imageName = generateFileName()
 
-        // const fileBuffer = await resizeImage(req.file.buffer);
+        const fileBuffer = await resizeImage(req.file.buffer);
 
         const params = {
             Bucket: bucketName,
             Key: imageName,
-            Body: req.file.buffer,
+            Body: fileBuffer,
             ContentType: req.file.mimetype,
         }
 
