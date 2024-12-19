@@ -39,7 +39,7 @@ const Login = () => {
     }
 
     try {
-      await doSignInWithEmailAndPassword(email.value, password.value);
+      await doSignInWithEmailAndPassword(email, password);
     } catch (error) {
       if(error.message.trim() === "Firebase: Error (auth/invalid-credential)."|| error.message.trim() === "Firebase: Error (auth/missing-email)."){
         setError('No user found with that email or password');
