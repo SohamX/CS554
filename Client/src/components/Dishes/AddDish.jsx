@@ -102,20 +102,25 @@ function AddDish(props) {
                     if (response.error) {
                         throw response;
                     }
-
+                    props.refreshDishes();
+                    document.getElementById('add-dish').reset();
+                    setLoading(false);
+                    alert('Dish Added');
+                    props.closeAddFormState();
                     console.log("Dish successfully added:", response.dish);
                 } catch (error) {
-                    alert(error);
+                    console.log("error", error.error)
+                    alert(`Could not add dish: ${error.error}`);
                 }
             };
 
             await addDish();
             // navigate('/cook/dishes');
-            props.refreshDishes();
-            document.getElementById('add-dish').reset();
-            setLoading(false);
-            alert('Dish Added');
-            props.closeAddFormState();
+            // props.refreshDishes();
+            // document.getElementById('add-dish').reset();
+            // setLoading(false);
+            // alert('Dish Added');
+            // props.closeAddFormState();
         } catch (e) {
             setError(true);
             const errorMessage = e.message ? e.message : e;

@@ -72,6 +72,8 @@ export const addDish = async (
     cuisineType = validateCuisineType(cuisineType);
     //validate cost
     cost = validateCost(cost, 'cost');
+    if (cost > 100) throw `Cost cannot be greater than 100`
+    if (cost <= 0) throw `Cost cannot be less than or equal to 0`
     //images = checkisValidImageArray(images, 'images');
 
     //check if dish already present for this cook
@@ -142,6 +144,8 @@ export const updateDish = async (
     if (cost) {
         //validate cost
         cost = validateCost(cost, 'cost');
+        if (cost > 100) throw `Cost cannot be greater than 100`
+        if (cost <= 0) throw `Cost cannot be less than or equal to 0`
         existingDish.cost = cost;
     }
 

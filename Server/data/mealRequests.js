@@ -36,6 +36,8 @@ export const createMealreq = async (
     budget = parseInt(budget, 10);
     if (isNaN(budget) || budget <= 0 || !Number.isInteger(budget)) {
     throw 'Budget should be a positive number';
+    } else if (budget > 1000) {
+      throw `Budget cannot be greater than 1000`
     }
     if (typeof requiredBy !== 'string') throw `Error: requiredBy date must be a string!`;
     requiredBy = requiredBy.trim();

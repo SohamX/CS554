@@ -57,6 +57,9 @@ function AddMealReq(props) {
         budget = parseInt(budget, 10);
         if (isNaN(budget) || budget <= 0 || !Number.isInteger(budget)) {    
           throw 'Budget should be a positive number';
+        } 
+        else if (budget > 1000) {
+          throw 'Budget cannot be greater than 1000';
         }
       } catch (e) {
         newErrors.push(e);
