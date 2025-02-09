@@ -18,7 +18,7 @@ export const CartProvider = ({children}) => {
         try{
             console.log(itemId);
             console.log(quantity);
-            const response = await apiCall(`http://localhost:3000/users/cart/add/${itemId}/to/${currentUser._id}/by/${quantity}`, {
+            const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/users/cart/add/${itemId}/to/${currentUser._id}/by/${quantity}`, {
                 method: 'POST'
             });
             console.log(response);

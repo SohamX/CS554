@@ -2,11 +2,9 @@ import { users, cooks } from '../config/mongoCollections.js';
 import { ObjectId } from 'mongodb';
 import helpers from '../helpers/pranHelpers.js'
 import bcrypt from 'bcryptjs';
+import client from '../config/redisClient.js';
 const userCollection = await users();
 const cookCollection = await cooks();
-import redis from 'redis'
-const client = redis.createClient();
-client.connect().then(() => {});
 
 export const registerCook = async (
   firstName,

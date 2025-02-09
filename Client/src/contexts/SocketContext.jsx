@@ -20,7 +20,7 @@ export const SocketProvider = ({ children }) => {
         if (!currentUser) return;
 
         if (!socketRef.current) {
-            socketRef.current = io('http://localhost:3000');
+            socketRef.current = io(`${import.meta.env.VITE_SERVER_URL}`);
             setSocket(socketRef.current);
 
             socketRef.current.on('connect', () => {
@@ -107,7 +107,7 @@ export const SocketProvider = ({ children }) => {
 
         const joinIncompleteOrders = async () => {
             try {
-                const response = await apiCall(`http://localhost:3000/orders/${currentUser.role ==='user'? 'user':'cook'}/incomplete/${currentUser._id}`);
+                const response = await apiCall(`${import.meta.env.VITE_SERVER_URL}/orders/${currentUser.role ==='user'? 'user':'cook'}/incomplete/${currentUser._id}`);
                 if (response.status === 'success') {
                     response.orders.forEach(order => {
                         if (!joinedStatusRef.current.has(order._id)) {

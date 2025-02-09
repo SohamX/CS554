@@ -17,7 +17,7 @@ function PendingMR() {
   // Function to handle button click and send Axios request
   const handleSend = async (mealReqId) => {
     try {
-      const  { data: { status } } = await axios.post(`http://localhost:3000/mealReqs/${currentUser._id}/pending/${mealReqId}`);
+      const  { data: { status } } = await axios.post(`${import.meta.env.VITE_SERVER_URL}/mealReqs/${currentUser._id}/pending/${mealReqId}`);
       console.log(status);
       setRequestSent((prevState) => ({
         ...prevState,
@@ -35,7 +35,7 @@ function PendingMR() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data: { pendingMealReqs } } = await axios.get(`http://localhost:3000/mealReqs/${currentUser._id}/pendingMr`);
+        const { data: { pendingMealReqs } } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/mealReqs/${currentUser._id}/pendingMr`);
         setShowsData(pendingMealReqs);
         setLoading(false);
       } catch (e) {

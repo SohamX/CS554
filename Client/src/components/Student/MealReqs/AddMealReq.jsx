@@ -79,7 +79,7 @@ function AddMealReq(props) {
     }
     try {
         // Send data to the backend
-        const response = await axios.post('http://localhost:3000/mealReqs',{userId : currentUser._id,
+        const response = await axios.post(`${import.meta.env.VITE_SERVER_URL}/mealReqs`,{userId : currentUser._id,
             noOfPeople ,
             description ,
             cuisineType,

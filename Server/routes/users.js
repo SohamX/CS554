@@ -5,11 +5,8 @@ import { checkisValidString } from '../helpers/validationHelper.js';
 import { errorMsg, validateCardNumber, validateCvv, validateZipCode } from '../helpers/validationHelper.js';
 import { loginDetails } from "./middlewares.js";
 import xss from 'xss';
+import client from '../config/redisClient.js';
 const router = Router();
-
-import redis from 'redis'
-const client = redis.createClient();
-client.connect().then(() => {});
 
 //REGISTER USER ROUTE
 

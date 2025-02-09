@@ -49,7 +49,7 @@ function MealReq() {
     fetchMealReqData();
     async function fetchData() {
       try {
-        const { data: { responses } } = await axios.get(`http://localhost:3000/mealReqs/pending/${mealReqId}/responses`);
+        const { data: { responses } } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/mealReqs/pending/${mealReqId}/responses`);
         console.log('data : ' + JSON.stringify(responses));
         setShowsData(responses);
         setLoading(false);

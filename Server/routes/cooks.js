@@ -6,9 +6,7 @@ import { cookData } from "../data/index.js";
 import helpers from "../helpers/pranHelpers.js";
 const userCollection = await users();
 const cookCollection = await cooks();
-import redis from 'redis'
-const client = redis.createClient();
-client.connect().then(() => {});
+import client from '../config/redisClient.js';
 import xss from 'xss'
 // ADD COOK ROUTE
 router.route("/register").post(async (req, res) => {

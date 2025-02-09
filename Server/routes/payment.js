@@ -3,10 +3,7 @@ import { Router } from 'express';
 const router = Router();
 import { errorMsg } from '../helpers/validationHelper.js';
 import { paymentData, orderData, userData, mealReqData, cookData, dishData } from '../data/index.js';
-
-import redis from 'redis'
-const client = redis.createClient();
-client.connect().then(() => {});
+import client from '../config/redisClient.js';
 
 
 router

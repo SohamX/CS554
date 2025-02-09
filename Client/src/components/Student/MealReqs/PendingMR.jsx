@@ -14,7 +14,7 @@ function PendingMR() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data: { pendingMealReqs } } = await axios.get(`http://localhost:3000/mealReqs/${currentUser._id}/pending`);
+        const { data: { pendingMealReqs } } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/mealReqs/${currentUser._id}/pending`);
         setShowsData(pendingMealReqs);
         setLoading(false);
       } catch (e) {

@@ -1,7 +1,5 @@
-import redis from 'redis';
 import { Server } from 'socket.io';
-const client = redis.createClient();
-await client.connect()
+import client from '../config/redisClient.js';
 
 const setUpSocket = (server) => {
     const io = new Server(server, {

@@ -1,8 +1,6 @@
 import { Router } from "express";
 const router = Router();
-import redis from 'redis';
-const client = redis.createClient();
-client.connect().then(() => {});
+import client from '../config/redisClient.js';
 import helpers from "../helpers/pranHelpers.js";
 import { dishData } from "../data/index.js";
 import { cookData } from "../data/index.js";

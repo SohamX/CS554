@@ -14,7 +14,7 @@ function AwaitingMRCook() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data: { awaitingResponseMealReqs } } = await axios.get(`http://localhost:3000/mealReqs/${currentUser._id}/awaiting/`);
+        const { data: { awaitingResponseMealReqs } } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/mealReqs/${currentUser._id}/awaiting/`);
         setShowsData(awaitingResponseMealReqs);
         setLoading(false);
       } catch (e) {

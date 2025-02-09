@@ -14,7 +14,7 @@ function AcceptedMRCook() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data: { accpetedMealReqs } } = await axios.get(`http://localhost:3000/mealReqs/${currentUser._id}/acceptedMr/`);
+        const { data: { accpetedMealReqs } } = await axios.get(`${import.meta.env.VITE_SERVER_URL}/mealReqs/${currentUser._id}/acceptedMr/`);
         //console.log(acceptedMealReqs);
         setShowsData(accpetedMealReqs);
         setLoading(false);
