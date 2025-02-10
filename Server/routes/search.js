@@ -110,6 +110,7 @@ router.route("/home/").get(userHome,async (req, res) => {
 
     res.status(200).json({ status: "success", dishes: dishes });
   } catch (e) {
+    console.log(e);
     res.status(404).json({error : e});
     return;
   }
