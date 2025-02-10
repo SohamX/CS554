@@ -94,7 +94,7 @@ router.route("/home/").get(userHome,async (req, res) => {
     const userId = req.query.userId;
     console.log(userId);
     const dishes = await dishData.getAvailableDishes(latitude, longitude);
-    await client.json.set(`home:dishes:${userId}`, '.',dishes);
+    await client.json.set(`home:dishes:${userId}`, '$',dishes);
     console.log("Setup in redis cache");
     for (const dish of dishes) {
       const getObjectParams = {

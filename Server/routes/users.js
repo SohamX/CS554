@@ -122,7 +122,7 @@ router
         latitude_float,
         longitude_float);
     if (succ.signupCompleted) {
-      await client.json.set(`user:${succ.user.gmail}`,'.',succ.user);
+      await client.json.set(`user:${succ.user.gmail}`,'$',succ.user);
       res.status(200).json({ status: "success",user:succ.user });
     }
     else {
@@ -306,7 +306,7 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
       try {
           const updateInfo = await userData.updateUser(req.params.id,updateData);
         if (updateInfo) {
-          await client.json.set(`user:${updateInfo.gmail}`,'.',updateInfo);
+          await client.json.set(`user:${updateInfo.gmail}`,'$',updateInfo);
           res.status(200).json({ status: "success", user: updateInfo });
         }
         else {

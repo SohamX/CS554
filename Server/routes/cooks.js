@@ -155,7 +155,7 @@ router.route("/register").post(async (req, res) => {
       longitude_float
     );
     if (success.signupCompleted) {
-      await client.json.set(`cook:${success.cook.gmail}`,'.',success.cook);
+      await client.json.set(`cook:${success.cook.gmail}`,'$',success.cook);
       res.status(200).json({ status: "Cook Registered Successfully",cook:success.cook });
     } else {
       res.status(500).json({ error: "Internal Server Error" });
@@ -320,7 +320,7 @@ router.route("/:id")
       updateData
     );
     if (success.cookDataUpdated) {
-      await client.json.set(`cook:${success.cook.gmail}`,'.',success.cook);
+      await client.json.set(`cook:${success.cook.gmail}`,'$',success.cook);
       res.status(200).json({ status: "Cook Updated Successfully", cook: success.cook });
     } else {
       res.status(500).json({ error: "Internal Server Error" });
@@ -368,7 +368,7 @@ router.route("/availability/:id").patch(async(req, res) => {
     }
     const resp = await cookData.updateCooksAvailability(userId, obj.isAvailable);
     if (resp) {
-      await client.json.set(`cook:${resp.gmail}`, '.',resp);
+      await client.json.set(`cook:${resp.gmail}`, '$',resp);
       res.status(200).json({ status: "success", availability: resp });
     } else {
       res.status(500).json({ error: "INTERNAL SERVER ERROR" });

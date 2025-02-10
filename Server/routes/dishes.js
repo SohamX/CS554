@@ -127,7 +127,10 @@ router
                 // images
             );
             if (dishAdded) {
-                const keysToDelete = await client.keys(`home:dishes:*`);
+                let keysToDelete = await client.keys(`home:dishes:*`);
+                if(typeof keysToDelete === 'string'){
+                    keysToDelete = JSON.parse(keysToDelete);
+                }
                 if (keysToDelete.length > 0) {
                     for (const key of keysToDelete) {
                     await client.del(key);
@@ -243,13 +246,19 @@ router
                 images,
                 isAvailable);
             if (dishUpdated) {
-                const keysToDelete = await client.keys(`home:dishes:*`);
+                let keysToDelete = await client.keys(`home:dishes:*`);
+                if(typeof keysToDelete === 'string'){
+                    keysToDelete = JSON.parse(keysToDelete);
+                }
                 if (keysToDelete.length > 0) {
                     for (const key of keysToDelete) {
                     await client.del(key);
                     }
                 }
-                const keystoDel = await client.keys(`historyList:*`);
+                let keystoDel = await client.keys(`historyList:*`);
+                if(typeof keystoDel === 'string'){
+                    keystoDel = JSON.parse(keystoDel);
+                }
                 if (keystoDel.length > 0) {
                     for (const key of keystoDel) {
                     await client.del(key);
@@ -285,13 +294,19 @@ router
             const command = new DeleteObjectCommand(getObjectParams);
             await s3Client.send(command);
 
-            const keysToDelete = await client.keys(`home:dishes:*`);
+            let keysToDelete = await client.keys(`home:dishes:*`);
+            if(typeof keysToDelete === 'string'){
+                keysToDelete = JSON.parse(keysToDelete);
+            }
             if (keysToDelete.length > 0) {
                 for (const key of keysToDelete) {
                 await client.del(key);
                 }
             }
-            const keysToDel = await client.keys(`historyList*`);
+            let keysToDel = await client.keys(`historyList*`);
+            if(typeof keysToDel === 'string'){
+                keysToDel = JSON.parse(keysToDel);
+            }
             if (keysToDel.length > 0) {
                 for (const key of keysToDel) {
                 await client.del(key);

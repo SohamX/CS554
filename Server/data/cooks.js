@@ -332,13 +332,19 @@ export const updateCooksAvailability = async (userId, availability) => {
   if (!responseObj) {
     throw `Unable to update availability`
   }
-  const keysToDelete = await client.keys(`home:dishes:*`);
+  let keysToDelete = await client.keys(`home:dishes:*`);
+  if(typeof keysToDelete === 'string'){
+    keysToDelete = JSON.parse(keysToDelete);
+  }
   if (keysToDelete.length > 0) {
       for (const key of keysToDelete) {
       await client.del(key);
       }
   }
-  const keystoDel = await client.keys(`historyList:*`);
+  let keystoDel = await client.keys(`historyList:*`);
+  if(typeof keystoDel === 'string'){
+    keystoDel = JSON.parse(keystoDel);
+  }
   if (keystoDel.length > 0) {
       for (const key of keystoDel) {
       await client.del(key);
