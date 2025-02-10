@@ -5,13 +5,14 @@ const redisHost = process.env.REDIS_HOST || 'localhost';
 const redisPort = process.env.REDIS_PORT || 6379;
 const redisPassword = process.env.REDIS_PASSWORD || '';
 
+let client;
 if(redisPassword === ''){
-    const client = redis.createClient({
+    client = redis.createClient({
         url: `redis://${redisHost}:${redisPort}`,
         password: redisPassword
     });
 } else {
-    const client = redis.createClient({
+    client = redis.createClient({
         url: `rediss://default:${redisPassword}@${redisHost}:${redisPort}`
     })
 }
