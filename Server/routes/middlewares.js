@@ -29,6 +29,9 @@ export const userHome = async(req,res,next)=>{
       //if we do have it in cache, send the raw html from cache
       console.log(`Dishes List from cache for user ${userId}`);
       let dishes = await client.json.GET(`home:dishes:${userId}`);
+      if (typeof data === 'string') {
+        data = JSON.parse(data);
+      }
       for (const dish of dishes) {
         const getObjectParams = {
           Bucket: bucketName,
@@ -57,14 +60,20 @@ export const loginDetails = async(req,res,next)=>{
         if (exists) {
         //if we do have it in cache, send the raw html from cache
         console.log('user details from Cache');
-        const data = await client.json.get(`user:${gmail}`);
+        let data = await client.json.get(`user:${gmail}`);
+        if (typeof data === 'string') {
+          data = JSON.parse(data);
+        }
         res.status(200).json({ status: "success", data:data});
         return;
         } else{
             let flag = await client.exists(`cook:${gmail}`);
             if(flag){
                 console.log('cook details from Cache');
-                const data = await client.json.get(`cook:${gmail}`);
+                let data = await client.json.get(`cook:${gmail}`);
+                if (typeof data === 'string') {
+                  data = JSON.parse(data);
+                }
                 res.status(200).json({ status: "success", data:data});
                 return;
 

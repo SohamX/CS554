@@ -34,7 +34,10 @@ const setUpSocket = (server) => {
         socket.on('join status', async ({ orderId, orderStatus }) => {
             console.log('joining room', orderId);
             socket.join(`status:${orderId}`);
-            const chat = await client.lRange(`chat:${orderId}`, 0, -1);
+            let chat = await client.lRange(`chat:${orderId}`, 0, -1);
+            if(typeof chat === 'string'){
+                chat = JSON.parse(chat);
+            }
             if(chat.length > 0){
                 let chatMessages = [];
                 chat.forEach((msg) => {

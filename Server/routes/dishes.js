@@ -344,7 +344,10 @@ router
     .get(async(req,res)=>{ 
       try{
         const userId = req.params.userId;
-        const a = await client.lRange(`historyList:${userId}`,-5,-1);
+        let a = await client.lRange(`historyList:${userId}`,-5,-1);
+        if(typeof a === 'string'){
+            a = JSON.parse(a);
+        }
         const parsedArray = a.map(item => JSON.parse(item));
         console.log(parsedArray.length);
         console.log(parsedArray);
