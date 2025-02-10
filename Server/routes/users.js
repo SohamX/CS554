@@ -145,8 +145,7 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
       gmail = gmail.trim();
       if(!/^[a-zA-Z0-9._%±]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$/.test(gmail)) throw 'Please enter valid gmail'
     } catch (e) {
-      res.status(400).json({error:e});
-      return;
+      return res.status(400).json({error:e});;
     }
     try {
       const data = await userData.loginUser(gmail);
@@ -157,8 +156,7 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
       }
       res.status(200).json({ status: "success", data:data});
     } catch (e) {
-      res.status(404).json({error:e});
-      return;
+      return res.status(404).json({error:e});
     }
   });
   
