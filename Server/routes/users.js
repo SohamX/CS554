@@ -156,6 +156,7 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
       }
       res.status(200).json({ status: "success", data:data});
     } catch (e) {
+      console.log(e, " here error");
       return res.status(404).json({error:e});
     }
   });
