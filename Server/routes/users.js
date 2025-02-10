@@ -149,10 +149,10 @@ router.route('/login').post(loginDetails,async (req, res) => {     // AFTER LOGI
     }
     try {
       const data = await userData.loginUser(gmail);
-      if(data.role==="user"){
-        await client.json.set(`user:${gmail}`,'.',data);
-      }else{
-        await client.json.set(`cook:${gmail}`,'.',data);
+      if (data.role === "user") {
+        await client.json.set(`user:${gmail}`, '$', JSON.stringify(data));
+      } else {
+        await client.json.set(`cook:${gmail}`, '$', JSON.stringify(data));
       }
       res.status(200).json({ status: "success", data:data});
     } catch (e) {
