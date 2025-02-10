@@ -39,7 +39,7 @@ export const AuthProvider = ({children, navigate}) => {
                   });
                 }
                 else{
-                  alert(error);
+                  alert(error.error);
                 }
             } finally{
               setLoadingUser(false); 

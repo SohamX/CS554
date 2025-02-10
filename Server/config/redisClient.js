@@ -5,10 +5,16 @@ const redisHost = process.env.REDIS_HOST || 'localhost';
 const redisPort = process.env.REDIS_PORT || 6379;
 const redisPassword = process.env.REDIS_PASSWORD || '';
 
-const client = redis.createClient({
-    url: `redis://${redisHost}:${redisPort}`,
-    password: redisPassword
-});
+if(redisPassword === ''){
+    const client = redis.createClient({
+        url: `redis://${redisHost}:${redisPort}`,
+        password: redisPassword
+    });
+} else {
+    const client = redis.createClient({
+        url: `rediss://default:${redisPassword}@${redisHost}:${redisPort}`
+    })
+}
 
 client.connect().then(() => {
     console.log('Connected to Redis');
